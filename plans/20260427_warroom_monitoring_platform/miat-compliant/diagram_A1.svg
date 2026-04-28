@@ -1,0 +1,45 @@
+<svg width="1138.0" height="615.8" viewBox="-184.0 -165.8 1138.0 615.8" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black" /></marker>
+<marker id="call_arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 M 0 2 L 6 5 L 0 8" fill="none" stroke="black" stroke-width="1" /></marker>
+</defs>
+<rect x="-184.0" y="-165.8" width="1138.0" height="615.8" fill="white" />
+<rect x="130.0" y="120.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A11" />
+<text x="230.0" y="152.9" text-anchor="middle" font-size="20" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A11" >A11</text>
+<text x="230.0" y="191.5" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A11" >設定執行環境</text>
+<rect x="440.0" y="120.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A12" />
+<text x="540.0" y="152.9" text-anchor="middle" font-size="20" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A12" >A12</text>
+<text x="540.0" y="191.5" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A12" >佈建資料來源</text>
+<rect x="130.0" y="300.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A13" />
+<text x="230.0" y="332.9" text-anchor="middle" font-size="20" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A13" >A13</text>
+<text x="230.0" y="371.5" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A13" >佈建儀表板</text>
+<rect x="440.0" y="300.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A14" />
+<text x="540.0" y="332.9" text-anchor="middle" font-size="20" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A14" >A14</text>
+<text x="540.0" y="371.5" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A14" >驗證本機入口</text>
+<rect x="40.0" y="44.2" width="690.0" height="395.8" stroke="black" fill="none" stroke-width="2" />
+<rect x="265.0" y="-155.8" width="240.0" height="110.0" stroke="black" fill="white" stroke-width="1.5" data-id="A1" />
+<text x="385.0" y="-118.4" text-anchor="middle" font-size="21" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A1" >A1</text>
+<text x="385.0" y="-78.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A1" >部署可觀測性平面 A1</text>
+<line x1="265.0" y1="-155.8" x2="40.0" y2="44.2" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="505.0" y1="-155.8" x2="730.0" y2="44.2" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="265.0" y1="-45.8" x2="40.0" y2="440.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="505.0" y1="-45.8" x2="730.0" y2="440.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<path d="M 330.0 170.0 L 440.0 170.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1112" data-waypoints="330.0,170.0 440.0,170.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 330.0 350.0 L 440.0 350.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1314" data-waypoints="330.0,350.0 440.0,350.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 640.0 170.0 L 670.0 170.0 Q 680.0 170.0 680.0 180.0 L 680.0 251.8 Q 680.0 261.8 670.0 261.8 L 100.0 261.8 Q 90.0 261.8 90.0 271.8 L 90.0 340.0 Q 90.0 350.0 100.0 350.0 L 130.0 350.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1213" data-waypoints="640.0,170.0 680.0,170.0 680.0,261.8 90.0,261.8 90.0,350.0 130.0,350.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 170.0 L 130.0 170.0" stroke="black" stroke-width="1.2" data-arrow-id="A1I1" data-waypoints="-10.0,170.0 130.0,170.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 84.2 L 230.0 120.0" stroke="black" stroke-width="1.2" data-arrow-id="A1C1" data-waypoints="230.0,84.2 230.0,120.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 255.8 L 230.0 220.0" stroke="black" stroke-width="1.2" data-arrow-id="A1M1" data-waypoints="230.0,255.8 230.0,220.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 640.0 350.0 L 780.0 350.0" stroke="black" stroke-width="1.2" data-arrow-id="A1O1" data-waypoints="640.0,350.0 780.0,350.0" marker-end="url(#arrow)" fill="none" />
+<text x="230.0" y="78.2" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1C1">公開版不含私有網域或憑證</text>
+<text x="224.0" y="236.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1M1">Docker、Grafana</text>
+<text x="236.0" y="236.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1M1">Prometheus、Loki</text>
+<text x="385.0" y="162.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1F1112" >本機服務端點</text>
+<text x="385.0" y="345.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1F1314">已佈建</text>
+<text x="385.0" y="362.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1F1314">dashboard</text>
+<text x="540.0" y="279.8" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1F1213" >已註冊 datasource</text>
+<text x="-14.0" y="161.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1I1">Docker Compose</text>
+<text x="-14.0" y="187.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1I1">與 .env 設定</text>
+<text x="784.0" y="341.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1O1">可用的本</text>
+<text x="784.0" y="367.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="A1O1">機觀測平面</text>
+</svg>

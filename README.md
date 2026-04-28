@@ -14,25 +14,23 @@ Warroom 是一個企業內部監控與稽核平台概念驗證。本專案目前
 
 ## 系統架構圖
 
+以下圖表由 `miatdiagram` 產生 drawmiat-compatible IDEF0 JSON，再由 drawmiat renderer 輸出新版 SVG。
+
 ### A0：Warroom Synology NAS DLP 概念驗證
 
-![A0 Warroom Synology NAS DLP POC](plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/diagram_A0.svg)
+![A0 Warroom Synology NAS DLP POC](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_A0.svg)
 
 ### A1：部署可觀測性平面
 
-![A1 部署可觀測性平面](plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/diagram_A1.svg)
+![A1 部署可觀測性平面](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_A1.svg)
 
-### A2：監控基礎設施
+### A3：蒐集防禦證據
 
-![A2 監控基礎設施](plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/diagram_A2.svg)
+![A3 蒐集防禦證據](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_A3.svg)
 
-### A3：蒐集證據
+### A4：正規化 DLP 事件
 
-![A3 蒐集證據](plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/diagram_A3.svg)
-
-### A4：正規化證據
-
-![A4 正規化證據](plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/diagram_A4.svg)
+![A4 正規化 DLP 事件](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_A4.svg)
 
 ## 核心元件
 

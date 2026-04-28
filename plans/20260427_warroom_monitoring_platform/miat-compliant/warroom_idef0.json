@@ -1,0 +1,110 @@
+{
+  "diagram_title": "Warroom Synology NAS DLP 概念驗證 - 合規 IDEF0",
+  "node_reference": "A0",
+  "activities": [
+    {
+      "id": "A1",
+      "title": "部署可觀測性平面",
+      "description": "啟動 Grafana、Prometheus、Loki、Alloy 與本機 placeholder 服務，建立可重現的觀測面。",
+      "decomposition": {
+        "diagram_title": "部署可觀測性平面 A1",
+        "node_reference": "A1",
+        "activities": [
+          { "id": "A11", "title": "設定執行環境", "description": "設定 Docker Compose 服務、連接埠、volume 與公開 root URL placeholder。", "decomposition": null },
+          { "id": "A12", "title": "佈建資料來源", "description": "以 Grafana provisioning 註冊 Prometheus 與 Loki datasource。", "decomposition": null },
+          { "id": "A13", "title": "佈建儀表板", "description": "載入 web ingress、事件流、檔案證據與本機總覽 dashboard。", "decomposition": null },
+          { "id": "A14", "title": "驗證本機入口", "description": "驗證 Compose config、Grafana dashboard 與本機服務端點。", "decomposition": null }
+        ],
+        "arrows": [
+          { "id": "A1I1", "source": "EXTERNAL", "target": "A11:input", "label": "Docker Compose 與 .env 設定", "type": "input" },
+          { "id": "A1C1", "source": "EXTERNAL", "target": "A11:control", "label": "公開版不含私有網域或憑證", "type": "control" },
+          { "id": "A1M1", "source": "EXTERNAL", "target": "A11:mechanism", "label": "Docker、Grafana、Prometheus、Loki", "type": "mechanism" },
+          { "id": "A1F1112", "source": "A11:output", "target": "A12:input", "label": "本機服務端點", "type": "output" },
+          { "id": "A1F1213", "source": "A12:output", "target": "A13:input", "label": "已註冊 datasource", "type": "output" },
+          { "id": "A1F1314", "source": "A13:output", "target": "A14:input", "label": "已佈建 dashboard", "type": "output" },
+          { "id": "A1O1", "source": "A14:output", "target": "EXTERNAL", "label": "可用的本機觀測平面", "type": "output" }
+        ]
+      }
+    },
+    {
+      "id": "A2",
+      "title": "偵測能力缺口",
+      "description": "用 capability detection 判斷哪些 NAS 指標、log、DB 與 web evidence source 可用。",
+      "decomposition": null
+    },
+    {
+      "id": "A3",
+      "title": "蒐集防禦證據",
+      "description": "透過 nginx、Drive DB、File Station DB 與 sanitized fixtures 蒐集 metadata-first DLP 證據。",
+      "decomposition": {
+        "diagram_title": "蒐集防禦證據 A3",
+        "node_reference": "A3",
+        "activities": [
+          { "id": "A31", "title": "接收 Web 入口", "description": "以 Alloy 接收 Synology nginx access/syslog 或 approved mounted logs。", "decomposition": null },
+          { "id": "A32", "title": "解析 Drive 物件", "description": "用 read-only Drive resolver 將 file_id/permanent_id 轉成可讀 metadata。", "decomposition": null },
+          { "id": "A33", "title": "讀取 File Station 傳輸", "description": "用 transfer adapter 讀取下載/匯出證據。", "decomposition": null },
+          { "id": "A34", "title": "標記能力缺口", "description": "對不可觀測 preview/open 等行為輸出 capability_gap。", "decomposition": null }
+        ],
+        "arrows": [
+          { "id": "A3I1", "source": "EXTERNAL", "target": "A31:input", "label": "nginx route/timing/status evidence", "type": "input" },
+          { "id": "A3I2", "source": "EXTERNAL", "target": "A32:input", "label": "Drive file id 與 SQLite metadata", "type": "input" },
+          { "id": "A3I3", "source": "EXTERNAL", "target": "A33:input", "label": "File Station transfer DB rows", "type": "input" },
+          { "id": "A3C1", "source": "EXTERNAL", "target": "A31:control", "label": "metadata-first，不讀檔案內容", "type": "control" },
+          { "id": "A3C2", "source": "EXTERNAL", "target": "A32:control", "label": "SSH stdin、SQLite read-only", "type": "control" },
+          { "id": "A3M1", "source": "EXTERNAL", "target": "A31:mechanism", "label": "Grafana Alloy", "type": "mechanism" },
+          { "id": "A3M2", "source": "EXTERNAL", "target": "A32:mechanism", "label": "drive_file_resolver、drive_event_enricher", "type": "mechanism" },
+          { "id": "A3M3", "source": "EXTERNAL", "target": "A33:mechanism", "label": "file_station_transfer_adapter", "type": "mechanism" },
+          { "id": "A3F3134", "source": "A31:output", "target": "A34:input", "label": "route-level candidate evidence", "type": "output" },
+          { "id": "A3F3234", "source": "A32:output", "target": "A34:input", "label": "Drive readable metadata evidence", "type": "output" },
+          { "id": "A3F3334", "source": "A33:output", "target": "A34:input", "label": "download/export evidence", "type": "output" },
+          { "id": "A3O1", "source": "A34:output", "target": "EXTERNAL", "label": "安全原始證據候選集", "type": "output" }
+        ]
+      }
+    },
+    {
+      "id": "A4",
+      "title": "正規化 DLP 事件",
+      "description": "把來源特定 evidence 轉成受限 label、可推送 Loki 的 normalized event。",
+      "decomposition": {
+        "diagram_title": "正規化 DLP 事件 A4",
+        "node_reference": "A4",
+        "activities": [
+          { "id": "A41", "title": "映射行為", "description": "映射 open、preview、download、export、share 與 capability_gap。", "decomposition": null },
+          { "id": "A42", "title": "補齊 metadata", "description": "加入 source_app、source_channel、confidence、raw_ref、correlation_refs。", "decomposition": null },
+          { "id": "A43", "title": "限制標籤", "description": "僅將 bounded low-cardinality fields 作為 Loki labels。", "decomposition": null },
+          { "id": "A44", "title": "推送或 dry-run", "description": "用 dlp_event_collector dry-run JSONL 或 push 到 Loki。", "decomposition": null }
+        ],
+        "arrows": [
+          { "id": "A4I1", "source": "EXTERNAL", "target": "A41:input", "label": "安全原始證據候選集", "type": "input" },
+          { "id": "A4C1", "source": "EXTERNAL", "target": "A43:control", "label": "不得把路徑、使用者、IP 作為高基數 label", "type": "control" },
+          { "id": "A4C2", "source": "EXTERNAL", "target": "A44:control", "label": "fail-fast；不使用 silent fallback", "type": "control" },
+          { "id": "A4M1", "source": "EXTERNAL", "target": "A44:mechanism", "label": "dlp_event_collector 與 Loki Push API", "type": "mechanism" },
+          { "id": "A4F4142", "source": "A41:output", "target": "A42:input", "label": "normalized action", "type": "output" },
+          { "id": "A4F4243", "source": "A42:output", "target": "A43:input", "label": "event payload with metadata", "type": "output" },
+          { "id": "A4F4344", "source": "A43:output", "target": "A44:input", "label": "bounded-label event stream", "type": "output" },
+          { "id": "A4O1", "source": "A44:output", "target": "EXTERNAL", "label": "Loki/Grafana DLP 事件串流", "type": "output" }
+        ]
+      }
+    },
+    {
+      "id": "A5",
+      "title": "視覺化與操作",
+      "description": "在 Grafana 儀表板呈現 web ingress、檔案證據、事件流與 capability gaps。",
+      "decomposition": null
+    }
+  ],
+  "arrows": [
+    { "id": "I1", "source": "EXTERNAL", "target": "A1:input", "label": "Docker runtime 與公開版設定", "type": "input" },
+    { "id": "I2", "source": "EXTERNAL", "target": "A2:input", "label": "NAS 監控/稽核面", "type": "input" },
+    { "id": "I3", "source": "EXTERNAL", "target": "A3:input", "label": "nginx、Drive、File Station 證據來源", "type": "input" },
+    { "id": "C1", "source": "EXTERNAL", "target": "A3:control", "label": "metadata-first 與 read-only policy", "type": "control" },
+    { "id": "C2", "source": "EXTERNAL", "target": "A4:control", "label": "bounded labels 與 secret-free publication", "type": "control" },
+    { "id": "M1", "source": "EXTERNAL", "target": "A1:mechanism", "label": "Docker Compose、Grafana、Prometheus、Loki、Alloy", "type": "mechanism" },
+    { "id": "M2", "source": "EXTERNAL", "target": "A3:mechanism", "label": "read-only Python CLI adapters", "type": "mechanism" },
+    { "id": "F12", "source": "A1:output", "target": "A2:input", "label": "可觀測性平面", "type": "output" },
+    { "id": "F23", "source": "A2:output", "target": "A3:input", "label": "已核准能力面與缺口", "type": "output" },
+    { "id": "F34", "source": "A3:output", "target": "A4:input", "label": "安全原始證據候選集", "type": "output" },
+    { "id": "F45", "source": "A4:output", "target": "A5:input", "label": "正規化 DLP 事件串流", "type": "output" },
+    { "id": "O1", "source": "A5:output", "target": "EXTERNAL", "label": "Warroom Grafana 證據儀表板", "type": "output" }
+  ]
+}

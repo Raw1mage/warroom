@@ -1,0 +1,153 @@
+<svg width="1913" height="1356" viewBox="-504.2 -16.0 1912.6 1356.0" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black" /></marker></defs>
+<rect x="-504.2" y="-16.0" width="1912.6" height="1356.0" fill="white" />
+<rect x="360.0" y="80.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<rect x="365.0" y="85.0" width="70.0" height="50.0" stroke="black" stroke-width="1" fill="none" />
+<text x="400" y="115.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">0</text>
+<line x1="440" y1="110.0" x2="480.0" y2="110.0" stroke="black" />
+<rect x="480.0" y="64.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="632.1" y="90.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Initialize observability</text>
+<text x="632.1" y="114.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">runtime from sanitized</text>
+<text x="632.1" y="138.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">configuration</text>
+<line x1="400" y1="140.0" x2="400" y2="220" stroke="black" />
+<line x1="380" y1="180.0" x2="420" y2="180.0" stroke="black" stroke-width="2" />
+<text x="424.0" y="184.0" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">docker_compose_config_valid</text>
+<rect x="360.0" y="220.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="400" y="255.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">1</text>
+<line x1="440" y1="250.0" x2="480.0" y2="250.0" stroke="black" />
+<rect x="480.0" y="204.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="632.1" y="230.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Detect approved NAS</text>
+<text x="632.1" y="254.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">monitoring and</text>
+<text x="632.1" y="278.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">evidence capabilities</text>
+<line x1="400" y1="280" x2="400" y2="320" stroke="black" />
+<line x1="280.0" y1="320" x2="1336.3" y2="320" stroke="black" stroke-width="1.5" />
+<line x1="320.0" y1="320" x2="320.0" y2="360" stroke="black" />
+<line x1="300.0" y1="360" x2="340.0" y2="360" stroke="black" stroke-width="2" />
+<text x="296.0" y="364" font-style="italic" font-size="11" text-anchor="end" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">capability_surface_available</text>
+<line x1="320.0" y1="360" x2="320.0" y2="400" stroke="black" marker-end="url(#arrow)" />
+<line x1="1296.3" y1="320" x2="1296.3" y2="360" stroke="black" />
+<line x1="1276.3" y1="360" x2="1316.3" y2="360" stroke="black" stroke-width="2" />
+<text x="1320.3" y="364" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">capability_surface_missing_or_blocked</text>
+<line x1="1296.3" y1="360" x2="1296.3" y2="400" stroke="black" />
+<rect x="280.0" y="400.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="320.0" y="435.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">2</text>
+<line x1="360.0" y1="430.0" x2="400.0" y2="430.0" stroke="black" />
+<rect x="400.0" y="384.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="552.1" y="410.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Collect metadata-first</text>
+<text x="552.1" y="434.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">evidence from nginx, Drive</text>
+<text x="552.1" y="458.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">DB, File Station DB, or fixtures</text>
+<line x1="320.0" y1="460" x2="320.0" y2="500" stroke="black" />
+<line x1="7.9000000000000625" y1="500" x2="984.2000000000002" y2="500" stroke="black" stroke-width="1.5" />
+<line x1="47.90000000000006" y1="500" x2="47.90000000000006" y2="540" stroke="black" />
+<line x1="27.900000000000063" y1="540" x2="67.90000000000006" y2="540" stroke="black" stroke-width="2" />
+<text x="23.900000000000063" y="544" font-style="italic" font-size="11" text-anchor="end" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">evidence_candidate_observed</text>
+<line x1="47.90000000000006" y1="540" x2="47.90000000000006" y2="580" stroke="black" marker-end="url(#arrow)" />
+<line x1="944.2000000000002" y1="500" x2="944.2000000000002" y2="540" stroke="black" />
+<line x1="924.2000000000002" y1="540" x2="964.2000000000002" y2="540" stroke="black" stroke-width="2" />
+<text x="968.2000000000003" y="544" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">evidence_source_unreliable</text>
+<line x1="944.2000000000002" y1="540" x2="944.2000000000002" y2="580" stroke="black" marker-end="url(#arrow)" />
+<rect x="7.9000000000000625" y="580.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="47.90000000000006" y="615.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">3</text>
+<line x1="87.90000000000006" y1="610.0" x2="127.90000000000008" y2="610.0" stroke="black" />
+<rect x="127.90000000000006" y="564.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="280.00000000000006" y="590.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Normalize evidence</text>
+<text x="280.00000000000006" y="614.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">into Warroom DLP</text>
+<text x="280.00000000000006" y="638.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">event payload</text>
+<line x1="47.90000000000006" y1="640" x2="47.90000000000006" y2="680" stroke="black" />
+<line x1="-72.09999999999994" y1="680" x2="632.1000000000001" y2="680" stroke="black" stroke-width="1.5" />
+<line x1="-32.09999999999994" y1="680" x2="-32.09999999999994" y2="720" stroke="black" />
+<line x1="-52.09999999999994" y1="720" x2="-12.099999999999937" y2="720" stroke="black" stroke-width="2" />
+<text x="-56.09999999999994" y="724" font-style="italic" font-size="11" text-anchor="end" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">required_fields_valid_and_labels_bounded</text>
+<line x1="-32.09999999999994" y1="720" x2="-32.09999999999994" y2="760" stroke="black" marker-end="url(#arrow)" />
+<line x1="592.1000000000001" y1="680" x2="592.1000000000001" y2="720" stroke="black" />
+<line x1="572.1000000000001" y1="720" x2="612.1000000000001" y2="720" stroke="black" stroke-width="2" />
+<text x="616.1" y="724" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">validation_failed</text>
+<line x1="592.1000000000001" y1="720" x2="592.1000000000001" y2="760" stroke="black" />
+<rect x="-72.09999999999994" y="760.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="-32.09999999999994" y="795.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">4</text>
+<line x1="7.9000000000000625" y1="790.0" x2="47.90000000000008" y2="790.0" stroke="black" />
+<rect x="47.90000000000006" y="744.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="200.00000000000006" y="770.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Emit dry-run JSONL</text>
+<text x="200.00000000000006" y="794.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">or push bounded-</text>
+<text x="200.00000000000006" y="817.9999999999999" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">label stream to Loki</text>
+<line x1="-32.09999999999994" y1="820" x2="-32.09999999999994" y2="860" stroke="black" />
+<line x1="-344.19999999999993" y1="860" x2="280.00000000000006" y2="860" stroke="black" stroke-width="1.5" />
+<line x1="-304.19999999999993" y1="860" x2="-304.19999999999993" y2="900" stroke="black" />
+<line x1="-324.19999999999993" y1="900" x2="-284.19999999999993" y2="900" stroke="black" stroke-width="2" />
+<text x="-328.19999999999993" y="904" font-style="italic" font-size="11" text-anchor="end" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">collector_emit_success</text>
+<line x1="-304.19999999999993" y1="900" x2="-304.19999999999993" y2="940" stroke="black" marker-end="url(#arrow)" />
+<line x1="240.00000000000006" y1="860" x2="240.00000000000006" y2="900" stroke="black" />
+<line x1="220.00000000000006" y1="900" x2="260.00000000000006" y2="900" stroke="black" stroke-width="2" />
+<text x="264.00000000000006" y="904" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">collector_emit_failed</text>
+<line x1="240.00000000000006" y1="900" x2="240.00000000000006" y2="940" stroke="black" marker-end="url(#arrow)" />
+<rect x="-344.19999999999993" y="940.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="-304.19999999999993" y="975.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">5</text>
+<line x1="-264.19999999999993" y1="970.0" x2="-224.19999999999993" y2="970.0" stroke="black" />
+<rect x="-224.19999999999993" y="924.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="-72.09999999999995" y="950.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Visualize evidence, route</text>
+<text x="-72.09999999999995" y="974.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">activity, file evidence, and</text>
+<text x="-72.09999999999995" y="997.9999999999999" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">capability gaps in Grafana</text>
+<line x1="-304.19999999999993" y1="1000.0" x2="-304.19999999999993" y2="1080" stroke="black" />
+<line x1="-324.19999999999993" y1="1040.0" x2="-284.19999999999993" y2="1040.0" stroke="black" stroke-width="2" />
+<text x="-280.19999999999993" y="1044.0" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">dashboard_queries_return_evidence_or_empty_safe_state</text>
+<rect x="200.00000000000006" y="940.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="240.00000000000006" y="975.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">8</text>
+<line x1="280.00000000000006" y1="970.0" x2="320.00000000000006" y2="970.0" stroke="black" />
+<rect x="320.0000000000001" y="924.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="472.1000000000001" y="950.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Fail fast with explicit</text>
+<text x="472.1000000000001" y="974.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">validation error and</text>
+<text x="472.1000000000001" y="997.9999999999999" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">preserve safe diagnostics</text>
+<line x1="240.00000000000006" y1="1000.0" x2="240.00000000000006" y2="1080" stroke="black" />
+<line x1="220.00000000000006" y1="1040.0" x2="260.00000000000006" y2="1040.0" stroke="black" stroke-width="2" />
+<text x="264.00000000000006" y="1044.0" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">safe_error_payload_written</text>
+<line x1="-344.19999999999993" y1="1080" x2="280.00000000000006" y2="1080" stroke="black" stroke-width="1.5" />
+<line x1="-304.19999999999993" y1="1080" x2="-304.19999999999993" y2="1080" stroke="black" />
+<line x1="240.00000000000006" y1="1080" x2="240.00000000000006" y2="1080" stroke="black" />
+<line x1="-32.09999999999994" y1="1080" x2="-32.09999999999994" y2="1120" stroke="black" marker-end="url(#arrow)" />
+<rect x="-72.09999999999994" y="1120.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="-32.09999999999994" y="1155.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">6</text>
+<line x1="7.9000000000000625" y1="1150.0" x2="47.90000000000008" y2="1150.0" stroke="black" />
+<rect x="47.90000000000006" y="1104.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="200.00000000000006" y="1130.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Complete POC evidence</text>
+<text x="200.00000000000006" y="1154.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">cycle and wait for next</text>
+<text x="200.00000000000006" y="1178.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">observation window</text>
+<line x1="-32.09999999999994" y1="1180.0" x2="-32.09999999999994" y2="1260" stroke="black" />
+<line x1="-52.09999999999994" y1="1220.0" x2="-12.099999999999937" y2="1220.0" stroke="black" stroke-width="2" />
+<text x="-8.099999999999937" y="1224.0" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">next_poll_or_manual_test_requested</text>
+<line x1="-72.09999999999994" y1="1260" x2="632.1000000000001" y2="1260" stroke="black" stroke-width="1.5" />
+<line x1="-32.09999999999994" y1="1260" x2="-32.09999999999994" y2="1260" stroke="black" />
+<line x1="592.1000000000001" y1="760" x2="592.1000000000001" y2="1260" stroke="black" />
+<line x1="47.90000000000006" y1="1260" x2="47.90000000000006" y2="1300" stroke="black" marker-end="url(#arrow)" />
+<rect x="904.2000000000002" y="580.0" width="80" height="60" stroke="black" stroke-width="1.5" fill="white" />
+<text x="944.2000000000002" y="615.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-weight="bold" font-size="14">7</text>
+<line x1="984.2000000000002" y1="610.0" x2="1024.2000000000003" y2="610.0" stroke="black" />
+<rect x="1024.2000000000003" y="564.0" width="304.2" height="92.0" stroke="black" stroke-width="1.2" fill="white" />
+<text x="1176.3000000000002" y="590.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">Record capability_gap</text>
+<text x="1176.3000000000002" y="614.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">instead of guessing</text>
+<text x="1176.3000000000002" y="638.0" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" font-size="11">unavailable evidence</text>
+<line x1="944.2000000000002" y1="640.0" x2="944.2000000000002" y2="720" stroke="black" />
+<line x1="924.2000000000002" y1="680.0" x2="964.2000000000002" y2="680.0" stroke="black" stroke-width="2" />
+<text x="968.2000000000003" y="684.0" font-style="italic" font-size="11" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif">gap_recorded_with_source_and_reason</text>
+<line x1="7.9000000000000625" y1="1300" x2="984.2000000000002" y2="1300" stroke="black" stroke-width="1.5" />
+<line x1="47.90000000000006" y1="1300" x2="47.90000000000006" y2="1300" stroke="black" />
+<line x1="944.2000000000002" y1="720" x2="944.2000000000002" y2="1300" stroke="black" />
+<line x1="320.0" y1="1300" x2="320.0" y2="1340" stroke="black" marker-end="url(#arrow)" />
+<line x1="280.0" y1="1340" x2="1336.3" y2="1340" stroke="black" stroke-width="1.5" />
+<line x1="320.0" y1="1340" x2="320.0" y2="1340" stroke="black" />
+<line x1="1296.3" y1="400" x2="1296.3" y2="1340" stroke="black" />
+<line x1="400" y1="1340" x2="400" y2="1380" stroke="black" marker-end="url(#arrow)" />
+<line x1="-32.09999999999994" y1="1260" x2="-32.09999999999994" y2="1260.0" stroke="black" />
+<line x1="-32.09999999999994" y1="1260.0" x2="-424.19999999999993" y2="1260.0" stroke="black" />
+<line x1="-424.19999999999993" y1="1260.0" x2="-424.19999999999993" y2="206.0" stroke="black" />
+<line x1="-424.19999999999993" y1="206.0" x2="400" y2="206.0" stroke="black" marker-end="url(#arrow)" />
+<line x1="1296.3" y1="400" x2="1296.3" y2="400" stroke="black" />
+<line x1="1296.3" y1="400" x2="1296.3" y2="400" stroke="black" />
+<line x1="1296.3" y1="400" x2="1296.3" y2="560.0" stroke="black" />
+<line x1="1296.3" y1="560.0" x2="944.2000000000002" y2="560.0" stroke="black" />
+<line x1="944.2000000000002" y1="560.0" x2="944.2000000000002" y2="580.0" stroke="black" marker-end="url(#arrow)" />
+<line x1="592.1000000000001" y1="760" x2="592.1000000000001" y2="760" stroke="black" />
+<line x1="592.1000000000001" y1="760" x2="592.1000000000001" y2="760" stroke="black" />
+<line x1="592.1000000000001" y1="760" x2="592.1000000000001" y2="920.0" stroke="black" />
+<line x1="592.1000000000001" y1="920.0" x2="240.00000000000006" y2="920.0" stroke="black" />
+<line x1="240.00000000000006" y1="920.0" x2="240.00000000000006" y2="940.0" stroke="black" marker-end="url(#arrow)" />
+</svg>

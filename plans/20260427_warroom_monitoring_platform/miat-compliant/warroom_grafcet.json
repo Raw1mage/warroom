@@ -1,0 +1,110 @@
+[
+  {
+    "StepNumber": 0,
+    "ModuleRef": "A1",
+    "StepType": "initial",
+    "StepAction": "Initialize observability runtime from sanitized configuration",
+    "LinkInputType": [],
+    "LinkInputNumber": [10],
+    "LinkOutputNumber": [1],
+    "LinkOutputType": "track",
+    "Condition": ["docker_compose_config_valid"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 1,
+    "ModuleRef": "A2",
+    "StepType": "normal",
+    "StepAction": "Detect approved NAS monitoring and evidence capabilities",
+    "LinkInputType": [],
+    "LinkInputNumber": [0],
+    "LinkOutputNumber": [2, 7],
+    "LinkOutputType": "or_diverge",
+    "Condition": ["capability_surface_available", "capability_surface_missing_or_blocked"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 2,
+    "ModuleRef": "A3",
+    "StepType": "normal",
+    "StepAction": "Collect metadata-first evidence from nginx, Drive DB, File Station DB, or fixtures",
+    "LinkInputType": [],
+    "LinkInputNumber": [1],
+    "LinkOutputNumber": [3, 7],
+    "LinkOutputType": "or_diverge",
+    "Condition": ["evidence_candidate_observed", "evidence_source_unreliable"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 3,
+    "ModuleRef": "A4",
+    "StepType": "normal",
+    "StepAction": "Normalize evidence into Warroom DLP event payload",
+    "LinkInputType": [],
+    "LinkInputNumber": [2],
+    "LinkOutputNumber": [4, 8],
+    "LinkOutputType": "or_diverge",
+    "Condition": ["required_fields_valid_and_labels_bounded", "validation_failed"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 4,
+    "ModuleRef": "A4",
+    "StepType": "normal",
+    "StepAction": "Emit dry-run JSONL or push bounded-label stream to Loki",
+    "LinkInputType": [],
+    "LinkInputNumber": [3],
+    "LinkOutputNumber": [5, 8],
+    "LinkOutputType": "or_diverge",
+    "Condition": ["collector_emit_success", "collector_emit_failed"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 5,
+    "ModuleRef": "A5",
+    "StepType": "normal",
+    "StepAction": "Visualize evidence, route activity, file evidence, and capability gaps in Grafana",
+    "LinkInputType": [],
+    "LinkInputNumber": [4],
+    "LinkOutputNumber": [6],
+    "LinkOutputType": "track",
+    "Condition": ["dashboard_queries_return_evidence_or_empty_safe_state"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 6,
+    "ModuleRef": "A5",
+    "StepType": "normal",
+    "StepAction": "Complete POC evidence cycle and wait for next observation window",
+    "LinkInputType": ["or_converge"],
+    "LinkInputNumber": [5, 7, 8],
+    "LinkOutputNumber": [1],
+    "LinkOutputType": "track",
+    "Condition": ["next_poll_or_manual_test_requested"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 7,
+    "ModuleRef": "A2",
+    "StepType": "normal",
+    "StepAction": "Record capability_gap instead of guessing unavailable evidence",
+    "LinkInputType": [],
+    "LinkInputNumber": [1, 2],
+    "LinkOutputNumber": [6],
+    "LinkOutputType": "or_converge",
+    "Condition": ["gap_recorded_with_source_and_reason"],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 8,
+    "ModuleRef": "A4",
+    "StepType": "normal",
+    "StepAction": "Fail fast with explicit validation error and preserve safe diagnostics",
+    "LinkInputType": [],
+    "LinkInputNumber": [3, 4],
+    "LinkOutputNumber": [6],
+    "LinkOutputType": "or_converge",
+    "Condition": ["safe_error_payload_written"],
+    "SubGrafcet": []
+  }
+]

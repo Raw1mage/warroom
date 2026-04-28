@@ -1,0 +1,59 @@
+<svg width="1955.9" height="720.0" viewBox="-415.4 -210.0 1955.9 720.0" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black" /></marker>
+<marker id="call_arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 M 0 2 L 6 5 L 0 8" fill="none" stroke="black" stroke-width="1" /></marker>
+</defs>
+<rect x="-415.4" y="-210.0" width="1955.9" height="720.0" fill="white" />
+<rect x="130.0" y="120.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A1" />
+<text x="230.0" y="161.9" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A1" >A1</text>
+<text x="230.0" y="203.4" text-anchor="middle" font-size="24" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A1" >部署可觀測性平面</text>
+<rect x="440.0" y="120.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A2" />
+<text x="540.0" y="159.9" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A2" >A2</text>
+<text x="540.0" y="207.0" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A2" >偵測能力缺口</text>
+<rect x="795.0" y="120.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A3" />
+<text x="895.0" y="159.9" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A3" >A3</text>
+<text x="895.0" y="207.0" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A3" >蒐集防禦證據</text>
+<rect x="130.0" y="340.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A4" />
+<text x="230.0" y="382.4" text-anchor="middle" font-size="21" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A4" >A4</text>
+<text x="230.0" y="422.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A4" >正規化 DLP 事件</text>
+<rect x="440.0" y="340.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A5" />
+<text x="540.0" y="379.9" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A5" >A5</text>
+<text x="540.0" y="427.0" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A5" >視覺化與操作</text>
+<rect x="40.0" y="0.0" width="1045.0" height="500.0" stroke="black" fill="none" stroke-width="2" />
+<rect x="353.5" y="-200.0" width="418.0" height="110.0" stroke="black" fill="white" stroke-width="1.5" data-id="A0" />
+<text x="562.5" y="-174.0" text-anchor="middle" font-size="14" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A0" >A0</text>
+<text x="562.5" y="-144.0" text-anchor="middle" font-size="16" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A0" >WARROOM SYNOLOGY NAS</text>
+<text x="562.5" y="-114.0" text-anchor="middle" font-size="16" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-id="A0" >DLP 概念驗證 - 合規 IDEF0</text>
+<line x1="353.5" y1="-200.0" x2="40.0" y2="0.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="771.5" y1="-200.0" x2="1085.0" y2="0.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="353.5" y1="-90.0" x2="40.0" y2="500.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="771.5" y1="-90.0" x2="1085.0" y2="500.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<path d="M 330.0 200.0 L 440.0 200.0" stroke="black" stroke-width="1.2" data-arrow-id="F12" data-waypoints="330.0,200.0 440.0,200.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 640.0 200.0 L 795.0 200.0" stroke="black" stroke-width="1.2" data-arrow-id="F23" data-waypoints="640.0,200.0 795.0,200.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 330.0 400.0 L 440.0 400.0" stroke="black" stroke-width="1.2" data-arrow-id="F45" data-waypoints="330.0,400.0 440.0,400.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 995.0 180.0 L 1025.0 180.0 Q 1035.0 180.0 1035.0 190.0 L 1035.0 280.0 Q 1035.0 290.0 1025.0 290.0 L 100.0 290.0 Q 90.0 290.0 90.0 300.0 L 90.0 390.0 Q 90.0 400.0 100.0 400.0 L 130.0 400.0" stroke="black" stroke-width="1.2" data-arrow-id="F34" data-waypoints="995.0,180.0 1035.0,180.0 1035.0,290.0 90.0,290.0 90.0,400.0 130.0,400.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 180.0 L 130.0 180.0" stroke="black" stroke-width="1.2" data-arrow-id="I1" data-waypoints="-10.0,180.0 130.0,180.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 80.0 L 375.0 80.0 Q 385.0 80.0 385.0 90.0 L 385.0 150.0 Q 385.0 160.0 395.0 160.0 L 440.0 160.0" stroke="black" stroke-width="1.2" data-arrow-id="I2" data-waypoints="-10.0,80.0 385.0,80.0 385.0,160.0 440.0,160.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 40.0 L 707.5 40.0 Q 717.5 40.0 717.5 50.0 L 717.5 150.0 Q 717.5 160.0 727.5 160.0 L 795.0 160.0" stroke="black" stroke-width="1.2" data-arrow-id="I3" data-waypoints="-10.0,40.0 717.5,40.0 717.5,160.0 795.0,160.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 895.0 84.2 L 895.0 120.0" stroke="black" stroke-width="1.2" data-arrow-id="C1" data-waypoints="895.0,84.2 895.0,120.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 304.2 L 230.0 340.0" stroke="black" stroke-width="1.2" data-arrow-id="C2" data-waypoints="230.0,304.2 230.0,340.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 275.8 L 230.0 240.0" stroke="black" stroke-width="1.2" data-arrow-id="M1" data-waypoints="230.0,275.8 230.0,240.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 895.0 275.8 L 895.0 240.0" stroke="black" stroke-width="1.2" data-arrow-id="M2" data-waypoints="895.0,275.8 895.0,240.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 640.0 400.0 L 1135.0 400.0" stroke="black" stroke-width="1.2" data-arrow-id="O1" data-waypoints="640.0,400.0 1135.0,400.0" marker-end="url(#arrow)" fill="none" />
+<text x="895.0" y="78.2" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="C1">metadata-first 與 read-only policy</text>
+<text x="224.0" y="334.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="C2">bounded labels</text>
+<text x="236.0" y="334.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="C2">secret-free publication</text>
+<text x="224.0" y="256.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="M1">Docker Compose、Grafana</text>
+<text x="236.0" y="256.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="M1">Prometheus、Loki、Alloy</text>
+<text x="889.0" y="256.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="M2">read-only Python</text>
+<text x="901.0" y="256.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="M2">CLI adapters</text>
+<text x="385.0" y="192.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="F12" >可觀測性平面</text>
+<text x="717.5" y="192.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="F23" >已核准能力面與缺口</text>
+<text x="385.0" y="395.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="F45">正規化 DLP</text>
+<text x="385.0" y="412.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="F45">事件串流</text>
+<text x="540.0" y="308.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="F34" >安全原始證據候選集</text>
+<text x="-14.0" y="184.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="I1">Docker runtime 與公開版設定</text>
+<text x="-14.0" y="84.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="I2">NAS 監控/稽核面</text>
+<text x="-14.0" y="44.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="I3">nginx、Drive、File Station 證據來源</text>
+<text x="1139.0" y="404.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '標楷體', 'KaiTi', serif" data-arrow-id="O1">Warroom Grafana 證據儀表板</text>
+</svg>

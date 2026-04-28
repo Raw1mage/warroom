@@ -29,3 +29,6 @@ plans/**
 !plans/20260427_warroom_monitoring_platform/
 !plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/
 !plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/*.svg
+!plans/20260427_warroom_monitoring_platform/miat-compliant/
+!plans/20260427_warroom_monitoring_platform/miat-compliant/*.json
+!plans/20260427_warroom_monitoring_platform/miat-compliant/*.svg
