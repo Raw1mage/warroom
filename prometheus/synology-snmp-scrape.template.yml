@@ -1,0 +1,32 @@
+# Synology SNMP scrape template for Warroom.
+#
+# This file is intentionally not mounted by docker-compose.yml and is not
+# included by prometheus.yml. Copy this block into prometheus.yml only after
+# the Synology SNMP path is explicitly approved and configured.
+#
+# Safety notes:
+# - Do not commit real community strings, SNMPv3 passwords, NAS hostnames, or IPs.
+# - Prefer SNMPv3 for real deployments.
+# - Keep target labels generic in shared planning artifacts.
+# - This template scrapes SNMP through the local snmp_exporter bridge.
+
+- job_name: synology-snmp-template
+  metrics_path: /snmp
+  params:
+    auth:
+      - synology_snmp_auth_placeholder
+    module:
+      - synology
+  static_configs:
+    - targets:
+        - synology-nas-placeholder.example.invalid
+      labels:
+        role: synology_nas
+        environment: placeholder
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: snmp-exporter:9116

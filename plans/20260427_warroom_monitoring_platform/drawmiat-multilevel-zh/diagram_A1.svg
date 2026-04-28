@@ -1,0 +1,68 @@
+<svg width="1807.7" height="745.8" viewBox="-346.9 -160.0 1807.7 745.8" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black" /></marker>
+<marker id="call_arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 M 0 2 L 6 5 L 0 8" fill="none" stroke="black" stroke-width="1" /></marker>
+</defs>
+<rect x="-346.9" y="-160.0" width="1807.7" height="745.8" fill="white" />
+<rect x="130.0" y="150.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A11" />
+<text x="230.0" y="191.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A11" >A11</text>
+<text x="230.0" y="234.3" text-anchor="middle" font-size="25" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A11" >設定執行環境</text>
+<rect x="444.0" y="150.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A12" />
+<text x="544.0" y="191.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A12" >A12</text>
+<text x="544.0" y="234.3" text-anchor="middle" font-size="25" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A12" >佈建資料來源</text>
+<rect x="784.0" y="150.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A13" />
+<text x="884.0" y="191.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A13" >A13</text>
+<text x="884.0" y="234.3" text-anchor="middle" font-size="25" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A13" >佈建儀表板</text>
+<rect x="130.0" y="370.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A14" />
+<text x="230.0" y="415.5" text-anchor="middle" font-size="15" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A14" >A14</text>
+<text x="230.0" y="446.9" text-anchor="middle" font-size="17" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A14" >發布 GATEWAY 路由</text>
+<rect x="444.0" y="370.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A15" />
+<text x="544.0" y="411.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A15" >A15</text>
+<text x="544.0" y="454.3" text-anchor="middle" font-size="25" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A15" >客製操作介面</text>
+<rect x="784.0" y="370.0" width="200.0" height="120.0" stroke="black" fill="white" stroke-width="1.5" data-id="A16" />
+<text x="884.0" y="411.4" text-anchor="middle" font-size="23" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A16" >A16</text>
+<text x="884.0" y="454.3" text-anchor="middle" font-size="25" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A16" >驗證存取</text>
+<rect x="40.0" y="50.0" width="1034.0" height="525.8" stroke="black" fill="none" stroke-width="2" />
+<rect x="437.0" y="-150.0" width="240.0" height="110.0" stroke="black" fill="white" stroke-width="1.5" data-id="A1" />
+<text x="557.0" y="-111.5" text-anchor="middle" font-size="19" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A1" >A1</text>
+<text x="557.0" y="-74.4" text-anchor="middle" font-size="21" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A1" >部署可觀測性平面 A1</text>
+<line x1="437.0" y1="-150.0" x2="40.0" y2="50.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="677.0" y1="-150.0" x2="1074.0" y2="50.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="437.0" y1="-40.0" x2="40.0" y2="575.8" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="677.0" y1="-40.0" x2="1074.0" y2="575.8" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<path d="M 330.0 210.0 L 444.0 210.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1112" data-waypoints="330.0,210.0 444.0,210.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 644.0 230.0 L 784.0 230.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1213" data-waypoints="644.0,230.0 784.0,230.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 330.0 430.0 L 444.0 430.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1415" data-waypoints="330.0,430.0 444.0,430.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 644.0 430.0 L 784.0 430.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1516" data-waypoints="644.0,430.0 784.0,430.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 984.0 210.0 L 1014.0 210.0 Q 1024.0 210.0 1024.0 220.0 L 1024.0 310.0 Q 1024.0 320.0 1014.0 320.0 L 100.0 320.0 Q 90.0 320.0 90.0 330.0 L 90.0 420.0 Q 90.0 430.0 100.0 430.0 L 130.0 430.0" stroke="black" stroke-width="1.2" data-arrow-id="A1F1314" data-waypoints="984.0,210.0 1024.0,210.0 1024.0,320.0 90.0,320.0 90.0,430.0 130.0,430.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 210.0 L 130.0 210.0" stroke="black" stroke-width="1.2" data-arrow-id="A1I1" data-waypoints="-10.0,210.0 130.0,210.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 100.0 L 704.0 100.0 Q 714.0 100.0 714.0 110.0 L 714.0 180.0 Q 714.0 190.0 724.0 190.0 L 784.0 190.0" stroke="black" stroke-width="1.2" data-arrow-id="A1I2" data-waypoints="-10.0,100.0 714.0,100.0 714.0,190.0 784.0,190.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 114.2 L 230.0 150.0" stroke="black" stroke-width="1.2" data-arrow-id="A1C1" data-waypoints="230.0,114.2 230.0,150.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 334.2 L 230.0 370.0" stroke="black" stroke-width="1.2" data-arrow-id="A1C2" data-waypoints="230.0,334.2 230.0,370.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 544.0 334.2 L 544.0 370.0" stroke="black" stroke-width="1.2" data-arrow-id="A1C3" data-waypoints="544.0,334.2 544.0,370.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 305.8 L 230.0 270.0" stroke="black" stroke-width="1.2" data-arrow-id="A1M1" data-waypoints="230.0,305.8 230.0,270.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 544.0 305.8 L 544.0 270.0" stroke="black" stroke-width="1.2" data-arrow-id="A1M2" data-waypoints="544.0,305.8 544.0,270.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 525.8 L 230.0 490.0" stroke="black" stroke-width="1.2" data-arrow-id="A1M3" data-waypoints="230.0,525.8 230.0,490.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 984.0 430.0 L 1124.0 430.0" stroke="black" stroke-width="1.2" data-arrow-id="A1O1" data-waypoints="984.0,430.0 1124.0,430.0" marker-end="url(#arrow)" fill="none" />
+<text x="224.0" y="144.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1C1">本地 Docker</text>
+<text x="236.0" y="144.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1C1">概念驗證政策</text>
+<text x="224.0" y="364.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1C2">Gateway 前綴</text>
+<text x="236.0" y="364.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1C2">warroom 與公開存取政策</text>
+<text x="538.0" y="364.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1C3">繁體中文操</text>
+<text x="550.0" y="364.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1C3">作介面需求</text>
+<text x="224.0" y="286.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1M1">Docker</text>
+<text x="236.0" y="286.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1M1">Compose</text>
+<text x="538.0" y="286.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1M2">Grafana</text>
+<text x="550.0" y="286.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1M2">佈建檔案</text>
+<text x="230.0" y="541.8" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1M3">opencode gateway 路由登錄</text>
+<text x="387.0" y="202.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1F1112" >內部服務端點</text>
+<text x="714.0" y="222.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1F1213" >資料來源綁定</text>
+<text x="387.0" y="425.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1F1415">公開</text>
+<text x="387.0" y="442.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1F1415">Grafana 介面</text>
+<text x="714.0" y="422.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1F1516" >在地化儀表板介面</text>
+<text x="884.0" y="338.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1F1314" >Grafana 儀表板路由目標</text>
+<text x="-14.0" y="214.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1I1">Compose 與公開網址需求</text>
+<text x="-14.0" y="91.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1I2">儀表板需求與</text>
+<text x="-14.0" y="117.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1I2">DLP 證據視圖</text>
+<text x="1128.0" y="434.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A1O1">已驗證的 Warroom Grafana 網站</text>
+</svg>

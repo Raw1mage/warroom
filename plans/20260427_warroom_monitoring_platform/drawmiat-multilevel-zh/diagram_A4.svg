@@ -1,0 +1,47 @@
+<svg width="1262.3" height="645.8" viewBox="-231.1 -120.0 1262.3 645.8" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black" /></marker>
+<marker id="call_arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 M 0 2 L 6 5 L 0 8" fill="none" stroke="black" stroke-width="1" /></marker>
+</defs>
+<rect x="-231.1" y="-120.0" width="1262.3" height="645.8" fill="white" />
+<rect x="130.0" y="140.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A41" />
+<text x="230.0" y="174.5" text-anchor="middle" font-size="17" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A41" >A41</text>
+<text x="230.0" y="208.8" text-anchor="middle" font-size="19" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A41" >映射動作</text>
+<rect x="470.0" y="140.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A42" />
+<text x="570.0" y="174.5" text-anchor="middle" font-size="17" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A42" >A42</text>
+<text x="570.0" y="208.8" text-anchor="middle" font-size="19" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A42" >補強中繼資料</text>
+<rect x="130.0" y="330.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A43" />
+<text x="230.0" y="364.5" text-anchor="middle" font-size="17" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A43" >A43</text>
+<text x="230.0" y="398.8" text-anchor="middle" font-size="19" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A43" >估算停留時間</text>
+<rect x="470.0" y="330.0" width="200.0" height="100.0" stroke="black" fill="white" stroke-width="1.5" data-id="A44" />
+<text x="570.0" y="364.5" text-anchor="middle" font-size="17" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A44" >A44</text>
+<text x="570.0" y="398.8" text-anchor="middle" font-size="19" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A44" >推送事件</text>
+<rect x="40.0" y="90.0" width="720.0" height="425.8" stroke="black" fill="none" stroke-width="2" />
+<rect x="280.0" y="-110.0" width="240.0" height="110.0" stroke="black" fill="white" stroke-width="1.5" data-id="A4" />
+<text x="400.0" y="-72.1" text-anchor="middle" font-size="20" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A4" >A4</text>
+<text x="400.0" y="-33.5" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A4" >正規化證據 A4</text>
+<line x1="280.0" y1="-110.0" x2="40.0" y2="90.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="520.0" y1="-110.0" x2="760.0" y2="90.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="280.0" y1="0.0" x2="40.0" y2="515.8" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="520.0" y1="0.0" x2="760.0" y2="515.8" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<path d="M 330.0 190.0 L 470.0 190.0" stroke="black" stroke-width="1.2" data-arrow-id="A4F4142" data-waypoints="330.0,190.0 470.0,190.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 330.0 380.0 L 470.0 380.0" stroke="black" stroke-width="1.2" data-arrow-id="A4F4344" data-waypoints="330.0,380.0 470.0,380.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 670.0 190.0 L 700.0 190.0 Q 710.0 190.0 710.0 200.0 L 710.0 270.0 Q 710.0 280.0 700.0 280.0 L 100.0 280.0 Q 90.0 280.0 90.0 290.0 L 90.0 370.0 Q 90.0 380.0 100.0 380.0 L 130.0 380.0" stroke="black" stroke-width="1.2" data-arrow-id="A4F4243" data-waypoints="670.0,190.0 710.0,190.0 710.0,280.0 90.0,280.0 90.0,380.0 130.0,380.0" marker-end="url(#arrow)" fill="none" />
+<path d="M -10.0 190.0 L 130.0 190.0" stroke="black" stroke-width="1.2" data-arrow-id="A4I1" data-waypoints="-10.0,190.0 130.0,190.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 570.0 294.2 L 570.0 330.0" stroke="black" stroke-width="1.2" data-arrow-id="A4C1" data-waypoints="570.0,294.2 570.0,330.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 294.2 L 230.0 330.0" stroke="black" stroke-width="1.2" data-arrow-id="A4C2" data-waypoints="230.0,294.2 230.0,330.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 570.0 465.8 L 570.0 430.0" stroke="black" stroke-width="1.2" data-arrow-id="A4M1" data-waypoints="570.0,465.8 570.0,430.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 670.0 380.0 L 810.0 380.0" stroke="black" stroke-width="1.2" data-arrow-id="A4O1" data-waypoints="670.0,380.0 810.0,380.0" marker-end="url(#arrow)" fill="none" />
+<text x="564.0" y="324.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4C1">受限標籤與 fail-fast</text>
+<text x="576.0" y="324.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4C1">collector 政策</text>
+<text x="224.0" y="324.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4C2">未證明 heartbeat</text>
+<text x="236.0" y="324.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4C2">前，檢視時間一律視為估算</text>
+<text x="570.0" y="481.8" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4M1">dlp_event_collector 與 Loki Push API</text>
+<text x="400.0" y="182.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4F4142" >正規化動作候選值</text>
+<text x="400.0" y="375.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4F4344">含時長欄位的</text>
+<text x="400.0" y="392.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4F4344">DLP 事件</text>
+<text x="570.0" y="272.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4F4243" >檔案/Session 中繼資料組</text>
+<text x="-14.0" y="181.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4I1">安全原始</text>
+<text x="-14.0" y="207.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4I1">證據候選集</text>
+<text x="814.0" y="384.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A4O1">正規化 DLP 事件串流</text>
+</svg>

@@ -1,0 +1,38 @@
+{
+  "event_id": "fixture-file-station-transfer-download-1",
+  "action": "webapp_file_download",
+  "nas_host": "demo-nas",
+  "source_channel": "file_station_transfer_db",
+  "source_app": "file_station",
+  "source_surface": "transfer_db",
+  "object_type": "file",
+  "protocol": "synology_file_station_web",
+  "confidence": 0.92,
+  "observed_at": 1777315200,
+  "actor": "fixture-user",
+  "source_ip": "192.0.2.10",
+  "file_name": "sample-report.pdf",
+  "folder_path": "/volume1/homes/example-user/sanitized",
+  "display_path": "/volume1/homes/example-user/sanitized/sample-report.pdf",
+  "extension": ".pdf",
+  "size_bytes": 123456,
+  "correlation_refs": [
+    {
+      "type": "file_station_transfer_db",
+      "path": "/volume1/@database/synolog/.DSMFMXFERDB",
+      "table": "logs",
+      "row_ref": "fixture-row-1",
+      "action_reason": "explicit_download_command"
+    }
+  ],
+  "raw_ref": {
+    "type": "sqlite_row_ref",
+    "path": "/volume1/@database/synolog/.DSMFMXFERDB",
+    "table": "logs",
+    "row_ref": "fixture-row-1"
+  },
+  "policy_notes": [
+    "Sanitized fixture only; no raw NAS row, cookie, session token, credential, or file content is included.",
+    "File Station adapter opens SQLite databases read-only."
+  ]
+}

@@ -1,0 +1,31 @@
+# Local secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Runtime data
+synology-nginx-logs/*
+*.log
+*.sqlite
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+*.py[cod]
+
+# Private planning / event artifacts retained locally only
+docs/events/
+specs/
+refs/
+plans/**
+!plans/
+!plans/20260427_warroom_monitoring_platform/
+!plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/
+!plans/20260427_warroom_monitoring_platform/drawmiat-multilevel-zh/*.svg

@@ -1,0 +1,65 @@
+<svg width="1819.4" height="970.0" viewBox="-339.7 -220.0 1819.4 970.0" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black" /></marker>
+<marker id="call_arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 M 0 2 L 6 5 L 0 8" fill="none" stroke="black" stroke-width="1" /></marker>
+</defs>
+<rect x="-339.7" y="-220.0" width="1819.4" height="970.0" fill="white" />
+<rect x="130.0" y="150.0" width="200.0" height="200.0" stroke="black" fill="white" stroke-width="1.5" data-id="A31" />
+<text x="230.0" y="203.6" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A31" >A31</text>
+<text x="230.0" y="250.8" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A31" >接收 WEB</text>
+<text x="230.0" y="303.3" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A31" >入口證據</text>
+<rect x="450.0" y="150.0" width="200.0" height="200.0" stroke="black" fill="white" stroke-width="1.5" data-id="A32" />
+<text x="550.0" y="203.6" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A32" >A32</text>
+<text x="550.0" y="250.8" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A32" >解析</text>
+<text x="550.0" y="303.3" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A32" >DRIVE 物件</text>
+<rect x="770.0" y="150.0" width="200.0" height="200.0" stroke="black" fill="white" stroke-width="1.5" data-id="A33" />
+<text x="870.0" y="229.9" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A33" >A33</text>
+<text x="870.0" y="277.0" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A33" >讀取傳輸紀錄</text>
+<rect x="130.0" y="490.0" width="200.0" height="200.0" stroke="black" fill="white" stroke-width="1.5" data-id="A34" />
+<text x="230.0" y="569.9" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A34" >A34</text>
+<text x="230.0" y="617.0" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A34" >關聯分享行為</text>
+<rect x="450.0" y="490.0" width="200.0" height="200.0" stroke="black" fill="white" stroke-width="1.5" data-id="A35" />
+<text x="550.0" y="569.9" text-anchor="middle" font-size="26" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A35" >A35</text>
+<text x="550.0" y="617.0" text-anchor="middle" font-size="28" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A35" >保護證據</text>
+<rect x="80.0" y="-10.0" width="980.0" height="750.0" stroke="black" fill="none" stroke-width="2" />
+<rect x="450.0" y="-210.0" width="240.0" height="110.0" stroke="black" fill="white" stroke-width="1.5" data-id="A3" />
+<text x="570.0" y="-172.1" text-anchor="middle" font-size="20" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A3" >A3</text>
+<text x="570.0" y="-133.5" text-anchor="middle" font-size="22" font-weight="bold" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-id="A3" >蒐集證據 A3</text>
+<line x1="450.0" y1="-210.0" x2="80.0" y2="-10.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="690.0" y1="-210.0" x2="1060.0" y2="-10.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="450.0" y1="-100.0" x2="80.0" y2="740.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<line x1="690.0" y1="-100.0" x2="1060.0" y2="740.0" stroke="red" stroke-dasharray="5,5" stroke-width="1.0" opacity="0.6" />
+<path d="M 330.0 650.0 L 450.0 650.0" stroke="black" stroke-width="1.2" data-arrow-id="A3F3435" data-waypoints="330.0,650.0 450.0,650.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 330.0 250.0 L 360.0 250.0 Q 370.0 250.0 370.0 260.0 L 370.0 600.0 Q 370.0 610.0 380.0 610.0 L 450.0 610.0" stroke="black" stroke-width="1.2" data-arrow-id="A3F3135" data-waypoints="330.0,250.0 370.0,250.0 370.0,610.0 450.0,610.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 970.0 250.0 L 1000.0 250.0 Q 1010.0 250.0 1010.0 260.0 L 1010.0 430.0 Q 1010.0 440.0 1000.0 440.0 L 460.0 440.0 Q 450.0 440.0 450.0 450.0 L 450.0 530.0" stroke="black" stroke-width="1.2" data-arrow-id="A3F3335" data-waypoints="970.0,250.0 1010.0,250.0 1010.0,440.0 450.0,440.0 450.0,530.0 450.0,530.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 650.0 250.0 L 680.0 250.0 Q 690.0 250.0 690.0 260.0 L 690.0 390.0 Q 690.0 400.0 680.0 400.0 L 420.0 400.0 Q 410.0 400.0 410.0 410.0 L 410.0 560.0 Q 410.0 570.0 420.0 570.0 L 450.0 570.0" stroke="black" stroke-width="1.2" data-arrow-id="A3F3235" data-waypoints="650.0,250.0 690.0,250.0 690.0,400.0 410.0,400.0 410.0,570.0 450.0,570.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 30.0 250.0 L 130.0 250.0" stroke="black" stroke-width="1.2" data-arrow-id="A3I1" data-waypoints="30.0,250.0 130.0,250.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 30.0 100.0 L 400.0 100.0 Q 410.0 100.0 410.0 110.0 L 410.0 260.0 Q 410.0 270.0 420.0 270.0 L 450.0 270.0" stroke="black" stroke-width="1.2" data-arrow-id="A3I2" data-waypoints="30.0,100.0 410.0,100.0 410.0,270.0 450.0,270.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 30.0 40.0 L 720.0 40.0 Q 730.0 40.0 730.0 50.0 L 730.0 240.0 Q 730.0 250.0 740.0 250.0 L 770.0 250.0" stroke="black" stroke-width="1.2" data-arrow-id="A3I3" data-waypoints="30.0,40.0 730.0,40.0 730.0,250.0 770.0,250.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 550.0 454.2 L 550.0 490.0" stroke="black" stroke-width="1.2" data-arrow-id="A3C1" data-waypoints="550.0,454.2 550.0,490.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 550.0 114.2 L 550.0 150.0" stroke="black" stroke-width="1.2" data-arrow-id="A3C2" data-waypoints="550.0,114.2 550.0,150.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 230.0 385.8 L 230.0 350.0" stroke="black" stroke-width="1.2" data-arrow-id="A3M1" data-waypoints="230.0,385.8 230.0,350.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 550.0 385.8 L 550.0 350.0" stroke="black" stroke-width="1.2" data-arrow-id="A3M2" data-waypoints="550.0,385.8 550.0,350.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 870.0 385.8 L 870.0 350.0" stroke="black" stroke-width="1.2" data-arrow-id="A3M3" data-waypoints="870.0,385.8 870.0,350.0" marker-end="url(#arrow)" fill="none" />
+<path d="M 650.0 590.0 L 1110.0 590.0" stroke="black" stroke-width="1.2" data-arrow-id="A3O1" data-waypoints="650.0,590.0 1110.0,590.0" marker-end="url(#arrow)" fill="none" />
+<text x="544.0" y="484.0" font-size="14" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3C1">以中繼資料為主的</text>
+<text x="556.0" y="484.0" font-size="14" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3C1">隱私邊界</text>
+<text x="550.0" y="108.2" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3C2">最小侵入 SSH 唯讀執行</text>
+<text x="230.0" y="401.8" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3M1">Grafana Alloy</text>
+<text x="544.0" y="366.0" font-size="13" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3M2">drive_file_resolver</text>
+<text x="556.0" y="366.0" font-size="13" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3M2">drive_event_enricher</text>
+<text x="870.0" y="401.8" font-size="14" text-anchor="middle" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3M3">file_station_transfer_adapter</text>
+<text x="390.0" y="642.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3F3435" >分享路由證據</text>
+<text x="340.0" y="457.6" font-size="14" font-weight="bold" fill="black" text-anchor="end" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3F3135" >路由層級 Web 證據</text>
+<text x="550.0" y="432.0" font-size="14" font-weight="bold" fill="black" text-anchor="middle" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3F3335" >下載或匯出證據</text>
+<text x="646.0" y="395.0" font-size="14" font-weight="bold" fill="black" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3F3235">可讀 Drive</text>
+<text x="646.0" y="412.0" font-size="14" font-weight="bold" fill="black" text-anchor="start" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3F3235">檔案中繼資料</text>
+<text x="26.0" y="228.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3I1">Synology nginx</text>
+<text x="26.0" y="254.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3I1">access 與</text>
+<text x="26.0" y="280.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3I1">syslog 紀錄</text>
+<text x="26.0" y="104.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3I2">Drive 檔案 ID 與 SQLite 中繼資料</text>
+<text x="26.0" y="44.0" font-size="20" text-anchor="end" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3I3">File Station transfer DB 紀錄</text>
+<text x="1114.0" y="581.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3O1">安全原始</text>
+<text x="1114.0" y="607.0" font-size="20" text-anchor="start" font-weight="bold" fill="black" font-family="'Times New Roman', 'BiauKai', 'DFKai-SB', '标楷体', serif" data-arrow-id="A3O1">證據候選集</text>
+<path d="M 340.0,453.4 L 340.6,453.8 L 341.2,454.3 L 341.9,454.7 L 342.5,455.1 L 343.1,455.5 L 343.8,455.8 L 344.4,456.1 L 345.0,456.4 L 345.6,456.6 L 346.2,456.8 L 346.9,456.8 L 347.5,456.9 L 348.1,456.8 L 348.8,456.8 L 349.4,456.6 L 350.0,456.4 L 350.6,456.1 L 351.2,455.8 L 351.9,455.5 L 352.5,455.1 L 353.1,454.7 L 353.8,454.3 L 354.4,453.8 L 355.0,453.4 L 355.6,452.9 L 356.2,452.5 L 356.9,452.0 L 357.5,451.6 L 358.1,451.2 L 358.8,450.9 L 359.4,450.6 L 360.0,450.3 L 360.6,450.1 L 361.2,450.0 L 361.9,449.9 L 362.5,449.9 L 363.1,449.9 L 363.8,450.0 L 364.4,450.1 L 365.0,450.3 L 365.6,450.6 L 366.2,450.9 L 366.9,451.2 L 367.5,451.6 L 368.1,452.0 L 368.8,452.5 L 369.4,452.9 L 370.0,453.4" stroke="red" stroke-width="0.8" fill="none" opacity="0.5" />
+</svg>

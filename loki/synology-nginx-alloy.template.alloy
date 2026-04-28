@@ -1,0 +1,87 @@
+// Synology nginx log exporter template for Warroom.
+//
+// This Alloy pipeline is inactive by default. docker-compose.yml places the
+// service behind the `synology-nginx-logs` profile, so it only runs when an
+// approved, sanitized log source has been mounted explicitly.
+//
+// Safety notes:
+// - Do not mount raw sensitive NAS logs into a shared repo directory.
+// - Prefer a read-only export or sanitized copy of Synology nginx access logs.
+// - Do not include credentials, session IDs, cookies, or full sensitive paths
+//   in committed fixtures or documentation.
+
+loki.write "warroom_loki" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+local.file_match "synology_nginx" {
+	path_targets = [
+		{
+			__path__       = "/var/log/synology-nginx/*.log",
+			job            = "synology-nginx",
+			source_app     = "synology_nginx",
+			source_surface = "web_ingress_nginx",
+			environment    = "approved_mount_required",
+		},
+	]
+}
+
+loki.source.file "synology_nginx" {
+	targets    = local.file_match.synology_nginx.targets
+	forward_to = [loki.process.synology_nginx.receiver]
+}
+
+loki.source.syslog "synology_nginx_udp" {
+	listener {
+		address       = "0.0.0.0:1514"
+		protocol      = "udp"
+		syslog_format = "rfc3164"
+		labels        = {
+			job            = "synology-nginx",
+			source_app     = "synology_nginx",
+			source_surface = "web_ingress_nginx",
+			transport      = "syslog_udp",
+		}
+	}
+
+	forward_to = [loki.process.synology_nginx.receiver]
+}
+
+loki.source.syslog "synology_nginx_tcp" {
+	listener {
+		address       = "0.0.0.0:1514"
+		protocol      = "tcp"
+		syslog_format = "rfc3164"
+		labels        = {
+			job            = "synology-nginx",
+			source_app     = "synology_nginx",
+			source_surface = "web_ingress_nginx",
+			transport      = "syslog_tcp",
+		}
+	}
+
+	forward_to = [loki.process.synology_nginx.receiver]
+}
+
+loki.process "synology_nginx" {
+	// Synology nginx formats vary across DSM/app portal/reverse proxy paths.
+	// This first local-test parser supports sanitized nginx combined-style
+	// samples and extracts only low-sensitivity route/action labels. Raw request
+	// lines are still kept in Loki for the local fixture; do not mount real raw
+	// NAS logs until retention/redaction policy is approved.
+	stage.regex {
+		expression = "^(?P<remote_addr>[^ ]+) [^ ]+ (?P<remote_user>[^ ]+) \\[(?P<time_local>[^\\]]+)\\] \\\"(?P<method>[A-Z]+) (?P<path>/(?P<route_family>drive|file|sharing)[^ ]*) (?P<protocol>[^\\\"]+)\\\" (?P<status>[0-9]{3}) (?P<body_bytes_sent>[0-9]+)"
+	}
+
+	stage.labels {
+		values = {
+			method       = "",
+			route_family = "",
+			status       = "",
+		}
+	}
+
+	forward_to = [loki.write.warroom_loki.receiver]
+}

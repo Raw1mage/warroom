@@ -1,0 +1,106 @@
+services:
+  grafana:
+    image: ${GRAFANA_IMAGE:-grafana/grafana:11.5.2}
+    container_name: warroom-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-change-me-local-only}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_METRICS_ENABLED: "true"
+      GF_SERVER_ROOT_URL: "${GRAFANA_ROOT_URL:-http://localhost:3000/}"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/warroom-dlp-web-ingress.json"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+      - loki
+      - warroom-placeholder
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: warroom-prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+
+  snmp-exporter:
+    image: quay.io/prometheus/snmp-exporter:v0.30.1
+    container_name: warroom-snmp-exporter
+    restart: unless-stopped
+    expose:
+      - "9116"
+
+  loki:
+    image: grafana/loki:3.4.2
+    container_name: warroom-loki
+    restart: unless-stopped
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+    command:
+      - "-config.file=/etc/loki/loki-config.yaml"
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki-data:/loki
+
+  loki-canary:
+    image: grafana/loki-canary:3.4.2
+    container_name: warroom-loki-canary
+    restart: unless-stopped
+    command:
+      - "-addr=loki"
+      - "-port=3100"
+      - "-labelname=job"
+      - "-labelvalue=loki-canary"
+    depends_on:
+      - loki
+
+  synology-nginx-log-exporter:
+    image: grafana/alloy:v1.8.2
+    container_name: warroom-synology-nginx-log-exporter
+    profiles:
+      - synology-nginx-logs
+    restart: unless-stopped
+    command:
+      - "run"
+      - "--server.http.listen-addr=0.0.0.0:12345"
+      - "/etc/alloy/config.alloy"
+    ports:
+      - "${SYNOLOGY_NGINX_SYSLOG_TCP_PORT:-1514}:1514/tcp"
+      - "${SYNOLOGY_NGINX_SYSLOG_UDP_PORT:-1514}:1514/udp"
+    volumes:
+      - ./loki/synology-nginx-alloy.template.alloy:/etc/alloy/config.alloy:ro
+      - ${SYNOLOGY_NGINX_LOG_DIR:-./synology-nginx-logs}:/var/log/synology-nginx:ro
+    depends_on:
+      - loki
+
+  warroom-placeholder:
+    build:
+      context: ./services/warroom-placeholder
+    container_name: warroom-placeholder
+    restart: unless-stopped
+    environment:
+      LOKI_PUSH_URL: "http://loki:3100/loki/api/v1/push"
+      WARROOM_SYNTHETIC_FOLDER: "~Raw1mage"
+      WARROOM_SYNTHETIC_NAS: "demo-nas"
+    ports:
+      - "${WARROOM_PLACEHOLDER_PORT:-8000}:8000"
+    depends_on:
+      - loki
+
+volumes:
+  grafana-data:
+  prometheus-data:
+  loki-data:

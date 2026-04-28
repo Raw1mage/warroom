@@ -1,0 +1,48 @@
+{
+  "event_id": "fixture-drive-preview-demo-file-id",
+  "action": "webapp_file_preview",
+  "nas_host": "demo-nas",
+  "source_channel": [
+    "web_ingress_nginx",
+    "drive_db"
+  ],
+  "source_app": "synology_drive",
+  "source_surface": "drive_web_viewer",
+  "file_object_id": "demo-file-id",
+  "view_id": 1,
+  "node_id": 1001,
+  "file_name": "sample-report.pdf",
+  "folder_path": "/team-drive/sanitized",
+  "display_path": "/team-drive/sanitized/sample-report.pdf",
+  "extension": ".pdf",
+  "size_bytes": 123456,
+  "object_type": "directory_or_drive_node",
+  "protocol": "synology_drive_web",
+  "confidence": 0.78,
+  "duration_confidence": "low",
+  "view_started_at": null,
+  "view_last_seen_at": null,
+  "estimated_view_duration_sec": null,
+  "correlation_refs": [
+    {
+      "type": "nginx_loki_query",
+      "description": "viewer-like Drive/File web-ingress events in the controlled activity window"
+    },
+    {
+      "type": "drive_route_db",
+      "path": "/volume1/@synologydrive/@sync/view-route-db.sqlite",
+      "table": "route_table",
+      "key": "permanent_id"
+    },
+    {
+      "type": "drive_view_db",
+      "path": "/volume1/@synologydrive/@sync/view/1/view-db.sqlite",
+      "table": "node_table",
+      "key": "permanent_id"
+    }
+  ],
+  "policy_notes": [
+    "Human-readable metadata is allowed in Warroom internal management evidence.",
+    "File content, cookies, session tokens, credentials, and raw credential-bearing URLs remain forbidden."
+  ]
+}
