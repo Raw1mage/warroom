@@ -19,7 +19,20 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟行為統計",
+      "tooltip": "切換到 DLP Webalizer-style insights dashboard",
+      "type": "dashboard",
+      "uid": "warroom-dlp-insights"
+    }
+  ],
   "panels": [
     {
       "datasource": {
@@ -251,7 +264,7 @@
         "prettifyLogMessage": false,
         "showCommonLabels": true,
         "showLabels": false,
-        "showTime": true,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },

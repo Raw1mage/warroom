@@ -31,6 +31,18 @@
       "tooltip": "切換到 Drive/File/Sharing 活動統計 dashboard",
       "type": "dashboard",
       "uid": "warroom-dlp-web-ingress"
+    },
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟行為統計",
+      "tooltip": "切換到 DLP Webalizer-style insights dashboard",
+      "type": "dashboard",
+      "uid": "warroom-dlp-insights"
     }
   ],
   "panels": [
@@ -267,7 +279,7 @@
         "prettifyLogMessage": true,
         "showCommonLabels": false,
         "showLabels": true,
-        "showTime": true,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },

@@ -1,0 +1,247 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟檔案證據",
+      "tooltip": "切換到 DLP file evidence dashboard",
+      "type": "dashboard",
+      "uid": "warroom-dlp-file-evidence"
+    },
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟即時事件流",
+      "tooltip": "切換到 terminal-like DLP evidence stream",
+      "type": "dashboard",
+      "uid": "warroom-dlp-terminal-stream"
+    },
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟 Web ingress",
+      "tooltip": "切換到 Synology nginx web ingress dashboard",
+      "type": "dashboard",
+      "uid": "warroom-dlp-web-ingress"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Webalizer-style normalized DLP event volume for the selected NAS. Counts only evidence already present in Loki; it does not infer missing activity.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"}[$__range]))", "queryType": "range", "refId": "A"}],
+      "title": "總事件數",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Capability gap events indicate sources that could not be collected. This is an evidence gap, not a synthetic activity estimate.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0},
+      "id": 2,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", action=\"capability_gap\"}[$__range]))", "queryType": "range", "refId": "A"}],
+      "title": "Capability gap 數",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "DLP event trend by normalized action. Use this like Webalizer daily/hourly hits, but scoped to metadata evidence.",
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "bars", "fillOpacity": 35, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 12, "x": 12, "y": 0},
+      "id": 3,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"hideZeros": false, "mode": "multi", "sort": "none"}},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "sum by (action) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"}[$__interval]))", "queryType": "range", "refId": "A"}],
+      "title": "活動時間分布 / action 趨勢",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top actors from normalized JSON payload. Empty actors are excluded rather than guessed.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 5},
+      "id": 4,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | actor != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "Login user 活動量排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top source IP addresses from collected metadata.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 5},
+      "id": 5,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | source_ip != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "來源 IP 排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top normalized network protocols. HTTP may include Synology web surfaces normalized by the collector.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 5},
+      "id": 6,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (network_protocol) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | network_protocol != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "通訊協議比例 / 排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top home/file folders referenced by normalized evidence. Missing folders are excluded rather than inferred.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 13},
+      "id": 7,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(15, sum by (folder_path) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | folder_path != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "被存取資料夾排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top file names referenced by metadata evidence.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 13},
+      "id": 8,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(15, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | file_name != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "被存取檔案排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top download/export targets. This is restricted to explicit download/export actions.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 21},
+      "id": 9,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", action=~\"webapp_file_download|webapp_file_export|file_read\"} | json | file_name != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "下載 / 匯出檔案排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top countries from GeoIP enrichment. Private IPs or missing MMDB remain absent/unknown; no country is guessed.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 21},
+      "id": 10,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (source_country) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | source_country != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "來源國家排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Top country/region pairs from GeoIP enrichment where both fields exist.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 21},
+      "id": 11,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (source_country, source_region) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | source_country != \"\" | source_region != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "來源地區排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Which collector channel/app produced evidence or gap signals.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 29},
+      "id": 12,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (source_app, source_channel) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\"} | json | source_app != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "來源通道排行",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Capability gaps grouped by source and stage so missing permissions/connectors remain visible.",
+      "fieldConfig": {"defaults": {"custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 29},
+      "id": 13,
+      "options": {"cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true},
+      "pluginVersion": "11.5.2",
+      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(15, sum by (source_channel, gap_stage) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", action=\"capability_gap\"} | json | source_channel != \"\" [$__range])))", "queryType": "range", "refId": "A"}],
+      "title": "Capability gap 統計",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 40,
+  "tags": ["warroom", "dlp", "insights", "webalizer-style"],
+  "templating": {
+    "list": [
+      {
+        "current": {"selected": true, "text": "All", "value": ".*"},
+        "datasource": {"type": "loki", "uid": "loki"},
+        "definition": "label_values({job=\"warroom-dlp-event-collector\"}, nas_host)",
+        "includeAll": true,
+        "label": "NAS",
+        "multi": false,
+        "name": "nas",
+        "options": [],
+        "query": "label_values({job=\"warroom-dlp-event-collector\"}, nas_host)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "DLP 行為統計與 Webalizer-style Insights",
+  "uid": "warroom-dlp-insights",
+  "version": 1,
+  "weekStart": ""
+}
