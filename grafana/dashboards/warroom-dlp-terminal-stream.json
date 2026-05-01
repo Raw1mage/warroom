@@ -49,11 +49,11 @@
       "id": 10,
       "options": {
         "dedupStrategy": "none",
-        "enableLogDetails": true,
+        "enableLogDetails": false,
         "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": false
       },
@@ -89,11 +89,11 @@
       "id": 11,
       "options": {
         "dedupStrategy": "none",
-        "enableLogDetails": true,
+        "enableLogDetails": false,
         "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
@@ -129,11 +129,11 @@
       "id": 12,
       "options": {
         "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
+        "enableLogDetails": false,
+        "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
@@ -146,7 +146,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", source_app=~\"synology_drive|file_station\"}",
+          "expr": "{job=\"warroom-dlp-event-collector\", source_app=~\"synology_drive|file_station\"} | json | line_format \"{{__timestamp__ | date \\\"2006-01-02T15:04:05Z07:00\\\"}} {{if .source_ip}}{{.source_ip}}{{else}}-{{end}} {{if .actor}}{{.actor}}{{else}}-{{end}} {{.source_app}} {{.action}} \\\"{{if .display_path}}{{.display_path}}{{else if .file_name}}{{.file_name}}{{else}}-{{end}}\\\" {{if .size_bytes}}{{if ge (float64 .size_bytes) 1073741824.0}}{{printf \\\"%.3f GB\\\" (divf .size_bytes 1073741824)}}{{else if ge (float64 .size_bytes) 1048576.0}}{{printf \\\"%.3f MB\\\" (divf .size_bytes 1048576)}}{{else}}{{printf \\\"%.3f KB\\\" (divf .size_bytes 1024)}}{{end}}{{else}}-{{end}} {{if .network_protocol}}{{.network_protocol}}{{else if .protocol}}{{.protocol}}{{else}}-{{end}} {{if .source_country}}{{.source_country}}{{if .source_region}}/{{.source_region}}{{end}}{{else}}-{{end}}\"",
           "queryType": "range",
           "refId": "A"
         }

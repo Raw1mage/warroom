@@ -294,7 +294,7 @@ def read_transfer_events(db_path: Path, limit: int, nas_host: str, max_label_len
 
 def _run_remote(args: argparse.Namespace) -> dict[str, Any]:
     script_source = Path(__file__).read_text(encoding="utf-8")
-    remote = f"{args.user}@{args.host}"
+    remote = f"{args.user}@{args.host}" if args.user else args.host
     proc = subprocess.run(
         [
             "ssh",
@@ -350,7 +350,7 @@ def main() -> int:
     parser.add_argument("--nas-host", default="demo-nas")
     parser.add_argument("--max-label-len", type=int, default=120)
     parser.add_argument("--host", default="nas.example.local", help="SSH host alias or address for --mode remote")
-    parser.add_argument("--user", default="nas-admin", help="SSH user for --mode remote")
+    parser.add_argument("--user", default="", help="SSH user for --mode remote; empty uses ssh config or current user")
     parser.add_argument("--timeout-sec", type=int, default=30)
     args = parser.parse_args()
 

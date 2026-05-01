@@ -17,6 +17,7 @@ synology-nginx-logs/*
 *.db
 *.db-wal
 *.db-shm
+geoip/*.mmdb
 __pycache__/
 *.py[cod]
 

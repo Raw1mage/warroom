@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "targets": [
+    {
+      "id": "rawdb",
+      "enabled": true,
+      "sources": ["file_station_remote", "nas_home_log_remote"],
+      "file_station_remote": {
+        "host": "rawdb",
+        "user": "",
+        "db_path": "/volume1/@database/synolog/.DSMFMXFERDB",
+        "limit": 50,
+        "timeout_seconds": 30
+      },
+      "nas_home_log_remote": {
+        "host": "rawdb",
+        "user": "",
+        "log_paths": [
+          "/var/log/messages",
+          "/var/log/synosys.log",
+          "/var/log/synolog/synosys.log",
+          "/var/log/samba/log.smbd",
+          "/var/log/rsyncd.log",
+          "/var/log/ftp.log",
+          "/var/log/vsftpd.log",
+          "/var/log/auth.log"
+        ],
+        "tail_lines": 2000,
+        "limit": 50,
+        "timeout_seconds": 30
+      }
+    }
+  ]
+}

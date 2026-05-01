@@ -51,7 +51,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "統計 Warroom DLP event collector 已送進 Loki 的 Drive / File Station 正規化檔案事件。查詢只使用 bounded labels。",
+      "description": "統計 Warroom DLP event collector 已送進 Loki 的 Drive / File Station / NAS home-scope 正規化檔案事件。查詢只使用 bounded labels。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -103,7 +103,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", source_app=~\"synology_drive|file_station\"}[30m]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", source_app=~\"synology_drive|file_station|nas_file_service\"}[30m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -116,7 +116,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "依 Drive / File Station 與 open/preview/download/export/share 等 bounded action label 呈現事件趨勢。",
+      "description": "依 Drive / File Station / NAS home-scope log 與 bounded action label 呈現事件趨勢。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -197,12 +197,12 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (source_app, action) (count_over_time({job=\"warroom-dlp-event-collector\", source_app=~\"synology_drive|file_station\", action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|public_share_page_load|sharing_link_access|capability_gap\"}[5m]))",
+          "expr": "sum by (nas_host, source_app, action) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", source_app=~\"synology_drive|file_station|nas_file_service\", action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|public_share_page_load|sharing_link_access|file_activity|file_read|file_write|file_delete|file_rename|capability_gap\"}[5m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Drive / File Station 動作趨勢",
+      "title": "Drive / File Station / NAS home 動作趨勢",
       "type": "timeseries"
     },
     {
@@ -220,11 +220,11 @@
       "id": 3,
       "options": {
         "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
+        "enableLogDetails": false,
+        "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
@@ -237,7 +237,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", source_app=\"synology_drive\", action=~\"webapp_file_open|webapp_file_preview\"}",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", source_app=\"synology_drive\", action=~\"webapp_file_open|webapp_file_preview\"} | json | line_format \"{{__timestamp__ | date \\\"2006-01-02T15:04:05Z07:00\\\"}} {{if .source_ip}}{{.source_ip}}{{else}}-{{end}} {{if .actor}}{{.actor}}{{else}}-{{end}} {{.source_app}} {{.action}} \\\"{{.display_path}}\\\" {{if ge (float64 .size_bytes) 1073741824.0}}{{printf \\\"%.3f GB\\\" (divf .size_bytes 1073741824)}}{{else if ge (float64 .size_bytes) 1048576.0}}{{printf \\\"%.3f MB\\\" (divf .size_bytes 1048576)}}{{else}}{{printf \\\"%.3f KB\\\" (divf .size_bytes 1024)}}{{end}} {{if .network_protocol}}{{.network_protocol}}{{else}}{{.protocol}}{{end}} {{if .source_country}}{{.source_country}}{{if .source_region}}/{{.source_region}}{{end}}{{else}}-{{end}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -260,11 +260,11 @@
       "id": 4,
       "options": {
         "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
+        "enableLogDetails": false,
+        "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
@@ -277,7 +277,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"}",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | line_format \"{{__timestamp__ | date \\\"2006-01-02T15:04:05Z07:00\\\"}} {{if .source_ip}}{{.source_ip}}{{else}}-{{end}} {{if .actor}}{{.actor}}{{else}}-{{end}} {{.source_app}} {{.action}} \\\"{{.display_path}}\\\" {{if ge (float64 .size_bytes) 1073741824.0}}{{printf \\\"%.3f GB\\\" (divf .size_bytes 1073741824)}}{{else if ge (float64 .size_bytes) 1048576.0}}{{printf \\\"%.3f MB\\\" (divf .size_bytes 1048576)}}{{else}}{{printf \\\"%.3f KB\\\" (divf .size_bytes 1024)}}{{end}} {{if .network_protocol}}{{.network_protocol}}{{else}}{{.protocol}}{{end}} {{if .source_country}}{{.source_country}}{{if .source_region}}/{{.source_region}}{{end}}{{else}}-{{end}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -317,7 +317,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", action=\"capability_gap\"}",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", action=\"capability_gap\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -330,7 +330,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "集中呈現 Drive / File Station 檔案層級事件。適合對照 nginx route timing、Drive object identity 與 File Station transfer evidence。",
+      "description": "集中呈現 Drive / File Station / NAS home-scope 檔案層級事件。適合對照 nginx route timing、Drive object identity、File Station transfer evidence 與 NAS 服務 log evidence。",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -340,11 +340,11 @@
       "id": 6,
       "options": {
         "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
+        "enableLogDetails": false,
+        "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
@@ -357,7 +357,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", source_app=~\"synology_drive|file_station\"}",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=~\"$nas\", source_app=~\"synology_drive|file_station|nas_file_service\"} | json | line_format \"{{__timestamp__ | date \\\"2006-01-02T15:04:05Z07:00\\\"}} {{if .source_ip}}{{.source_ip}}{{else}}-{{end}} {{if .actor}}{{.actor}}{{else}}-{{end}} {{.source_app}} {{.action}} \\\"{{.display_path}}\\\" {{if .size_bytes}}{{if ge (float64 .size_bytes) 1073741824.0}}{{printf \\\"%.3f GB\\\" (divf .size_bytes 1073741824)}}{{else if ge (float64 .size_bytes) 1048576.0}}{{printf \\\"%.3f MB\\\" (divf .size_bytes 1048576)}}{{else}}{{printf \\\"%.3f KB\\\" (divf .size_bytes 1024)}}{{end}}{{else}}-{{end}} {{if .network_protocol}}{{.network_protocol}}{{else}}{{.protocol}}{{end}} {{if .source_country}}{{.source_country}}{{if .source_region}}/{{.source_region}}{{end}}{{else}}-{{end}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -375,7 +375,31 @@
     "file-evidence"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "rawdb",
+          "value": "rawdb"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({job=\"warroom-dlp-event-collector\"}, nas_host)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "NAS",
+        "multi": true,
+        "name": "nas",
+        "options": [],
+        "query": "label_values({job=\"warroom-dlp-event-collector\"}, nas_host)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-30m",

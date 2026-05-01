@@ -6,7 +6,7 @@ Warroom 是一個企業內部監控與稽核平台概念驗證。本專案目前
 
 ## 目標
 
-- 建立 Docker Compose 版觀測平面：Grafana、Prometheus、Loki、Alloy 與 placeholder metrics/log producer。
+- 建立 Docker Compose 版觀測平面：Grafana、Prometheus、Loki、Alloy 與 DLP metadata collector。
 - 以 metadata-first 方式蒐集 DLP 證據，不讀取檔案內容。
 - 將 Synology nginx、Drive DB、File Station transfer DB 的資料轉換成一致的 DLP event JSON。
 - 在 Grafana 中查看 web ingress、檔案證據、事件串流與能力缺口。
@@ -40,7 +40,7 @@ Warroom 是一個企業內部監控與稽核平台概念驗證。本專案目前
 | Prometheus | `prometheus/` | metrics 與 exporter health |
 | Loki | `loki/` | DLP event 與 web ingress log 儲存 |
 | Alloy nginx log exporter | `loki/synology-nginx-alloy.template.alloy` | 接收或 tail Synology nginx log |
-| Placeholder service | `services/warroom-placeholder/` | 產生 synthetic metrics/logs，方便本機驗證 |
+| DLP file collector | `services/warroom-dlp-file-collector/` | 依 `config/nas-targets.json` 週期性蒐集 NAS metadata evidence，失敗時輸出 capability gap |
 | Drive resolver | `tools/drive_file_resolver.py` | 唯讀解析 Synology Drive `file_id` / `permanent_id` 到可讀 metadata |
 | Drive enricher | `tools/drive_event_enricher.py` | 透過 SSH stdin 執行 resolver，產生 Drive DLP event |
 | File Station adapter | `tools/file_station_transfer_adapter.py` | 唯讀讀取 File Station transfer DB，產生 download/export event |
@@ -146,17 +146,17 @@ docker compose up -d
 - Grafana: http://localhost:3000/
 - Prometheus: http://localhost:9090/
 - Loki: http://localhost:3100/
-- Placeholder metrics: http://localhost:8000/metrics
+- DLP file collector metrics: `warroom-dlp-file-collector:8010/metrics`（Compose network 內）
 
 ### 3. 驗證設定
 
 ```bash
 docker compose -f docker-compose.yml config
 python3 -m py_compile tools/*.py
-jq empty fixtures/dlp-events/*.json
+jq empty config/nas-targets.json
 ```
 
-### 4. 測試 normalized event collector
+### 4. 測試 normalized event collector 工具
 
 ```bash
 python3 tools/dlp_event_collector.py --dry-run \
@@ -171,6 +171,8 @@ python3 tools/dlp_event_collector.py \
   --loki-url http://127.0.0.1:3100/loki/api/v1/push \
   fixtures/dlp-events/file-station-transfer-download-sanitized.json
 ```
+
+上述 fixtures 只用於工具層 schema / Loki push 測試；預設 Compose runtime 不會使用 fixtures 作為監測來源。
 
 ### 5. 啟用 Synology nginx log exporter
 
@@ -208,7 +210,7 @@ python3 tools/file_station_transfer_adapter.py \
 
 `grafana/dashboards/` 目前包含：
 
-- `warroom-local-overview.json`：本機 synthetic overview
+- `warroom-local-overview.json`：本機 collector health / Loki stream overview
 - `warroom-dlp-web-ingress.json`：web ingress 統計
 - `warroom-dlp-terminal-stream.json`：terminal-like DLP event stream
 - `warroom-dlp-file-evidence.json`：Drive/File Station 檔案證據總覽
