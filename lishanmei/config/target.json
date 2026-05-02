@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "lishanmei",
+  "display_name": "利善美智能",
+  "enabled": true,
+  "ssh": {
+    "host": "nas.wuyang.co",
+    "user": "wuyangadmin"
+  }
+}

@@ -2,7 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 COPY app.py /app/app.py
-RUN pip install --no-cache-dir maxminddb==2.6.2
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssh-client \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir maxminddb==2.6.2
 
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8010

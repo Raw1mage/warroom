@@ -4,30 +4,156 @@
     {
       "id": "rawdb",
       "enabled": true,
-      "sources": ["file_station_remote", "nas_home_log_remote"],
+      "sources": [
+        "host_health_remote",
+        "file_station_remote",
+        "nas_home_log_remote",
+        "nas_system_log_remote"
+      ],
+      "host_health_remote": {
+        "host": "192.168.100.40",
+        "user": "yeatsluo",
+        "timeout_seconds": 90
+      },
       "file_station_remote": {
-        "host": "rawdb",
-        "user": "",
+        "host": "192.168.100.40",
+        "user": "yeatsluo",
         "db_path": "/volume1/@database/synolog/.DSMFMXFERDB",
         "limit": 50,
-        "timeout_seconds": 30
+        "timeout_seconds": 90
       },
       "nas_home_log_remote": {
-        "host": "rawdb",
-        "user": "",
+        "host": "192.168.100.40",
+        "user": "yeatsluo",
         "log_paths": [
           "/var/log/messages",
           "/var/log/synosys.log",
           "/var/log/synolog/synosys.log",
           "/var/log/samba/log.smbd",
+          "/var/log/samba/log.nmbd",
+          "/var/log/nginx/error.log",
+          "/var/log/httpd/access_log",
+          "/var/log/httpd/error_log",
           "/var/log/rsyncd.log",
           "/var/log/ftp.log",
           "/var/log/vsftpd.log",
-          "/var/log/auth.log"
+          "/var/log/auth.log",
+          "/var/log/scemd.log",
+          "/var/log/synoscgi.log",
+          "/var/log/synoscheduler.log",
+          "/var/log/synopkg.log"
+        ],
+        "tail_lines": 2000,
+        "limit": 50,
+        "timeout_seconds": 90
+      },
+      "nas_system_log_remote": {
+        "host": "192.168.100.40",
+        "user": "yeatsluo",
+        "log_paths": [
+          "/var/log/messages",
+          "/var/log/synosys.log",
+          "/var/log/synolog/synosys.log",
+          "/var/log/samba/log.smbd",
+          "/var/log/samba/log.nmbd",
+          "/var/log/samba/log.winbindd",
+          "/var/log/nginx/access.log",
+          "/var/log/nginx/error.log",
+          "/var/log/httpd/access_log",
+          "/var/log/httpd/error_log",
+          "/var/log/rsyncd.log",
+          "/var/log/ftp.log",
+          "/var/log/vsftpd.log",
+          "/var/log/auth.log",
+          "/var/log/scemd.log",
+          "/var/log/synoscgi.log",
+          "/var/log/synoscheduler.log",
+          "/var/log/synopkg.log",
+          "/var/log/synolog/synosmb.log",
+          "/var/log/synolog/synofile.log",
+          "/var/log/synolog/synoshare.log"
+        ],
+        "tail_lines": 2000,
+        "limit": 200,
+        "timeout_seconds": 90
+      }
+    },
+    {
+      "id": "lishanmei",
+      "display_name": "利善美智能",
+      "enabled": true,
+      "sources": [
+        "host_health_remote",
+        "file_station_remote",
+        "nas_home_log_remote",
+        "nas_system_log_remote"
+      ],
+      "host_health_remote": {
+        "host": "nas.wuyang.co",
+        "user": "wuyangadmin",
+        "timeout_seconds": 90
+      },
+      "file_station_remote": {
+        "host": "nas.wuyang.co",
+        "user": "wuyangadmin",
+        "db_path": "/volume1/@database/synolog/.DSMFMXFERDB",
+        "limit": 50,
+        "timeout_seconds": 90
+      },
+      "nas_home_log_remote": {
+        "host": "nas.wuyang.co",
+        "user": "wuyangadmin",
+        "log_paths": [
+          "/var/log/messages",
+          "/var/log/synosys.log",
+          "/var/log/synolog/synosys.log",
+          "/var/log/samba/log.smbd",
+          "/var/log/samba/log.nmbd",
+          "/var/log/nginx/error.log",
+          "/var/log/httpd/access_log",
+          "/var/log/httpd/error_log",
+          "/var/log/rsyncd.log",
+          "/var/log/ftp.log",
+          "/var/log/vsftpd.log",
+          "/var/log/auth.log",
+          "/var/log/scemd.log",
+          "/var/log/synoscgi.log",
+          "/var/log/synoscheduler.log",
+          "/var/log/synopkg.log"
         ],
         "tail_lines": 2000,
         "limit": 50,
         "timeout_seconds": 30
+      },
+      "nas_system_log_remote": {
+        "host": "nas.wuyang.co",
+        "user": "wuyangadmin",
+        "log_paths": [
+          "/var/log/messages",
+          "/var/log/synosys.log",
+          "/var/log/synolog/synosys.log",
+          "/var/log/samba/log.smbd",
+          "/var/log/samba/log.nmbd",
+          "/var/log/samba/log.winbindd",
+          "/var/log/nginx/access.log",
+          "/var/log/nginx/error.log",
+          "/var/log/httpd/access_log",
+          "/var/log/httpd/error_log",
+          "/var/log/rsyncd.log",
+          "/var/log/ftp.log",
+          "/var/log/vsftpd.log",
+          "/var/log/auth.log",
+          "/var/log/scemd.log",
+          "/var/log/synoscgi.log",
+          "/var/log/synoscheduler.log",
+          "/var/log/synopkg.log",
+          "/var/log/synolog/synosmb.log",
+          "/var/log/synolog/synofile.log",
+          "/var/log/synolog/synoshare.log"
+        ],
+        "tail_lines": 2000,
+        "limit": 200,
+        "timeout_seconds": 90
       }
     }
   ]

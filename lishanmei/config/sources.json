@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "sources": [
+    "host_health_remote",
+    "file_station_remote",
+    "nas_home_log_remote",
+    "nas_system_log_remote",
+    "auth_log_remote",
+    "network_socket_remote"
+  ],
+  "host_health_remote": {
+    "timeout_seconds": 90
+  },
+  "file_station_remote": {
+    "db_path": "/volume1/@database/synolog/.DSMFMXFERDB",
+    "limit": 50,
+    "timeout_seconds": 90
+  },
+  "nas_home_log_remote": {
+    "log_paths": [
+      "/var/log/messages",
+      "/var/log/synosys.log",
+      "/var/log/synolog/synosys.log",
+      "/var/log/samba/log.smbd",
+      "/var/log/samba/log.nmbd",
+      "/var/log/nginx/error.log",
+      "/var/log/httpd/access_log",
+      "/var/log/httpd/error_log",
+      "/var/log/rsyncd.log",
+      "/var/log/ftp.log",
+      "/var/log/vsftpd.log",
+      "/var/log/auth.log",
+      "/var/log/scemd.log",
+      "/var/log/synoscgi.log",
+      "/var/log/synoscheduler.log",
+      "/var/log/synopkg.log"
+    ],
+    "tail_lines": 2000,
+    "limit": 50,
+    "timeout_seconds": 30
+  },
+  "nas_system_log_remote": {
+    "log_paths": [
+      "/var/log/messages",
+      "/var/log/synosys.log",
+      "/var/log/synolog/synosys.log",
+      "/var/log/samba/log.smbd",
+      "/var/log/samba/log.nmbd",
+      "/var/log/samba/log.winbindd",
+      "/var/log/nginx/access.log",
+      "/var/log/nginx/error.log",
+      "/var/log/httpd/access_log",
+      "/var/log/httpd/error_log",
+      "/var/log/rsyncd.log",
+      "/var/log/ftp.log",
+      "/var/log/vsftpd.log",
+      "/var/log/auth.log",
+      "/var/log/scemd.log",
+      "/var/log/synoscgi.log",
+      "/var/log/synoscheduler.log",
+      "/var/log/synopkg.log",
+      "/var/log/synolog/synosmb.log",
+      "/var/log/synolog/synofile.log",
+      "/var/log/synolog/synoshare.log"
+    ],
+    "tail_lines": 2000,
+    "limit": 200,
+    "timeout_seconds": 90
+  },
+  "auth_log_remote": {
+    "log_paths": [
+      "/var/log/auth.log",
+      "/var/log/messages",
+      "/var/log/synosys.log",
+      "/var/log/synolog/synosys.log",
+      "/var/log/synoscgi.log",
+      "/var/log/samba/log.smbd",
+      "/var/log/ftp.log",
+      "/var/log/vsftpd.log"
+    ],
+    "tail_lines": 2000,
+    "limit": 100,
+    "timeout_seconds": 90
+  },
+  "network_socket_remote": {
+    "top_limit": 10,
+    "timeout_seconds": 90
+  }
+}

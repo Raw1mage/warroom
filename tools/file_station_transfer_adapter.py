@@ -295,13 +295,22 @@ def read_transfer_events(db_path: Path, limit: int, nas_host: str, max_label_len
 def _run_remote(args: argparse.Namespace) -> dict[str, Any]:
     script_source = Path(__file__).read_text(encoding="utf-8")
     remote = f"{args.user}@{args.host}" if args.user else args.host
-    proc = subprocess.run(
+    ssh_command = [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "UserKnownHostsFile=/dev/null",
+        "-o",
+        "StrictHostKeyChecking=accept-new",
+        "-o",
+        f"ConnectTimeout={min(args.timeout_sec, 30)}",
+    ]
+    identity_file = os.environ.get("WARROOM_SSH_IDENTITY_FILE", "").strip()
+    if identity_file:
+        ssh_command.extend(["-o", f"IdentityFile={identity_file}", "-o", "IdentitiesOnly=yes"])
+    ssh_command.extend(
         [
-            "ssh",
-            "-o",
-            "BatchMode=yes",
-            "-o",
-            f"ConnectTimeout={min(args.timeout_sec, 30)}",
             remote,
             "sudo",
             "-n",
@@ -317,7 +326,10 @@ def _run_remote(args: argparse.Namespace) -> dict[str, Any]:
             args.nas_host,
             "--max-label-len",
             str(args.max_label_len),
-        ],
+        ]
+    )
+    proc = subprocess.run(
+        ssh_command,
         input=script_source,
         text=True,
         capture_output=True,

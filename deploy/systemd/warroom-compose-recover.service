@@ -1,0 +1,19 @@
+[Unit]
+Description=Warroom Docker Compose reboot recovery
+Documentation=file:/home/pkcs12/projects/warroom/docs/ops/reboot-recovery.md
+Requires=docker.service
+After=docker.service network-online.target local-fs.target remote-fs.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pkcs12
+Group=pkcs12
+WorkingDirectory=/home/pkcs12/projects/warroom
+Environment=WARROOM_PROJECT_DIR=/home/pkcs12/projects/warroom
+ExecStart=/home/pkcs12/projects/warroom/scripts/warroom-recover-after-boot.sh
+RemainAfterExit=yes
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

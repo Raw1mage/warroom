@@ -20,6 +20,7 @@ SOURCES = [item.strip() for item in os.environ.get("WARROOM_DLP_COLLECTOR_SOURCE
 INTERVAL_SECONDS = max(1, int(os.environ.get("WARROOM_DLP_COLLECTOR_INTERVAL_SECONDS", "30")))
 GEOIP_MMDB_PATH = os.environ.get("WARROOM_GEOIP_MMDB_PATH", "").strip()
 NAS_TARGETS_CONFIG = os.environ.get("WARROOM_NAS_TARGETS_CONFIG", "/config/nas-targets.json").strip()
+SERVER_ROOTS_DIR = os.environ.get("WARROOM_SERVER_ROOTS_DIR", "").strip()
 TOOLS_DIR = Path(os.environ.get("WARROOM_DLP_TOOLS_DIR", "/tools"))
 if not TOOLS_DIR.exists():
     TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools"
@@ -38,7 +39,45 @@ STATE = {
 }
 REMOTE_SEEN_EVENT_IDS: set[str] = set()
 STATE_LOCK = threading.Lock()
-ALLOWED_SOURCES = {"file_station_remote", "nas_home_log_remote"}
+
+SOURCE_REGISTRY: dict[str, dict[str, Any]] = {
+    "file_station_remote": {
+        "source_app": "file_station",
+        "source_channel": "file_station_transfer_db",
+        "capability": "file_transfer_evidence",
+        "handler": None,
+    },
+    "nas_home_log_remote": {
+        "source_app": "nas_file_service",
+        "source_channel": "nas_home_log",
+        "capability": "home_scope_file_activity",
+        "handler": None,
+    },
+    "host_health_remote": {
+        "source_app": "nas_host_health",
+        "source_channel": "host_health",
+        "capability": "host_health_metrics",
+        "handler": None,
+    },
+    "nas_system_log_remote": {
+        "source_app": "nas_system_log",
+        "source_channel": "nas_system_log",
+        "capability": "nas_system_events",
+        "handler": None,
+    },
+    "auth_log_remote": {
+        "source_app": "nas_auth",
+        "source_channel": "auth_log",
+        "capability": "authentication_events",
+        "handler": None,
+    },
+    "network_socket_remote": {
+        "source_app": "nas_network",
+        "source_channel": "network_socket",
+        "capability": "network_socket_snapshot",
+        "handler": None,
+    },
+}
 
 
 def _metric_line(name: str, value: int | float) -> str:
@@ -81,14 +120,30 @@ def _set_metric(key: str, value: int) -> None:
         STATE[key] = value
 
 
-def _capability_gap(source: str, stage: str, detail: str, nas_host: str | None = None) -> dict[str, Any]:
+def _source_contract(source_key: str) -> dict[str, Any]:
+    return SOURCE_REGISTRY.get(
+        source_key,
+        {
+            "source_app": "collector",
+            "source_channel": source_key,
+            "capability": "unknown_source",
+            "handler": None,
+        },
+    )
+
+
+def _capability_gap(source_key: str, stage: str, detail: str, nas_host: str | None = None) -> dict[str, Any]:
     _bump("capability_gaps_total")
-    source_app = "file_station" if source == "file_station_remote" else "nas_file_service"
+    contract = _source_contract(source_key)
     event = {
-        "event_id": f"capability-gap-{source}-{stage}-{int(time.time())}",
+        "event_id": f"capability-gap-{source_key}-{stage}-{int(time.time())}",
         "action": "capability_gap",
-        "source_channel": source,
-        "source_app": source_app,
+        "source_key": source_key,
+        "source_channel": "collector_capability_gap",
+        "source_app": "collector",
+        "affected_source_channel": contract["source_channel"],
+        "affected_source_app": contract["source_app"],
+        "affected_capability": contract["capability"],
         "confidence": 1.0,
         "observed_at": int(time.time()),
         "collector": "warroom-dlp-file-collector",
@@ -203,7 +258,77 @@ def _fallback_target() -> dict[str, Any]:
     }
 
 
+def _load_json_object(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("json_object_required")
+    return payload
+
+
+def _merge_source_settings(target_payload: dict[str, Any], sources_payload: dict[str, Any], source: str, ssh: dict[str, Any]) -> dict[str, Any]:
+    merged: dict[str, Any] = {}
+    existing = target_payload.get(source)
+    if isinstance(existing, dict):
+        merged.update(existing)
+    source_settings = sources_payload.get(source)
+    if isinstance(source_settings, dict):
+        merged.update(source_settings)
+    if "host" not in merged and ssh.get("host"):
+        merged["host"] = ssh.get("host")
+    if "user" not in merged and ssh.get("user"):
+        merged["user"] = ssh.get("user")
+    return merged
+
+
+def _load_server_root_target(root: Path) -> dict[str, Any] | None:
+    target_path = root / "config" / "target.json"
+    sources_path = root / "config" / "sources.json"
+    if not target_path.is_file():
+        return None
+    try:
+        target_payload = _load_json_object(target_path)
+        sources_payload = _load_json_object(sources_path) if sources_path.is_file() else {}
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        return {
+            "id": root.name,
+            "enabled": True,
+            "sources": ["config_error"],
+            "config_error": exc.__class__.__name__,
+            "data_root": str(root / "data"),
+        }
+
+    ssh = target_payload.get("ssh") if isinstance(target_payload.get("ssh"), dict) else {}
+    sources = sources_payload.get("sources") if isinstance(sources_payload.get("sources"), list) else target_payload.get("sources")
+    if not isinstance(sources, list):
+        sources = SOURCES
+
+    target = dict(target_payload)
+    target["id"] = str(target.get("id") or root.name)
+    target["sources"] = [str(item) for item in sources]
+    target["data_root"] = str(root / "data")
+    for source in target["sources"]:
+        target[source] = _merge_source_settings(target_payload, sources_payload, source, ssh)
+    return target
+
+
+def _load_server_root_targets() -> list[dict[str, Any]]:
+    if not SERVER_ROOTS_DIR:
+        return []
+    roots_dir = Path(SERVER_ROOTS_DIR)
+    if not roots_dir.is_dir():
+        return []
+    targets: list[dict[str, Any]] = []
+    for root in sorted(item for item in roots_dir.iterdir() if item.is_dir()):
+        target = _load_server_root_target(root)
+        if target is not None:
+            targets.append(target)
+    return targets
+
+
 def _load_targets() -> list[dict[str, Any]]:
+    server_root_targets = _load_server_root_targets()
+    if server_root_targets:
+        return server_root_targets
     if not NAS_TARGETS_CONFIG:
         return [_fallback_target()]
     config_path = Path(NAS_TARGETS_CONFIG)
@@ -356,6 +481,241 @@ def _nas_home_log_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
     return new_events
 
 
+def _host_health_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
+    settings = target.get("host_health_remote") if isinstance(target.get("host_health_remote"), dict) else {}
+    nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
+    host = str(settings.get("host") or "").strip()
+    user = str(settings.get("user") or "").strip()
+    if not host:
+        return [_capability_gap("host_health_remote", "remote_config_missing", "remote host must be explicitly configured", nas_host)]
+
+    adapter = TOOLS_DIR / "host_health_adapter.py"
+    timeout = str(settings.get("timeout_seconds") or 30)
+    command = [
+        sys.executable,
+        str(adapter),
+        "--mode",
+        "remote",
+        "--host",
+        host,
+        "--nas-host",
+        nas_host,
+        "--timeout-sec",
+        timeout,
+    ]
+    if user:
+        command.extend(["--user", user])
+    try:
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=int(timeout) + 5, check=False)
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _bump("collection_failures_total")
+        return [_capability_gap("host_health_remote", "adapter_execution_failed", exc.__class__.__name__, nas_host)]
+    if proc.returncode != 0:
+        _bump("collection_failures_total")
+        detail = f"returncode={proc.returncode}"
+        try:
+            payload = json.loads(proc.stdout)
+            if isinstance(payload, dict):
+                detail = str(payload.get("stage") or detail)
+        except json.JSONDecodeError:
+            pass
+        return [_capability_gap("host_health_remote", "adapter_returned_failure", detail, nas_host)]
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        _bump("collection_failures_total")
+        return [_capability_gap("host_health_remote", "adapter_invalid_json", "adapter stdout was not valid JSON", nas_host)]
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        _bump("collection_failures_total")
+        return [_capability_gap("host_health_remote", "adapter_events_invalid", "adapter events field was not a list", nas_host)]
+    return [event for event in events if isinstance(event, dict)]
+
+
+def _nas_system_log_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
+    settings = target.get("nas_system_log_remote") if isinstance(target.get("nas_system_log_remote"), dict) else {}
+    nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
+    host = str(settings.get("host") or "").strip()
+    user = str(settings.get("user") or "").strip()
+    if not host:
+        return [_capability_gap("nas_system_log_remote", "remote_config_missing", "remote host must be explicitly configured", nas_host)]
+
+    adapter = TOOLS_DIR / "nas_system_log_adapter.py"
+    limit = str(settings.get("limit") or 100)
+    timeout = str(settings.get("timeout_seconds") or 30)
+    tail_lines = str(settings.get("tail_lines") or 2000)
+    log_paths = settings.get("log_paths") if isinstance(settings.get("log_paths"), list) else []
+    command = [
+        sys.executable,
+        str(adapter),
+        "--mode",
+        "remote",
+        "--host",
+        host,
+        "--nas-host",
+        nas_host,
+        "--limit",
+        limit,
+        "--tail-lines",
+        tail_lines,
+        "--timeout-sec",
+        timeout,
+    ]
+    for log_path in [str(item) for item in log_paths if str(item).strip()]:
+        command.extend(["--log-path", log_path])
+    if user:
+        command.extend(["--user", user])
+    try:
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=int(timeout) + 5, check=False)
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _bump("collection_failures_total")
+        return [_capability_gap("nas_system_log_remote", "adapter_execution_failed", exc.__class__.__name__, nas_host)]
+    if proc.returncode != 0:
+        _bump("collection_failures_total")
+        detail = f"returncode={proc.returncode}"
+        try:
+            payload = json.loads(proc.stdout)
+            if isinstance(payload, dict):
+                detail = str(payload.get("stage") or detail)
+        except json.JSONDecodeError:
+            pass
+        return [_capability_gap("nas_system_log_remote", "adapter_returned_failure", detail, nas_host)]
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        _bump("collection_failures_total")
+        return [_capability_gap("nas_system_log_remote", "adapter_invalid_json", "adapter stdout was not valid JSON", nas_host)]
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        _bump("collection_failures_total")
+        return [_capability_gap("nas_system_log_remote", "adapter_events_invalid", "adapter events field was not a list", nas_host)]
+
+    new_events = []
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        event_id = str(event.get("event_id") or "")
+        if not event_id or event_id in REMOTE_SEEN_EVENT_IDS:
+            continue
+        REMOTE_SEEN_EVENT_IDS.add(event_id)
+        new_events.append(event)
+    return new_events
+
+
+def _auth_log_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
+    settings = target.get("auth_log_remote") if isinstance(target.get("auth_log_remote"), dict) else {}
+    nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
+    host = str(settings.get("host") or "").strip()
+    user = str(settings.get("user") or "").strip()
+    if not host:
+        return [_capability_gap("auth_log_remote", "remote_config_missing", "remote host must be explicitly configured", nas_host)]
+
+    adapter = TOOLS_DIR / "auth_log_adapter.py"
+    limit = str(settings.get("limit") or 100)
+    timeout = str(settings.get("timeout_seconds") or 30)
+    tail_lines = str(settings.get("tail_lines") or 2000)
+    log_paths = settings.get("log_paths") if isinstance(settings.get("log_paths"), list) else []
+    command = [
+        sys.executable,
+        str(adapter),
+        "--mode",
+        "remote",
+        "--host",
+        host,
+        "--nas-host",
+        nas_host,
+        "--limit",
+        limit,
+        "--tail-lines",
+        tail_lines,
+        "--timeout-sec",
+        timeout,
+    ]
+    for log_path in [str(item) for item in log_paths if str(item).strip()]:
+        command.extend(["--log-path", log_path])
+    if user:
+        command.extend(["--user", user])
+    try:
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=int(timeout) + 5, check=False)
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _bump("collection_failures_total")
+        return [_capability_gap("auth_log_remote", "adapter_execution_failed", exc.__class__.__name__, nas_host)]
+    if proc.returncode != 0:
+        _bump("collection_failures_total")
+        detail = f"returncode={proc.returncode}"
+        try:
+            payload = json.loads(proc.stdout)
+            if isinstance(payload, dict):
+                detail = str(payload.get("stage") or detail)
+        except json.JSONDecodeError:
+            pass
+        return [_capability_gap("auth_log_remote", "adapter_returned_failure", detail, nas_host)]
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        _bump("collection_failures_total")
+        return [_capability_gap("auth_log_remote", "adapter_invalid_json", "adapter stdout was not valid JSON", nas_host)]
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        _bump("collection_failures_total")
+        return [_capability_gap("auth_log_remote", "adapter_events_invalid", "adapter events field was not a list", nas_host)]
+    return [event for event in events if isinstance(event, dict)]
+
+
+def _network_socket_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
+    settings = target.get("network_socket_remote") if isinstance(target.get("network_socket_remote"), dict) else {}
+    nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
+    host = str(settings.get("host") or "").strip()
+    user = str(settings.get("user") or "").strip()
+    if not host:
+        return [_capability_gap("network_socket_remote", "remote_config_missing", "remote host must be explicitly configured", nas_host)]
+
+    adapter = TOOLS_DIR / "network_socket_adapter.py"
+    timeout = str(settings.get("timeout_seconds") or 30)
+    top_limit = str(settings.get("top_limit") or 10)
+    command = [
+        sys.executable,
+        str(adapter),
+        "--mode",
+        "remote",
+        "--host",
+        host,
+        "--nas-host",
+        nas_host,
+        "--top-limit",
+        top_limit,
+        "--timeout-sec",
+        timeout,
+    ]
+    if user:
+        command.extend(["--user", user])
+    try:
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=int(timeout) + 5, check=False)
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _bump("collection_failures_total")
+        return [_capability_gap("network_socket_remote", "adapter_execution_failed", exc.__class__.__name__, nas_host)]
+    if proc.returncode != 0:
+        _bump("collection_failures_total")
+        detail = f"returncode={proc.returncode}"
+        try:
+            payload = json.loads(proc.stdout)
+            if isinstance(payload, dict):
+                detail = str(payload.get("stage") or detail)
+        except json.JSONDecodeError:
+            pass
+        return [_capability_gap("network_socket_remote", "adapter_returned_failure", detail, nas_host)]
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        _bump("collection_failures_total")
+        return [_capability_gap("network_socket_remote", "adapter_invalid_json", "adapter stdout was not valid JSON", nas_host)]
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        _bump("collection_failures_total")
+        return [_capability_gap("network_socket_remote", "adapter_events_invalid", "adapter events field was not a list", nas_host)]
+    return [event for event in events if isinstance(event, dict)]
+
+
 def _collect_target(target: dict[str, Any]) -> list[dict[str, Any]]:
     nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas")
     events: list[dict[str, Any]] = []
@@ -363,21 +723,71 @@ def _collect_target(target: dict[str, Any]) -> list[dict[str, Any]]:
         return events
     sources = target.get("sources") if isinstance(target.get("sources"), list) else SOURCES
     for source in [str(item) for item in sources]:
-        if source not in ALLOWED_SOURCES:
+        contract = SOURCE_REGISTRY.get(source)
+        handler = contract.get("handler") if contract else None
+        if not callable(handler):
             events.append(_capability_gap(source, "unsupported_source", "source mode is not supported by this collector", nas_host))
-        elif source == "file_station_remote":
-            events.extend(_file_station_remote_events(target))
-        elif source == "nas_home_log_remote":
-            events.extend(_nas_home_log_remote_events(target))
+            continue
+        source_events = handler(target)
+        for event in source_events:
+            if isinstance(event, dict) and event.get("action") != "capability_gap":
+                event.setdefault("source_key", source)
+        events.extend(source_events)
     for event in events:
         event.setdefault("nas_host", nas_host)
     return events
 
 
+SOURCE_REGISTRY["file_station_remote"]["handler"] = _file_station_remote_events
+SOURCE_REGISTRY["nas_home_log_remote"]["handler"] = _nas_home_log_remote_events
+SOURCE_REGISTRY["host_health_remote"]["handler"] = _host_health_remote_events
+SOURCE_REGISTRY["nas_system_log_remote"]["handler"] = _nas_system_log_remote_events
+SOURCE_REGISTRY["auth_log_remote"]["handler"] = _auth_log_remote_events
+SOURCE_REGISTRY["network_socket_remote"]["handler"] = _network_socket_remote_events
+
+
+def _append_jsonl(path: Path, items: list[dict[str, Any]]) -> None:
+    if not items:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        for item in items:
+            handle.write(json.dumps(item, ensure_ascii=False, sort_keys=True) + "\n")
+
+
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _spool_target_events(target: dict[str, Any], events: list[dict[str, Any]]) -> None:
+    data_root_value = str(target.get("data_root") or "").strip()
+    if not data_root_value:
+        return
+    data_root = Path(data_root_value)
+    now = int(time.time())
+    nas_host = str(target.get("id") or target.get("nas_host") or data_root.parent.name)
+    gaps = [event for event in events if event.get("action") == "capability_gap"]
+    _append_jsonl(data_root / "normalized" / "events.jsonl", events)
+    _append_jsonl(data_root / "normalized" / "capability_gaps.jsonl", gaps)
+    _write_json(
+        data_root / "state" / "last_run.json",
+        {
+            "nas_host": nas_host,
+            "observed_at": now,
+            "event_count": len(events),
+            "capability_gap_count": len(gaps),
+            "sources": target.get("sources") if isinstance(target.get("sources"), list) else SOURCES,
+        },
+    )
+
+
 def collect_events() -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     for target in _load_targets():
-        events.extend(_collect_target(target))
+        target_events = _collect_target(target)
+        _spool_target_events(target, target_events)
+        events.extend(target_events)
     return _enrich_geoip(_enrich_network_protocol(events))
 
 

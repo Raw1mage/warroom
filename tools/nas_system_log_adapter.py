@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Read NAS home-scope audit/log metadata as Warroom DLP events.
+"""Stream NAS service/system log metadata into Warroom Loki events.
 
-This helper inspects existing NAS log files for metadata-only evidence that
-references `/home`, `/homes`, or `/volume*/homes` paths. It never reads file
-contents and does not install a persistent NAS-side agent.
+This adapter uses SSH stdin payload execution for remote NAS collection. It
+tails existing log files only, redacts common secret-bearing fragments, and does
+not install persistent agents or read user file contents.
 """
 
 from __future__ import annotations
@@ -26,18 +26,34 @@ DEFAULT_LOG_PATHS = [
     "/var/log/samba/log.smbd",
     "/var/log/samba/log.nmbd",
     "/var/log/samba/log.winbindd",
+    "/var/log/nginx/access.log",
+    "/var/log/nginx/error.log",
+    "/var/log/httpd/access_log",
+    "/var/log/httpd/error_log",
     "/var/log/rsyncd.log",
     "/var/log/ftp.log",
     "/var/log/vsftpd.log",
     "/var/log/auth.log",
+    "/var/log/scemd.log",
+    "/var/log/synoscgi.log",
+    "/var/log/synoscheduler.log",
+    "/var/log/synopkg.log",
+    "/var/log/synolog/synosmb.log",
+    "/var/log/synolog/synofile.log",
+    "/var/log/synolog/synoshare.log",
 ]
 
-HOME_SCOPE_RE = re.compile(r"(?P<path>/(?:volume\d+/)?homes?/[^\s\"'<>]+|/home/[^\s\"'<>]+)")
+SECRET_PATTERNS = [
+    re.compile(r"(?i)(password|passwd|pwd|token|session|cookie|authorization)=([^\s&]+)"),
+    re.compile(r"(?i)(Cookie:|Authorization:)\s*\S+"),
+]
 IP_RE = re.compile(r"(?<!\d)(?:\d{1,3}\.){3}\d{1,3}(?!\d)")
+PATH_RE = re.compile(r"(?P<path>/(?:volume\d+/)?(?:homes?|share|photo|music|video|web|docker|var|tmp)[^\s\"'<>]*)")
 USER_PATTERNS = [
     re.compile(r"\buser(?:name)?[=: ]+(?P<user>[A-Za-z0-9._@-]+)", re.IGNORECASE),
     re.compile(r"\baccount[=: ]+(?P<user>[A-Za-z0-9._@-]+)", re.IGNORECASE),
     re.compile(r"\bfor\s+user\s+(?P<user>[A-Za-z0-9._@-]+)", re.IGNORECASE),
+    re.compile(r"\b(?:Accepted|Failed)\s+\S+\s+for\s+(?P<user>[A-Za-z0-9._@-]+)", re.IGNORECASE),
 ]
 
 
@@ -58,39 +74,47 @@ def _tail_lines(path: Path, max_lines: int) -> list[str]:
         return []
 
 
-def _classify_protocol(log_path: Path, line: str) -> str:
+def _redact(line: str) -> str:
+    redacted = line
+    for pattern in SECRET_PATTERNS:
+        redacted = pattern.sub(lambda m: f"{m.group(1)}=<redacted>", redacted)
+    return redacted[:1200]
+
+
+def _service(log_path: Path, line: str) -> tuple[str, str]:
     text = f"{log_path} {line}".lower()
     if "samba" in text or "smb" in text or "cifs" in text:
-        return "smb"
-    if "nfs" in text:
-        return "nfs"
+        return "smb", "smb"
+    if "nginx" in text:
+        return "nginx", "http"
+    if "httpd" in text or "apache" in text:
+        return "httpd", "http"
     if "ftp" in text or "vsftpd" in text:
-        return "ftp"
+        return "ftp", "ftp"
     if "rsync" in text:
-        return "rsync"
-    if "webdav" in text:
-        return "webdav"
-    if "ssh" in text or "sftp" in text:
-        return "sftp"
-    return "nas_log"
+        return "rsync", "rsync"
+    if "ssh" in text or "sshd" in text or log_path.name == "auth.log":
+        return "ssh", "ssh"
+    if "synoscgi" in text or "synosys" in text or "dsm" in text:
+        return "dsm", "http"
+    return "system", "nas_log"
 
 
-def _classify_action(line: str) -> tuple[str, float, str]:
+def _action(line: str, has_path: bool) -> tuple[str, float]:
     text = line.lower()
-    if any(token in text for token in ["delete", "unlink", "removed", "remove "]):
-        return "file_delete", 0.72, "delete_keyword"
-    if any(token in text for token in ["rename", "renamed", "move ", "moved"]):
-        return "file_rename", 0.70, "rename_keyword"
-    if any(token in text for token in ["write", "modified", "modify", "upload", "put "]):
-        return "file_write", 0.66, "write_keyword"
-    if any(token in text for token in ["download", "read", "open", "get "]):
-        return "file_read", 0.60, "read_keyword"
-    return "file_activity", 0.45, "home_path_log_match"
-
-
-def _first_ip(line: str) -> str | None:
-    match = IP_RE.search(line)
-    return match.group(0) if match else None
+    if has_path and any(token in text for token in ["delete", "unlink", "remove", "removed"]):
+        return "file_delete", 0.66
+    if has_path and any(token in text for token in ["rename", "renamed", "move", "moved"]):
+        return "file_rename", 0.64
+    if has_path and any(token in text for token in ["write", "modify", "modified", "upload", " put "]):
+        return "file_write", 0.62
+    if has_path and any(token in text for token in ["download", " read", "open", " get "]):
+        return "file_read", 0.58
+    if any(token in text for token in ["login", "accepted", "failed", "session opened", "session closed"]):
+        return "auth_activity", 0.70
+    if "error" in text or "fail" in text:
+        return "service_error", 0.60
+    return "system_log", 0.50
 
 
 def _first_user(line: str) -> str | None:
@@ -101,43 +125,33 @@ def _first_user(line: str) -> str | None:
     return None
 
 
-def _event_from_line(line: str, log_path: Path, line_no: int, nas_host: str) -> dict[str, Any] | None:
-    path_match = HOME_SCOPE_RE.search(line)
-    if not path_match:
-        return None
-    display_path = path_match.group("path")
-    file_name = os.path.basename(display_path.rstrip("/")) or None
-    folder_path = os.path.dirname(display_path) or None
+def _event_from_line(line: str, log_path: Path, line_no: int, nas_host: str) -> dict[str, Any]:
     digest = hashlib.sha256(f"{log_path}:{line_no}:{line}".encode("utf-8", errors="replace")).hexdigest()[:24]
-    action, confidence, action_reason = _classify_action(line)
-    protocol = _classify_protocol(log_path, line)
-
+    service, protocol = _service(log_path, line)
+    path_match = PATH_RE.search(line)
+    display_path = path_match.group("path") if path_match else None
+    action, confidence = _action(line, display_path is not None)
+    source_ip_match = IP_RE.search(line)
+    file_name = os.path.basename(display_path.rstrip("/")) if display_path else None
     event: dict[str, Any] = {
-        "event_id": f"nas-home-log-{digest}",
+        "event_id": f"nas-system-log-{digest}",
         "action": action,
         "nas_host": nas_host,
-        "source_channel": "nas_home_log",
-        "source_app": "nas_file_service",
-        "source_surface": "nas_home_scope_log",
-        "object_type": "file" if file_name else "path",
+        "source_channel": "nas_system_log",
+        "source_app": f"nas_{service}",
+        "source_surface": "nas_system_log_tail",
+        "service": service,
         "protocol": protocol,
         "network_protocol": protocol if protocol != "nas_log" else None,
         "confidence": confidence,
         "observed_at": int(time.time()),
         "actor": _first_user(line),
-        "source_ip": _first_ip(line),
-        "file_name": file_name,
-        "folder_path": folder_path,
+        "source_ip": source_ip_match.group(0) if source_ip_match else None,
         "display_path": display_path,
-        "extension": os.path.splitext(file_name or "")[1].lower() if file_name else None,
-        "correlation_refs": [
-            {
-                "type": "nas_home_log_line",
-                "path": str(log_path),
-                "line_ref": str(line_no),
-                "action_reason": action_reason,
-            }
-        ],
+        "file_name": file_name,
+        "folder_path": os.path.dirname(display_path) if display_path else None,
+        "object_type": "file" if display_path else "log_line",
+        "message_excerpt": _redact(line),
         "raw_ref": {
             "type": "log_line_ref",
             "path": str(log_path),
@@ -145,15 +159,15 @@ def _event_from_line(line: str, log_path: Path, line_no: int, nas_host: str) -> 
             "sha256_24": digest,
         },
         "policy_notes": [
-            "NAS home log adapter reads existing log metadata only.",
-            "Only log lines referencing configured home-scope paths are normalized.",
-            "File content, cookies, session tokens, credentials, and raw credential-bearing URLs remain forbidden.",
+            "NAS system log adapter tails existing service logs through transient SSH payloads.",
+            "Log content is redacted for common secret-bearing fragments before Loki push.",
+            "This source is service-log evidence, not guaranteed kernel-level per-file read auditing.",
         ],
     }
     return {key: value for key, value in event.items() if value is not None}
 
 
-def read_home_log_events(log_paths: list[Path], tail_lines: int, limit: int, nas_host: str) -> dict[str, Any]:
+def read_system_log_events(log_paths: list[Path], tail_lines: int, limit: int, nas_host: str) -> dict[str, Any]:
     events: list[dict[str, Any]] = []
     inspected: list[dict[str, Any]] = []
     for log_path in log_paths:
@@ -164,29 +178,16 @@ def read_home_log_events(log_paths: list[Path], tail_lines: int, limit: int, nas
         inspected.append({"path": str(log_path), "readable": bool(lines), "tail_lines": len(lines)})
         base_line_no = max(1, tail_lines - len(lines) + 1)
         for offset, line in enumerate(lines):
-            event = _event_from_line(line, log_path, base_line_no + offset, nas_host)
-            if event:
-                events.append(event)
+            if not line.strip():
+                continue
+            events.append(_event_from_line(line, log_path, base_line_no + offset, nas_host))
             if len(events) >= limit:
                 break
         if len(events) >= limit:
             break
-
     if not events:
-        return {
-            "found": False,
-            "stage": "home_scope_log_events_not_found",
-            "log_paths": [str(path) for path in log_paths],
-            "inspected": inspected,
-            "events": [],
-        }
-    return {
-        "found": True,
-        "stage": "home_scope_log_events_normalized",
-        "log_paths": [str(path) for path in log_paths],
-        "inspected": inspected,
-        "events": events,
-    }
+        return {"found": False, "stage": "nas_system_log_events_not_found", "inspected": inspected, "events": []}
+    return {"found": True, "stage": "nas_system_log_events_normalized", "inspected": inspected, "events": events}
 
 
 def _run_remote(args: argparse.Namespace) -> dict[str, Any]:
@@ -206,42 +207,16 @@ def _run_remote(args: argparse.Namespace) -> dict[str, Any]:
     identity_file = os.environ.get("WARROOM_SSH_IDENTITY_FILE", "").strip()
     if identity_file:
         command.extend(["-o", f"IdentityFile={identity_file}", "-o", "IdentitiesOnly=yes"])
-    command.extend(
-        [
-            remote,
-            "sudo",
-            "-n",
-            "python3",
-            "-",
-            "--mode",
-            "local",
-            "--nas-host",
-            args.nas_host,
-            "--tail-lines",
-            str(args.tail_lines),
-            "--limit",
-            str(args.limit),
-        ]
-    )
+    command.extend([remote, "sudo", "-n", "python3", "-", "--mode", "local", "--nas-host", args.nas_host, "--tail-lines", str(args.tail_lines), "--limit", str(args.limit)])
     for path in args.log_path:
         command.extend(["--log-path", path])
     proc = subprocess.run(command, input=script_source, text=True, capture_output=True, timeout=args.timeout_sec, check=False)
     if proc.returncode != 0:
-        return {
-            "found": False,
-            "stage": "remote_home_log_adapter_failed",
-            "returncode": proc.returncode,
-            "stderr": proc.stderr.strip()[-1000:],
-        }
+        return {"found": False, "stage": "remote_system_log_adapter_failed", "returncode": proc.returncode, "stderr": proc.stderr.strip()[-1000:]}
     try:
         return json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
-        return {
-            "found": False,
-            "stage": "remote_home_log_adapter_invalid_json",
-            "error": str(exc),
-            "stdout_sample": proc.stdout[:1000],
-        }
+        return {"found": False, "stage": "remote_system_log_adapter_invalid_json", "error": str(exc), "stdout_sample": proc.stdout[:1000]}
 
 
 def main() -> int:
@@ -249,7 +224,7 @@ def main() -> int:
     parser.add_argument("--mode", choices=["local", "remote"], default="local")
     parser.add_argument("--log-path", action="append", default=[], help="NAS log file path to inspect")
     parser.add_argument("--tail-lines", type=int, default=2000)
-    parser.add_argument("--limit", type=int, default=50)
+    parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--nas-host", default="rawdb")
     parser.add_argument("--host", default="rawdb", help="SSH host alias or address for --mode remote")
     parser.add_argument("--user", default="", help="SSH user for --mode remote; empty uses ssh config or current user")
@@ -264,7 +239,7 @@ def main() -> int:
         result = _run_remote(args)
     else:
         log_paths = [Path(path) for path in (args.log_path or DEFAULT_LOG_PATHS)]
-        result = read_home_log_events(log_paths, args.tail_lines, args.limit, args.nas_host)
+        result = read_system_log_events(log_paths, args.tail_lines, args.limit, args.nas_host)
 
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if result.get("found") else 1

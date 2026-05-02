@@ -21,6 +21,14 @@ geoip/*.mmdb
 __pycache__/
 *.py[cod]
 
+# Per-server runtime spool/state (keep directory skeletons only)
+rawdb/data/**/*
+!rawdb/data/**/
+!rawdb/data/**/.gitkeep
+lishanmei/data/**/*
+!lishanmei/data/**/
+!lishanmei/data/**/.gitkeep
+
 # Private planning / event artifacts retained locally only
 docs/events/
 specs/

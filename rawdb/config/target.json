@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "rawdb",
+  "display_name": "rawdb",
+  "enabled": true,
+  "ssh": {
+    "host": "192.168.100.40",
+    "user": "yeatsluo"
+  }
+}

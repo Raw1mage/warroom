@@ -10,17 +10,26 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-change-me-local-only}"
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_METRICS_ENABLED: "true"
-      GF_SERVER_ROOT_URL: "${GRAFANA_ROOT_URL:-http://localhost:3000/}"
+      GF_SERVER_ROOT_URL: "${GRAFANA_ROOT_URL:-http://localhost:3000/warroom/}"
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/warroom-dlp-web-ingress.json"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/lishanmei-dlp-file-evidence.json"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /var/lib/grafana/dashboards/lishanmei-dlp-file-evidence.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     depends_on:
-      - prometheus
-      - loki
-      - warroom-dlp-file-collector
+      prometheus:
+        condition: service_started
+      loki:
+        condition: service_started
+      warroom-dlp-file-collector:
+        condition: service_started
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -65,7 +74,8 @@ services:
       - "-labelname=job"
       - "-labelvalue=loki-canary"
     depends_on:
-      - loki
+      loki:
+        condition: service_started
 
   synology-nginx-log-exporter:
     image: grafana/alloy:v1.8.2
@@ -84,7 +94,8 @@ services:
       - ./loki/synology-nginx-alloy.template.alloy:/etc/alloy/config.alloy:ro
       - ${SYNOLOGY_NGINX_LOG_DIR:-./synology-nginx-logs}:/var/log/synology-nginx:ro
     depends_on:
-      - loki
+      loki:
+        condition: service_started
 
   warroom-dlp-file-collector:
     build:
@@ -92,11 +103,13 @@ services:
     container_name: warroom-dlp-file-collector
     restart: unless-stopped
     environment:
+      HOME: "/home/pkcs12"
       LOKI_PUSH_URL: "http://loki:3100/loki/api/v1/push"
       WARROOM_DLP_FILE_COLLECTOR_PORT: "8010"
-      WARROOM_DLP_COLLECTOR_SOURCES: "${WARROOM_DLP_COLLECTOR_SOURCES:-file_station_remote}"
+      WARROOM_DLP_COLLECTOR_SOURCES: "${WARROOM_DLP_COLLECTOR_SOURCES:-host_health_remote,file_station_remote,nas_home_log_remote,nas_system_log_remote}"
       WARROOM_DLP_COLLECTOR_INTERVAL_SECONDS: "${WARROOM_DLP_COLLECTOR_INTERVAL_SECONDS:-30}"
       WARROOM_DLP_TOOLS_DIR: "/tools"
+      WARROOM_SERVER_ROOTS_DIR: "/servers"
       WARROOM_NAS_TARGETS_CONFIG: "${WARROOM_NAS_TARGETS_CONFIG:-/config/nas-targets.json}"
       WARROOM_GEOIP_MMDB_PATH: "${WARROOM_GEOIP_MMDB_PATH:-}"
       WARROOM_FILE_STATION_REMOTE_HOST: "${WARROOM_FILE_STATION_REMOTE_HOST:-rawdb}"
@@ -105,14 +118,29 @@ services:
       WARROOM_FILE_STATION_REMOTE_LIMIT: "${WARROOM_FILE_STATION_REMOTE_LIMIT:-50}"
       WARROOM_FILE_STATION_REMOTE_TIMEOUT_SECONDS: "${WARROOM_FILE_STATION_REMOTE_TIMEOUT_SECONDS:-30}"
       WARROOM_FILE_STATION_DB_PATH: "${WARROOM_FILE_STATION_DB_PATH:-/volume1/@database/synolog/.DSMFMXFERDB}"
+      WARROOM_SSH_IDENTITY_FILE: "${WARROOM_SSH_IDENTITY_FILE:-/home/pkcs12/.ssh/id_ed25519}"
     expose:
       - "8010"
+    command:
+      - "sh"
+      - "-c"
+      - "test -r /home/pkcs12/.ssh/id_ed25519 || { echo 'missing SSH key from WARROOM_SSH_DIR SSOT' >&2; exit 1; }; exec python /app/app.py"
     volumes:
+      - ./services/warroom-dlp-file-collector/app.py:/app/app.py:ro
       - ./tools:/tools:ro
       - ./config:/config:ro
+      - .:/servers
       - ./geoip:/geoip:ro
+      - ${WARROOM_SSH_DIR:-/home/pkcs12/.ssh}:/home/pkcs12/.ssh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8010/metrics\", timeout=5).read(1)'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     depends_on:
-      - loki
+      loki:
+        condition: service_started
 
 volumes:
   grafana-data:
