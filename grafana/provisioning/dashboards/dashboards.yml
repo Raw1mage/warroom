@@ -3,7 +3,7 @@ apiVersion: 1
 providers:
   - name: warroom-local
     orgId: 1
-    folder: Warroom
+    folder: 利善美智能
     type: file
     disableDeletion: false
     editable: true
