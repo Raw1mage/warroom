@@ -67,6 +67,18 @@
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
       "uid": "warroom-nas-host-health"
+    },
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟異常警訊中心",
+      "tooltip": "查看登入、下載、連線與收集能力缺口的 POC 異常警訊",
+      "type": "dashboard",
+      "uid": "lishanmei-anomaly-alert-center"
     }
   ],
   "panels": [
