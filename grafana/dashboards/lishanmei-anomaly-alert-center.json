@@ -42,149 +42,470 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看 NAS 主機資源與服務狀態",
       "type": "dashboard",
-      "uid": "warroom-nas-host-health"
+      "uid": "lishanmei-nas-host-health"
     }
   ],
   "panels": [
     {
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "id": 1,
       "panels": [],
       "title": "Overview — active anomaly signals",
       "type": "row"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最近 2 分鐘 collector registry capability gap。大於 0 代表資料收集能力正在出問題。",
-      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 1},
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
       "id": 2,
-      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"}[2m])) or vector(0)", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"}[2m])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "Active capability gaps (2m)",
       "type": "stat"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最近 5 分鐘登入失敗數。可用來觀察密碼猜測或暴力破解跡象。",
-      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 5}, {"color": "red", "value": 20}]}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 1},
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 5 },
+              { "color": "red", "value": 20 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
       "id": 3,
-      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"}[5m])) or vector(0)", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"}[5m])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "Auth failures (5m)",
       "type": "stat"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最近 1 小時大檔下載事件數，門檻 100MB。",
-      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 5}]}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 1},
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
       "id": 4,
-      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 [1h])) or vector(0)", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 [1h])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "Large downloads >100MB (1h)",
       "type": "stat"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最近 15 分鐘 TCP established 最大值，用於連線突增 readiness。",
-      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 100}, {"color": "red", "value": 300}]}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 1},
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 100 },
+              { "color": "red", "value": 300 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
       "id": 5,
-      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [15m]) or vector(0)", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [15m]) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "TCP established max (15m)",
       "type": "stat"
     },
-    {"collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5}, "id": 6, "panels": [], "title": "Login anomaly scenarios", "type": "row"},
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 6,
+      "panels": [],
+      "title": "Login anomaly scenarios",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "暴力破解常見視角：最近 1 小時登入失敗來源 IP 排行。",
-      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
       "id": 7,
-      "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "orientation": "horizontal", "showValue": "auto", "xField": "source_ip"},
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xField": "source_ip"
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | source_ip != \"\" [1h])))", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | source_ip != \"\" [1h])))",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "Top failed login source IPs (1h)",
       "type": "barchart"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "使用者層面的登入失敗排行。",
-      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
       "id": 8,
-      "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "orientation": "horizontal", "showValue": "auto", "xField": "actor"},
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xField": "actor"
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | actor != \"\" [1h])))", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | actor != \"\" [1h])))",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "Top failed login actors (1h)",
       "type": "barchart"
     },
-    {"collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 14}, "id": 9, "panels": [], "title": "Data exfiltration scenarios", "type": "row"},
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 9,
+      "panels": [],
+      "title": "Data exfiltration scenarios",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最近 6 小時下載容量排行。若 actor 缺失會顯示空分類，代表資料源尚未提供 actor。",
-      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "bytes"}, "overrides": []},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 15},
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "bytes" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
       "id": 10,
-      "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "orientation": "horizontal", "showValue": "auto", "xField": "actor"},
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xField": "actor"
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(10, sum by (actor) (sum_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | unwrap size_bytes [6h])))", "queryType": "instant", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(10, sum by (actor) (sum_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | unwrap size_bytes [6h])))",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
       "title": "Download volume by actor (6h)",
       "type": "barchart"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最近 1 小時大檔下載原始 evidence，用於快速 drill-down。",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 15},
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
       "id": 11,
-      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600", "queryType": "range", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
       "title": "Large download evidence log",
       "type": "logs"
     },
-    {"collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 23}, "id": 12, "panels": [], "title": "Network anomaly scenarios", "type": "row"},
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 12,
+      "panels": [],
+      "title": "Network anomaly scenarios",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "network_socket snapshot 趨勢。第一版 POC 先看 established count；正式告警需 baseline。",
-      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"drawStyle": "line", "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 4, "showPoints": "never"}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 4,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
       "id": 13,
-      "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [$__interval])", "queryType": "range", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [$__interval])",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
       "title": "TCP established trend",
       "type": "timeseries"
     },
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "最新 socket snapshot 原始 evidence，包含 listening ports 與 top remote IPs。",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
       "id": 14,
-      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"}", "queryType": "range", "refId": "A"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
       "title": "Network socket snapshots",
       "type": "logs"
     },
-    {"collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 32}, "id": 15, "panels": [], "title": "Evidence collection health", "type": "row"},
     {
-      "datasource": {"type": "loki", "uid": "loki"},
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 15,
+      "panels": [],
+      "title": "Evidence collection health",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "新版 registry gap taxonomy：source_key / affected capability / stage。",
-      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "short"}, "overrides": []},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 33},
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 33 },
       "id": 16,
-      "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "orientation": "horizontal", "showValue": "auto", "xField": "category"},
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xField": "category"
+      },
       "pluginVersion": "11.5.2",
-      "targets": [{"datasource": {"type": "loki", "uid": "loki"}, "direction": "backward", "editorMode": "code", "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"} | json | label_format category=\"{{.source_key}}/{{.affected_capability}}/{{.gap_stage}}\" [24h])))", "queryType": "instant", "refId": "A", "legendFormat": "{{category}}"}],
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"} | json | label_format category=\"{{.source_key}}/{{.affected_capability}}/{{.gap_stage}}\" [24h])))",
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{category}}"
+        }
+      ],
       "title": "Capability gaps by registry source/capability/stage (24h)",
       "type": "barchart"
     }
@@ -192,8 +513,8 @@
   "refresh": "30s",
   "schemaVersion": 40,
   "tags": ["warroom", "lishanmei", "anomaly", "poc"],
-  "templating": {"list": []},
-  "time": {"from": "now-6h", "to": "now"},
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "TheSmartAI Anomaly Alert Center POC",

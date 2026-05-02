@@ -42,7 +42,7 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
-      "uid": "warroom-nas-host-health"
+      "uid": "lishanmei-nas-host-health"
     }
   ],
   "panels": [

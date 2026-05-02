@@ -13,6 +13,11 @@ services:
       GF_SERVER_ROOT_URL: "${GRAFANA_ROOT_URL:-http://localhost:3000/warroom/}"
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/lishanmei-dlp-file-evidence.json"
+      GF_SMTP_ENABLED: "${GRAFANA_SMTP_ENABLED:-true}"
+      GF_SMTP_HOST: "${GRAFANA_SMTP_HOST:-rawdb:25}"
+      GF_SMTP_FROM_ADDRESS: "${GRAFANA_SMTP_FROM_ADDRESS:-service@sob.com.tw}"
+      GF_SMTP_FROM_NAME: "${GRAFANA_SMTP_FROM_NAME:-Warroom Grafana}"
+      GF_SMTP_SKIP_VERIFY: "${GRAFANA_SMTP_SKIP_VERIFY:-true}"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
@@ -29,6 +34,8 @@ services:
       loki:
         condition: service_started
       warroom-dlp-file-collector:
+        condition: service_started
+      warroom-ai-anomaly-scorer:
         condition: service_started
 
   prometheus:
@@ -138,6 +145,43 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    depends_on:
+      loki:
+        condition: service_started
+
+  warroom-ai-anomaly-scorer:
+    image: ${WARROOM_AI_SCORER_IMAGE:-python:3.9}
+    container_name: warroom-ai-anomaly-scorer
+    restart: unless-stopped
+    environment:
+      WARROOM_AI_ANOMALY_SCORER_PORT: "8020"
+      WARROOM_AI_LOKI_QUERY_URL: "http://loki:3100/loki/api/v1/query"
+      WARROOM_AI_LOKI_PUSH_URL: "http://loki:3100/loki/api/v1/push"
+      WARROOM_AI_NAS_HOST: "${WARROOM_AI_NAS_HOST:-lishanmei}"
+      WARROOM_AI_SCORER_INTERVAL_SECONDS: "${WARROOM_AI_SCORER_INTERVAL_SECONDS:-60}"
+      WARROOM_AI_OLLAMA_ENABLED: "${WARROOM_AI_OLLAMA_ENABLED:-true}"
+      WARROOM_AI_OLLAMA_URL: "${WARROOM_AI_OLLAMA_URL:-http://host.docker.internal:11434/api/chat}"
+      WARROOM_AI_OLLAMA_MODEL: "${WARROOM_AI_OLLAMA_MODEL:-qwen2.5:14b-instruct}"
+      WARROOM_AI_OLLAMA_TIMEOUT_SECONDS: "${WARROOM_AI_OLLAMA_TIMEOUT_SECONDS:-20}"
+      WARROOM_AI_MIN_REPEAT_SECONDS: "${WARROOM_AI_MIN_REPEAT_SECONDS:-900}"
+      WARROOM_AI_AUTH_FAILURE_THRESHOLD_5M: "${WARROOM_AI_AUTH_FAILURE_THRESHOLD_5M:-20}"
+      WARROOM_AI_TCP_ESTABLISHED_THRESHOLD_5M: "${WARROOM_AI_TCP_ESTABLISHED_THRESHOLD_5M:-100}"
+      WARROOM_AI_LARGE_DOWNLOAD_BYTES: "${WARROOM_AI_LARGE_DOWNLOAD_BYTES:-104857600}"
+    expose:
+      - "8020"
+    command:
+      - "python"
+      - "/app/app.py"
+    volumes:
+      - ./services/warroom-ai-anomaly-scorer/app.py:/app/app.py:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8020/healthz\", timeout=5).read(1)'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     depends_on:
       loki:
         condition: service_started

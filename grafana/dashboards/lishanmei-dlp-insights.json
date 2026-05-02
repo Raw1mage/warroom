@@ -66,7 +66,7 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
-      "uid": "warroom-nas-host-health"
+      "uid": "lishanmei-nas-host-health"
     }
   ],
   "panels": [
@@ -192,7 +192,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\"}[$__range]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\"}[$__range])) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }

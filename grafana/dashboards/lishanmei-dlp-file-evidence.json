@@ -66,7 +66,7 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
-      "uid": "warroom-nas-host-health"
+      "uid": "lishanmei-nas-host-health"
     },
     {
       "asDropdown": false,
@@ -87,7 +87,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "最近 30 分鐘 File Station transfer DB adapter 送出的明確下載/匯出事件數。只統計已進 Loki 的 raw evidence，不推估缺漏。",
+      "description": "最近 30 分鐘 NAS home-scope log adapter 送出的 live file evidence。File Station download/export 另由專用大下載 panel 呈現；不以歷史 download DB 假裝即時活動。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -137,12 +137,12 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"}[30m]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"}[30m])) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "最近 30m File Station download/export",
+      "title": "最近 30m live file evidence",
       "type": "stat"
     },
     {
@@ -150,7 +150,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "最近 30 分鐘 File Station 下載/匯出事件中，payload 內 actor 欄位的 distinct count；空值不補猜。",
+      "description": "最近 30 分鐘 live file evidence 中，payload 內 actor 欄位的 distinct count；空值不補猜。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -200,7 +200,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "count(sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | actor != \"\" [30m])))",
+          "expr": "count(sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | actor != \"\" [30m]))) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
@@ -213,7 +213,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "最近 30 分鐘 File Station 下載/匯出事件中，payload 內 source_ip 欄位的 distinct count；空值不補猜。",
+      "description": "最近 30 分鐘 live file evidence 中，payload 內 source_ip 欄位的 distinct count；空值不補猜。NAS log evidence 不一定有 source_ip。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -263,7 +263,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "count(sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | source_ip != \"\" [30m])))",
+          "expr": "count(sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" [30m]))) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
@@ -391,7 +391,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為 actor/login user，Y 軸為目前時間範圍內 File Station download/export 事件量。用來快速看誰最常取出檔案。",
+      "description": "X 軸為 actor/login user，Y 軸為目前時間範圍內 live file evidence 事件量。用來快速看誰最常出現在 NAS home-scope file metadata。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -470,13 +470,13 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | actor != \"\" | label_format category=\"{{.actor}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | actor != \"\" | label_format category=\"{{.actor}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
         }
       ],
-      "title": "Login/File Station user activity volume",
+      "title": "NAS file evidence by actor",
       "type": "barchart",
       "transformations": [
         {
@@ -506,7 +506,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為來源 IP，Y 軸為目前時間範圍內 download/export 事件量。用來辨識集中來源或外部來源。",
+      "description": "X 軸為來源 IP，Y 軸為目前時間範圍內 live file evidence 事件量。NAS home log metadata 不一定含 source_ip；無 IP 時此 panel 會顯示 0/空。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -585,7 +585,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | source_ip != \"\" | label_format category=\"{{.source_ip}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" | label_format category=\"{{.source_ip}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -621,7 +621,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為檔案路徑，Y 軸為目前時間範圍內下載/匯出次數。長標籤會旋轉顯示，適合找出反覆外流檔案。",
+      "description": "X 軸為檔案路徑，Y 軸為目前時間範圍內 live file evidence 次數。長標籤會旋轉顯示，適合找出反覆出現的 home-scope paths。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -700,13 +700,13 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | display_path != \"\" | label_format category=\"{{.display_path}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | display_path != \"\" | label_format category=\"{{.display_path}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
         }
       ],
-      "title": "Downloaded file volume by file path",
+      "title": "Live file evidence by path",
       "type": "barchart",
       "transformations": [
         {
@@ -736,7 +736,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為 folder_path，Y 軸為目前時間範圍內 download/export 事件量。用來找出被集中取出的資料夾。",
+      "description": "X 軸為 folder_path，Y 軸為目前時間範圍內 live file evidence 事件量。用來找出被集中觀察到的資料夾。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -815,7 +815,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | folder_path != \"\" | label_format category=\"{{.folder_path}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | folder_path != \"\" | label_format category=\"{{.folder_path}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -851,7 +851,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為 file_name，Y 軸為目前時間範圍內 download/export 事件量。用於比完整 path 更短的檔名視角。",
+      "description": "X 軸為 file_name，Y 軸為目前時間範圍內 live file evidence 事件量。用於比完整 path 更短的檔名視角。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -930,7 +930,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | file_name != \"\" | label_format category=\"{{.file_name}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | file_name != \"\" | label_format category=\"{{.file_name}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -966,7 +966,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為 source_country，Y 軸為目前時間範圍內 download/export 事件量。只有 GeoIP enrichment 有資料時才會顯示。",
+      "description": "X 軸為 source_country，Y 軸為目前時間範圍內 live file evidence 事件量。只有 GeoIP enrichment 有資料時才會顯示。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1045,7 +1045,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | source_country != \"\" | label_format category=\"{{.source_country}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_country != \"\" | label_format category=\"{{.source_country}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1081,7 +1081,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為 source_region，Y 軸為目前時間範圍內 download/export 事件量。只有 GeoIP enrichment 有資料時才會顯示。",
+      "description": "X 軸為 source_region，Y 軸為目前時間範圍內 live file evidence 事件量。只有 GeoIP enrichment 有資料時才會顯示。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1160,7 +1160,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | source_region != \"\" | label_format category=\"{{.source_region}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_region != \"\" | label_format category=\"{{.source_region}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1196,7 +1196,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "依 size_bytes 分成級距統計下載/匯出頻率；這是檔案外流量級的摘要，不顯示流水帳。",
+      "description": "依 size_bytes 分成級距統計 File Station download/export 頻率；這是歷史 download DB 視角，不代表目前 30m 一定有即時下載。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1275,7 +1275,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes < 10485760 [$__range]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes < 10485760 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "<10MB"
@@ -1287,7 +1287,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 10485760 | size_bytes < 104857600 [$__range]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 10485760 | size_bytes < 104857600 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "B",
           "legendFormat": "10-100MB"
@@ -1299,7 +1299,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 104857600 | size_bytes < 1073741824 [$__range]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 104857600 | size_bytes < 1073741824 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "C",
           "legendFormat": "100MB-1GB"
@@ -1311,7 +1311,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 1073741824 [$__range]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 1073741824 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "D",
           "legendFormat": ">=1GB"

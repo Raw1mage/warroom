@@ -23,6 +23,7 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 - Role: dashboard and visualization plane.
 - Public route: `/warroom` via opencode gateway to port `3000`.
 - Provisioned dashboard folder display name: `利善美智能`; this reuses the original Warroom/陽光沙灘 dashboard JSON layout while targeting `lishanmei` data streams.
+- Alerting posture: Grafana-managed alerting is the first alert-system layer. Provisioned TheSmartAI alert rules live under `grafana/provisioning/alerting/`, send to contact point `warroom-thesmartai-email`, and use the LAN `rawdb:25` MTA relay by default with sender `service@sob.com.tw`. Grafana owns alert state, grouping, deduplication, notification policy, and email delivery; Warroom collector remains the evidence producer.
 - Current home dashboard: `warroom-dlp-web-ingress`.
 - DLP dashboards include `warroom-dlp-web-ingress`, `warroom-dlp-file-evidence`, `warroom-dlp-terminal-stream`, `warroom-local-overview`, and `warroom-dlp-insights`.
 - `warroom-dlp-insights` provides Webalizer-style evidence statistics from existing Loki payload fields only: event trends, actor/IP/protocol/file/folder rankings, GeoIP country/region rankings when local MMDB enrichment exists, source channel rankings, and capability-gap rankings.
@@ -96,6 +97,16 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 - `tools/dlp_event_collector.py`: local normalized event collector that dry-runs JSONL or pushes bounded-label streams to Loki.
 
 These utilities are reusable normalization helpers. They are used directly for CLI workflows and indirectly by `warroom-dlp-file-collector` where applicable.
+
+### Warroom AI anomaly scorer service
+
+- Service: `warroom-ai-anomaly-scorer` in `docker-compose.yml`.
+- Implementation: `services/warroom-ai-anomaly-scorer/app.py`.
+- Role: Phase 2 anomaly signal producer for TheSmartAI. It queries Loki for bounded feature windows, evaluates deterministic rule candidates, optionally calls a direct Ollama HTTP endpoint for triage enrichment, and pushes bounded-label `action="anomaly_alert"` events back to Loki.
+- Runtime contract: Grafana Alerting remains responsible for alert lifecycle, grouping, deduplication, and email delivery. The AI scorer must not implement its own notification system and must not perform automatic response actions.
+- LLM posture: direct Ollama triage is optional and non-blocking. If Ollama is unavailable, the scorer still emits deterministic anomaly signals and marks `llm_status="unavailable"`. LLM output is triage-only and must not be treated as primary detection, final severity, or response authority.
+- Metrics: `/metrics` on port `8020`, scraped by Prometheus job `warroom-ai-anomaly-scorer`.
+- Current rules: auth failure spike, active collector capability gap, TCP established spike, and large File Station download ingestion. Download alerting remains ingestion-based until an `observed_at` freshness/cursor guard is implemented.
 
 ## Evidence Sources and Data Flow
 
@@ -212,4 +223,4 @@ Viewing duration is currently an estimate derived from viewer/open timing window
 
 ## Open Architecture Items
 
-- Keep AI Alert Judge deferred until egress evidence collection is proven.
+- Phase 2 AI detection is tracked in `plans/20260502_phase2_ai_detection/`: AI scoring is a proposed signal-producer module, not the alert lifecycle. It should extract features from Loki/Prometheus, apply deterministic rules plus rolling baselines, optionally add Isolation Forest after enough history, and emit bounded-label `action="anomaly_alert"` events back to Loki. Grafana Alerting remains responsible for alert state, grouping, deduplication, email delivery, and future LINE webhook routing. LLMs may assist triage summaries only; they must not be the primary detector or automatic response authority.
