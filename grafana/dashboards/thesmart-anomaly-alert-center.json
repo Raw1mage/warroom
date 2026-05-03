@@ -557,7 +557,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "AI scorer 已產生的 anomaly_alert。這是最接近「需要處理的告警」的表格。",
+      "description": "AI scorer 已產生的 anomaly_alert。空白代表目前查詢時間範圍內沒有需要處理的 AI 告警，不代表資料源未開發。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -613,7 +613,7 @@
           "refId": "A"
         }
       ],
-      "title": "AI 告警清單",
+      "title": "AI 告警清單（目前無告警時空白）",
       "transformations": [
         {
           "id": "extractFields",
@@ -834,7 +834,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "只列出大於 100MB 的下載 evidence；無資料代表目前沒有大檔下載候選。",
+      "description": "大於 100MB 的下載 evidence 彙總。以使用者、檔名、來源與 IP 去重，證據筆數表示底層 File Station transfer DB/log row 數；無資料代表目前沒有大檔下載候選。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -885,57 +885,30 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600",
-          "queryType": "range",
+          "expr": "topk(100, sum by (actor, file_name, source_app, source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 | label_format actor=\"{{.actor}}\", file_name=\"{{.file_name}}\", source_app=\"{{.source_app}}\", source_ip=\"{{.source_ip}}\" [$__range])))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
-      "title": "大檔下載候選",
+      "title": "大檔下載候選（去重彙總）",
       "transformations": [
         {
-          "id": "extractFields",
-          "options": {
-            "format": "json",
-            "replace": false,
-            "source": "Line"
-          }
+          "id": "seriesToRows",
+          "options": {}
         },
         {
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Line": true,
-              "__error__": true,
-              "__error_details__": true,
-              "collector": true,
-              "confidence": true,
-              "event_id": true,
-              "ingested_at": true,
-              "nas_host": true,
-              "observed_at": true,
-              "policy_notes": true,
-              "raw_ref": true,
-              "source_channel": true,
-              "source_key": true,
-              "source_surface": true
+              "Time": true
             },
             "indexByName": {
-              "Time": 0,
-              "actor": 1,
-              "file_name": 2,
-              "display_path": 3,
-              "size_bytes": 4,
-              "source_ip": 5,
-              "source_app": 6
+              "Metric": 0,
+              "Value": 1
             },
             "renameByName": {
-              "Time": "時間",
-              "actor": "使用者",
-              "file_name": "檔名",
-              "display_path": "路徑",
-              "size_bytes": "大小",
-              "source_ip": "IP",
-              "source_app": "來源"
+              "Metric": "使用者 / 檔名 / 來源 / IP",
+              "Value": "證據筆數"
             }
           }
         }
@@ -947,7 +920,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "列出目前或歷史 capability gap，指出是哪個來源/能力/階段出問題。",
+      "description": "列出目前或歷史 capability gap，指出是哪個來源/能力/階段出問題。空白代表目前查詢時間範圍內沒有收集缺口事件，不代表 panel 未開發。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1003,7 +976,7 @@
           "refId": "A"
         }
       ],
-      "title": "收集能力缺口",
+      "title": "收集能力缺口（目前無缺口時空白）",
       "transformations": [
         {
           "id": "extractFields",

@@ -205,7 +205,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "DLP event trend by normalized action. Use this like Webalizer daily/hourly hits, but scoped to metadata evidence.",
+      "description": "DLP event timeline by normalized action. Time-related activity must be read on a timeline; rankings below are only for non-time aggregations.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -218,8 +218,8 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
-            "drawStyle": "bars",
-            "fillOpacity": 35,
+            "drawStyle": "line",
+            "fillOpacity": 15,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -291,7 +291,7 @@
           "refId": "A"
         }
       ],
-      "title": "活動時間分布 / action 趨勢",
+      "title": "事件 Timeline / action 趨勢",
       "type": "timeseries"
     },
     {
@@ -299,7 +299,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top actors from normalized JSON payload. Empty actors are excluded rather than guessed.",
+      "description": "Top actors from normalized JSON payload. This is a non-time ranking for the selected time range; empty actors are excluded rather than guessed. Empty table means no actor field is covered in the range.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -362,7 +362,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top source IP addresses from collected metadata.",
+      "description": "Top source IP addresses from collected metadata. This is a non-time ranking for the selected time range. Empty table means current evidence has no source_ip coverage in the range.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -425,7 +425,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top normalized network protocols. HTTP may include Synology web surfaces normalized by the collector.",
+      "description": "Top normalized network protocols. This is a non-time ranking for the selected time range. HTTP may include Synology web surfaces normalized by the collector.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -488,7 +488,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top home/file folders referenced by normalized evidence. Missing folders are excluded rather than inferred.",
+      "description": "Top home/file folders referenced by normalized evidence. This is a non-time ranking for the selected time range; missing folders are excluded rather than inferred.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -551,7 +551,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top file names referenced by metadata evidence.",
+      "description": "Top file names referenced by metadata evidence. This is a non-time ranking for the selected time range; empty table means no file_name field is covered in the range.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -614,7 +614,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top download/export targets. This is restricted to explicit download/export actions.",
+      "description": "Top download/export targets. This is a non-time ranking restricted to explicit download/export actions in the selected time range.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -677,7 +677,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top countries from GeoIP enrichment. Private IPs or missing MMDB remain absent/unknown; no country is guessed.",
+      "description": "Top countries from GeoIP enrichment. This is a non-time ranking for the selected time range. Empty table means GeoIP is not covered or no public source_ip matched; no country is guessed.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -740,7 +740,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top country/region pairs from GeoIP enrichment where both fields exist.",
+      "description": "Top country/region pairs from GeoIP enrichment where both fields exist. Empty table means region-level GeoIP is not covered in the selected range.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -803,7 +803,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Which collector channel/app produced evidence or gap signals.",
+      "description": "Which collector channel/app produced evidence or gap signals. This is a non-time ranking for the selected time range; use the event timeline for temporal interpretation.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -866,7 +866,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Capability gaps grouped by source and stage so missing permissions/connectors remain visible.",
+      "description": "Capability gaps grouped by source and stage so missing permissions/connectors remain visible. Empty table means no capability gap events occurred in the selected range.",
       "fieldConfig": {
         "defaults": {
           "custom": {

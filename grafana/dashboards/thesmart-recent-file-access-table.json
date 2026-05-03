@@ -39,7 +39,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "最近被存取的檔案清單。欄位直接來自 Loki JSON payload：時間、file_name、actor、source_app、source_ip；缺 IP 或使用者時保持空值，不推測補值。",
+      "description": "最近被存取的檔案彙總。以檔名、使用者、途徑與 IP 去重，證據筆數表示同一活動在底層 DB/log 中出現的 row 數；缺 IP 或使用者時保持空值，不推測補值。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -88,59 +88,30 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"$nas\", source_app!=\"collector\", action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|file_activity|file_read|file_write|file_delete|file_rename\"} | json | file_name != \"\"",
-          "queryType": "range",
+          "expr": "topk(100, sum by (file_name, actor, source_app, source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"$nas\", source_app!=\"collector\", action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|file_read|file_write|file_delete|file_rename\"} | json | file_name != \"\" | label_format file_name=\"{{.file_name}}\", actor=\"{{.actor}}\", source_app=\"{{.source_app}}\", source_ip=\"{{.source_ip}}\" [$__range])))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
-      "title": "最近被存取的檔案",
+      "title": "最近被存取的檔案（去重彙總）",
       "transformations": [
         {
-          "id": "extractFields",
-          "options": {
-            "format": "json",
-            "replace": false,
-            "source": "Line"
-          }
+          "id": "seriesToRows",
+          "options": {}
         },
         {
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Line": true,
-              "__error__": true,
-              "__error_details__": true,
-              "action": true,
-              "collector": true,
-              "confidence": true,
-              "display_path": true,
-              "event_id": true,
-              "folder_path": true,
-              "ingested_at": true,
-              "nas_host": true,
-              "network_protocol": true,
-              "observed_at": true,
-              "policy_notes": true,
-              "protocol": true,
-              "size_bytes": true,
-              "source_channel": true,
-              "source_country": true,
-              "source_key": true,
-              "source_region": true
+              "Time": true
             },
             "indexByName": {
-              "Time": 0,
-              "file_name": 1,
-              "actor": 2,
-              "source_app": 3,
-              "source_ip": 4
+              "Metric": 0,
+              "Value": 1
             },
             "renameByName": {
-              "Time": "時間",
-              "actor": "使用者",
-              "file_name": "檔名",
-              "source_app": "途徑（app名）",
-              "source_ip": "IP"
+              "Metric": "檔案 / 使用者 / 途徑 / IP",
+              "Value": "證據筆數"
             }
           }
         }
