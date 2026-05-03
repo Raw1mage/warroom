@@ -11,23 +11,23 @@
 ### IN
 
 - Grafana provisioning folder 名稱改為「利善美智能」。
-- `config/nas-targets.json` 新增 `lishanmei` 目標，透過 SSH 讀取 File Station transfer DB 與 NAS home-scope log metadata。
+- `config/nas-targets.json` 新增 `thesmart` 目標，透過 SSH 讀取 File Station transfer DB 與 NAS home-scope log metadata。
 - `warroom-dlp-file-collector` 容器補齊 SSH client 與 SSH key mount，以便本地 collector 可透過 SSH 執行 transient payload。
-- `specs/architecture.md` 同步：`rawdb` 與 `lishanmei` 的預設監測模式皆為 SSH stdin payload pull，不是 NAS 端常駐 agent/exporter，也不是因區網便利而直接依賴 syslog。
+- `specs/architecture.md` 同步：`rawdb` 與 `thesmart` 的預設監測模式皆為 SSH stdin payload pull，不是 NAS 端常駐 agent/exporter，也不是因區網便利而直接依賴 syslog。
 
 ### OUT
 
 - 不在 `nas.wuyang.co` 部署 Docker、Grafana、Promtail、node_exporter 或任何常駐 Warroom agent。
 - 不預設開啟 NAS 端 Prometheus scrape port，例如 `:9100`。
-- 不把 direct syslog 當作 `rawdb` 或 `lishanmei` 的標準收集路徑；Alloy/syslog profile 僅保留為明確批准的 compatibility/experimental path。
+- 不把 direct syslog 當作 `rawdb` 或 `thesmart` 的標準收集路徑；Alloy/syslog profile 僅保留為明確批准的 compatibility/experimental path。
 - 不收集檔案內容、不提交 NAS 密碼或 SSH 私鑰。
 
 ## 任務清單
 
 - [x] 將 Grafana provisioning folder 顯示名稱改為「利善美智能」。
-- [x] 將 `lishanmei` 加入 NAS target config，沿用本地 collector 的 SSH remote adapter 模式。
-- [x] 移除 Prometheus 對 `nas.wuyang.co:9100` / `lishanmei-node-exporter` 的直接 scrape 設定。
-- [x] 更新架構文件，明確規範 `rawdb` 與 `lishanmei` 都應採 SSH payload pull 預設姿態。
+- [x] 將 `thesmart` 加入 NAS target config，沿用本地 collector 的 SSH remote adapter 模式。
+- [x] 移除 Prometheus 對 `nas.wuyang.co:9100` / `thesmart-node-exporter` 的直接 scrape 設定。
+- [x] 更新架構文件，明確規範 `rawdb` 與 `thesmart` 都應採 SSH payload pull 預設姿態。
 - [x] 本機驗證 compose config 與 Python collector/helper 語法。
 
 ## Key Decisions
@@ -39,14 +39,14 @@
 ## Issues Found
 
 - 先前規劃曾錯誤導向 NAS 端常駐 node_exporter/Promtail 與 reverse tunnel。已在 `prometheus/prometheus.yml` 移除 direct NAS scrape，並在 `specs/architecture.md` 改寫為 SSH payload pull。
-- `rawdb` 原先容易被視為「因在區網內可直接接 syslog」的例外；本次決策收斂為 rawdb 與 lishanmei 同規格，避免監測架構分裂。
+- `rawdb` 原先容易被視為「因在區網內可直接接 syslog」的例外；本次決策收斂為 rawdb 與 thesmart 同規格，避免監測架構分裂。
 
 ## Verification
 
 - `docker compose config`：通過；resolved config 中 Prometheus 僅包含本地 targets，未包含 `nas.wuyang.co:9100`。
 - `python3 -m py_compile services/warroom-dlp-file-collector/app.py tools/file_station_transfer_adapter.py tools/nas_home_log_adapter.py`：通過。
-- Search check：未在 active config 中發現 `lishanmei-node-exporter`、`nas.wuyang.co:9100`、`warroom-node-exporter`、`warroom-promtail`；僅 legacy plan note 還有 `warroom-node-exporter-c` 設計名詞。
-- Architecture Sync: Updated `specs/architecture.md` to make SSH stdin payload pull the default collection boundary for both `rawdb` and `lishanmei`.
+- Search check：未在 active config 中發現 `thesmart-node-exporter`、`nas.wuyang.co:9100`、`warroom-node-exporter`、`warroom-promtail`；僅 legacy plan note 還有 `warroom-node-exporter-c` 設計名詞。
+- Architecture Sync: Updated `specs/architecture.md` to make SSH stdin payload pull the default collection boundary for both `rawdb` and `thesmart`.
 
 ## Remaining
 
@@ -55,17 +55,17 @@
 
 ## Gap Resolution 2026-05-02
 
-### Resolved: `lishanmei/file_station_remote`
+### Resolved: `thesmart/file_station_remote`
 
-- Symptom: Loki capability gap `nas_host="lishanmei"`, `source_channel="file_station_remote"`, `gap_stage="adapter_returned_failure"`.
+- Symptom: Loki capability gap `nas_host="thesmart"`, `source_channel="file_station_remote"`, `gap_stage="adapter_returned_failure"`.
 - Root cause: remote File Station transfer DB adapter succeeded when run serially with a longer timeout, but the target config used `timeout_seconds: 30`, which was too short for the NAS-side SQLite scan and SSH payload round trip.
-- Change: `config/nas-targets.json` now sets `lishanmei.file_station_remote.timeout_seconds` to `90`.
-- Validation: direct adapter run returned `events_normalized` from `/volume1/@database/synolog/.DSMFMXFERDB`; collector metrics later showed `events_pushed_total=249`, and Loki had 50 recent `nas_host="lishanmei"`, `source_channel="file_station_transfer_db"` events.
+- Change: `config/nas-targets.json` now sets `thesmart.file_station_remote.timeout_seconds` to `90`.
+- Validation: direct adapter run returned `events_normalized` from `/volume1/@database/synolog/.DSMFMXFERDB`; collector metrics later showed `events_pushed_total=249`, and Loki had 50 recent `nas_host="thesmart"`, `source_channel="file_station_transfer_db"` events.
 
-### Verified clean: `lishanmei/nas_home_log_remote`
+### Verified clean: `thesmart/nas_home_log_remote`
 
 - Symptom: older Loki capability gaps existed for `nas_home_log_remote`.
-- Finding: after serial SSH testing and the longer running collector cycle, no new 1-minute gap appeared; Loki had 332 recent `nas_host="lishanmei"`, `source_channel="nas_home_log"` events.
+- Finding: after serial SSH testing and the longer running collector cycle, no new 1-minute gap appeared; Loki had 332 recent `nas_host="thesmart"`, `source_channel="nas_home_log"` events.
 - Decision: no code/config change needed for this gap at this point; treat existing entries as historical gaps visible in the dashboard.
 
 ### Blocked: `rawdb/file_station_remote` and `rawdb/nas_home_log_remote`

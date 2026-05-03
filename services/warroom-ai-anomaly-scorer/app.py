@@ -16,7 +16,7 @@ from typing import Any, Optional, Union
 PORT = int(os.environ.get("WARROOM_AI_ANOMALY_SCORER_PORT", "8020"))
 LOKI_QUERY_URL = os.environ.get("WARROOM_AI_LOKI_QUERY_URL", "http://loki:3100/loki/api/v1/query")
 LOKI_PUSH_URL = os.environ.get("WARROOM_AI_LOKI_PUSH_URL", "http://loki:3100/loki/api/v1/push")
-NAS_HOST = os.environ.get("WARROOM_AI_NAS_HOST", "lishanmei")
+NAS_HOST = os.environ.get("WARROOM_AI_NAS_HOST", "thesmart")
 INTERVAL_SECONDS = max(10, int(os.environ.get("WARROOM_AI_SCORER_INTERVAL_SECONDS", "60")))
 OLLAMA_URL = os.environ.get("WARROOM_AI_OLLAMA_URL", "http://host.docker.internal:11434/api/chat")
 OLLAMA_MODEL = os.environ.get("WARROOM_AI_OLLAMA_MODEL", "qwen2.5:14b-instruct")

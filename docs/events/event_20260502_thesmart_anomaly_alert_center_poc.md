@@ -6,8 +6,8 @@
 
 ## Scope IN
 
-- 新增 Grafana dashboard：`lishanmei-anomaly-alert-center`。
-- 顯示名稱使用 `TheSmartAI`；既有技術 label / UID 中的 `lishanmei` 維持不變，避免破壞 Loki 查詢與 dashboard links。
+- 新增 Grafana dashboard：`thesmart-anomaly-alert-center`。
+- 顯示名稱使用 `TheSmartAI`；既有技術 label / UID 中的 `thesmart` 維持不變，避免破壞 Loki 查詢與 dashboard links。
 - 使用現有 Loki evidence / collector source registry。
 - 視覺化登入異常、下載異常、網路連線異常、capability gap。
 
@@ -19,13 +19,13 @@
 
 ## Tasks
 
-See `plans/20260502_lishanmei_anomaly_alert_center_poc/tasks.md`.
+See `plans/20260502_thesmart_anomaly_alert_center_poc/tasks.md`.
 
 ## Validation
 
-- `python3 -m json.tool grafana/dashboards/lishanmei-anomaly-alert-center.json`: pass.
-- `python3 -m json.tool grafana/dashboards/lishanmei-dlp-file-evidence.json`: pass.
-- `python3 -m json.tool lishanmei/config/target.json`: pass.
+- `python3 -m json.tool grafana/dashboards/thesmart-anomaly-alert-center.json`: pass.
+- `python3 -m json.tool grafana/dashboards/thesmart-dlp-file-evidence.json`: pass.
+- `python3 -m json.tool thesmart/config/target.json`: pass.
 - `docker compose config`: pass.
 - Loki smoke queries passed for:
   - active registry capability gaps (`collector_capability_gap`, 2m)
@@ -36,4 +36,4 @@ See `plans/20260502_lishanmei_anomaly_alert_center_poc/tasks.md`.
 
 ## Architecture Sync
 
-- Updated `specs/architecture.md` to mention the TheSmartAI Anomaly Alert Center POC while preserving `nas_host="lishanmei"` as the stable technical selector.
+- Updated `specs/architecture.md` to mention the TheSmartAI Anomaly Alert Center POC while preserving `nas_host="thesmart"` as the stable technical selector.

@@ -88,7 +88,7 @@ Auth failures:
 
 ```logql
 sum by (source_ip) (
-  count_over_time({nas_host="lishanmei", source_channel="auth_log", action="auth_failure"}
+  count_over_time({nas_host="thesmart", source_channel="auth_log", action="auth_failure"}
   | json | source_ip != "" [5m])
 )
 ```
@@ -97,7 +97,7 @@ Large downloads:
 
 ```logql
 sum by (actor) (
-  sum_over_time({nas_host="lishanmei", action="webapp_file_download"}
+  sum_over_time({nas_host="thesmart", action="webapp_file_download"}
   | json | unwrap size_bytes [1h])
 )
 ```
@@ -105,14 +105,14 @@ sum by (actor) (
 Network spike:
 
 ```logql
-max_over_time({nas_host="lishanmei", source_channel="network_socket"}
+max_over_time({nas_host="thesmart", source_channel="network_socket"}
 | json | unwrap tcp_established_count [15m])
 ```
 
 Active collector gaps:
 
 ```logql
-sum(count_over_time({nas_host="lishanmei", action="capability_gap", source_channel="collector_capability_gap"}[2m]))
+sum(count_over_time({nas_host="thesmart", action="capability_gap", source_channel="collector_capability_gap"}[2m]))
 ```
 
 ## Alert Event Schema
@@ -122,10 +122,10 @@ Emit alert decisions back to Loki as normalized metadata events:
 ```json
 {
   "action": "anomaly_alert",
-  "nas_host": "lishanmei",
+  "nas_host": "thesmart",
   "source_app": "warroom_ai",
   "source_channel": "ai_anomaly_alert",
-  "alert_id": "ai-lishanmei-auth-bruteforce-20260502T120000Z",
+  "alert_id": "ai-thesmart-auth-bruteforce-20260502T120000Z",
   "rule_id": "AUTH_BRUTE_FORCE_SOURCE_IP_V1",
   "severity": "high",
   "status": "active",

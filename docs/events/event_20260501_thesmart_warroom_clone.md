@@ -10,9 +10,9 @@
 
 ### IN
 
-- 在既有 `config/nas-targets.json` 新增 `lishanmei` target。
+- 在既有 `config/nas-targets.json` 新增 `thesmart` target。
 - 讓本機 Warroom collector 容器能透過 SSH 對 `nas.wuyang.co` 執行唯讀 metadata 取證。
-- 驗證 File Station transfer DB 與 NAS home-scope log metadata 可進入 Loki，供既有 dashboard 以 `nas_host="lishanmei"` 過濾。
+- 驗證 File Station transfer DB 與 NAS home-scope log metadata 可進入 Loki，供既有 dashboard 以 `nas_host="thesmart"` 過濾。
 
 ### OUT
 
@@ -23,12 +23,12 @@
 ## Key Decisions
 
 - **KD-1** Warroom runtime 仍只在本機/現有部署面執行；NAS 端只提供 SSH + sudo read-only metadata access。
-- **KD-2** `nas_host` label 使用 `lishanmei`，display name 記錄為「利善美智能」。
-- **KD-3** 錯誤方向的 `deploy/lishanmei/` 第二 stack 產物已移除，不納入本任務結果。
+- **KD-2** `nas_host` label 使用 `thesmart`，display name 記錄為「利善美智能」。
+- **KD-3** 錯誤方向的 `deploy/thesmart/` 第二 stack 產物已移除，不納入本任務結果。
 
 ## Changes
 
-- `config/nas-targets.json` 新增 enabled target：`id="lishanmei"`, `display_name="利善美智能"`, host `nas.wuyang.co`, user `wuyangadmin`。
+- `config/nas-targets.json` 新增 enabled target：`id="thesmart"`, `display_name="利善美智能"`, host `nas.wuyang.co`, user `wuyangadmin`。
 - `docker-compose.yml` 將 collector 預設 sources 改為 `file_station_remote,nas_home_log_remote`，掛載 `app.py`、`tools/`、`config/`、`geoip/` 與本機 SSH 目錄供本機 collector 出站連線。
 - `services/warroom-dlp-file-collector/Dockerfile` 安裝 `openssh-client`，供 remote adapters 使用 SSH。
 - `tools/file_station_transfer_adapter.py` 與 `tools/nas_home_log_adapter.py` 在 SSH 呼叫中忽略容器內不相容的 host SSH config，避免 `/root/.ssh/config` ownership 檢查阻斷。
@@ -43,13 +43,13 @@
 ### Instrumentation Plan
 
 - 從 host 與 collector 容器分別執行 File Station DB adapter 與 NAS home log adapter dry-run。
-- 查 Loki `{nas_host="lishanmei"}` range query，確認事件可供既有 Grafana dashboard 查詢。
+- 查 Loki `{nas_host="thesmart"}` range query，確認事件可供既有 Grafana dashboard 查詢。
 
 ### Execution
 
 - Host dry-run 成功讀取 `/volume1/@database/synolog/.DSMFMXFERDB`，回傳 `webapp_file_download` 事件。
 - Host dry-run 成功讀取 `/var/log/messages`、`/var/log/samba/log.smbd`、`/var/log/auth.log` 中 home-scope metadata。
-- Collector container dry-run 成功回傳 `nas_host="lishanmei"` 的 File Station 與 NAS log metadata。
+- Collector container dry-run 成功回傳 `nas_host="thesmart"` 的 File Station 與 NAS log metadata。
 - `docker compose -f docker-compose.yml up -d --no-build warroom-dlp-file-collector` 已重建本機 collector 容器；沒有在 NAS 上部署任何容器。
 
 ### Root Cause / Design Finding
@@ -61,6 +61,6 @@
 
 - `python3 -m py_compile tools/file_station_transfer_adapter.py tools/nas_home_log_adapter.py services/warroom-dlp-file-collector/app.py` 通過。
 - `docker compose -f docker-compose.yml config` 通過。
-- Collector container dry-run 產生 `nas_host="lishanmei"` events。
-- Loki query_range `{nas_host="lishanmei"}` 回傳 `success`，result count `1`。
-- Architecture Sync: `specs/architecture.md` 已同步新增 `lishanmei` target 與 SSH client requirement。
+- Collector container dry-run 產生 `nas_host="thesmart"` events。
+- Loki query_range `{nas_host="thesmart"}` 回傳 `success`，result count `1`。
+- Architecture Sync: `specs/architecture.md` 已同步新增 `thesmart` target 與 SSH client requirement。

@@ -43,16 +43,16 @@ OUT:
 
 - `grafana/dashboards/warroom-nas-host-health.json` 改成 NAS 基本監控 dashboard，預設利善美並使用 `source_channel="host_health"` / `source_app="nas_host_health"` Loki evidence。
 - Host Health dashboard panels 覆蓋 CPU busy percent、memory used percent、disk max/volume use percent、uptime/load/process count、service/network-facing status 與 raw snapshot drill-down。
-- `grafana/dashboards/lishanmei-local-overview.json`、`lishanmei-dlp-file-evidence.json`、`lishanmei-dlp-web-ingress.json`、`lishanmei-dlp-insights.json`、`lishanmei-dlp-terminal-stream.json` 均新增 `開啟 NAS 主機監控` dashboard link。
-- 依使用者後續要求，將 `grafana/dashboards/lishanmei-dlp-terminal-stream.json` 的 `Terminal / DLP 綜合證據流` logs panel 改為 `DLP 綜合 evidence insight 比例` pie chart，不再直接依 raw `action` 分組，而是歸類成檔案外流/下載匯出、開檔/預覽/分享瀏覽、NAS 檔案服務活動、主機健康/資源監測、NAS 系統/服務事件、能力缺口/收集失敗與其他 evidence。
+- `grafana/dashboards/thesmart-local-overview.json`、`thesmart-dlp-file-evidence.json`、`thesmart-dlp-web-ingress.json`、`thesmart-dlp-insights.json`、`thesmart-dlp-terminal-stream.json` 均新增 `開啟 NAS 主機監控` dashboard link。
+- 依使用者後續要求，將 `grafana/dashboards/thesmart-dlp-terminal-stream.json` 的 `Terminal / DLP 綜合證據流` logs panel 改為 `DLP 綜合 evidence insight 比例` pie chart，不再直接依 raw `action` 分組，而是歸類成檔案外流/下載匯出、開檔/預覽/分享瀏覽、NAS 檔案服務活動、主機健康/資源監測、NAS 系統/服務事件、能力缺口/收集失敗與其他 evidence。
 - 未新增 node_exporter、SNMP real target、NAS-side container 或 persistent agent。
 
 ## Verification
 
-- Dashboard JSON parse: pass for `warroom-nas-host-health.json` and all five `lishanmei-*.json` dashboards.
-- Plan JSON parse: pass for `plans/20260502_lishanmei_nas_host_dashboard_refresh/idef0.json` and `grafcet.json`.
+- Dashboard JSON parse: pass for `warroom-nas-host-health.json` and all five `thesmart-*.json` dashboards.
+- Plan JSON parse: pass for `plans/20260502_thesmart_nas_host_dashboard_refresh/idef0.json` and `grafcet.json`.
 - Dashboard content check: pass; all five利善美 dashboards link to `warroom-nas-host-health`, and host-health dashboard references `cpu_busy_percent`, `memory_used_percent`, `disk_max_use_percent`, `disk_volume1_use_percent`, `service_ssh_up`, `service_smb_up`, `service_nginx_up`, `process_count`, and `uptime_seconds`.
-- Terminal insight pie panel check: pass; `lishanmei-dlp-terminal-stream.json` panel `id=10` is `piechart`, uses instant queries, and exposes seven semantic evidence categories instead of raw action buckets.
+- Terminal insight pie panel check: pass; `thesmart-dlp-terminal-stream.json` panel `id=10` is `piechart`, uses instant queries, and exposes seven semantic evidence categories instead of raw action buckets.
 - `docker compose config`: pass.
 - YAML parse: pass for Prometheus config/template and Grafana provisioning files.
 

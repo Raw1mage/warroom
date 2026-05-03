@@ -26,7 +26,7 @@ Each server root can contain:
 ```json
 {
   "schema_version": 1,
-  "id": "lishanmei",
+  "id": "thesmart",
   "display_name": "利善美智能",
   "enabled": true,
   "ssh": {

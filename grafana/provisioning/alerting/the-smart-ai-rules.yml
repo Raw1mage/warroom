@@ -64,7 +64,7 @@ groups:
         noDataState: Alerting
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: critical
           warroom_scope: thesmartai
         annotations:
@@ -82,7 +82,7 @@ groups:
               to: 0
             model:
               refId: A
-              expr: sum(count_over_time({nas_host="lishanmei", source_channel="collector_capability_gap", action="capability_gap"}[2m]))
+              expr: sum(count_over_time({nas_host="thesmart", source_channel="collector_capability_gap", action="capability_gap"}[2m]))
               queryType: instant
               datasource:
                 type: loki
@@ -128,7 +128,7 @@ groups:
         noDataState: OK
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: high
           warroom_scope: thesmartai
         annotations:
@@ -193,7 +193,7 @@ groups:
         noDataState: Alerting
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: high
           warroom_scope: thesmartai
         annotations:
@@ -210,7 +210,7 @@ groups:
               to: 0
             model:
               refId: A
-              expr: sum(count_over_time({nas_host="lishanmei", source_channel="ai_anomaly_alert", action="anomaly_alert"}[5m]))
+              expr: sum(count_over_time({nas_host="thesmart", source_channel="ai_anomaly_alert", action="anomaly_alert"}[5m]))
               queryType: instant
               datasource:
                 type: loki
@@ -256,7 +256,7 @@ groups:
         noDataState: OK
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: high
           warroom_scope: thesmartai
         annotations:
@@ -273,7 +273,7 @@ groups:
               to: 0
             model:
               refId: A
-              expr: sum(count_over_time({nas_host="lishanmei", source_channel="auth_log", action="auth_failure"}[5m]))
+              expr: sum(count_over_time({nas_host="thesmart", source_channel="auth_log", action="auth_failure"}[5m]))
               queryType: instant
               datasource:
                 type: loki
@@ -319,7 +319,7 @@ groups:
         noDataState: OK
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: high
           warroom_scope: thesmartai
         annotations:
@@ -336,7 +336,7 @@ groups:
               to: 0
             model:
               refId: A
-              expr: sum(count_over_time({nas_host="lishanmei", source_app="file_station", action="webapp_file_download"} | json | size_bytes >= 104857600 [5m]))
+              expr: sum(count_over_time({nas_host="thesmart", source_app="file_station", action="webapp_file_download"} | json | size_bytes >= 104857600 [5m]))
               queryType: instant
               datasource:
                 type: loki
@@ -382,7 +382,7 @@ groups:
         noDataState: OK
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: medium
           warroom_scope: thesmartai
         annotations:
@@ -399,7 +399,7 @@ groups:
               to: 0
             model:
               refId: A
-              expr: max_over_time({nas_host="lishanmei", source_channel="network_socket"} | json | __error__="" | unwrap tcp_established_count [5m])
+              expr: max_over_time({nas_host="thesmart", source_channel="network_socket"} | json | __error__="" | unwrap tcp_established_count [5m])
               queryType: instant
               datasource:
                 type: loki
@@ -445,7 +445,7 @@ groups:
         noDataState: OK
         execErrState: Error
         labels:
-          nas_host: lishanmei
+          nas_host: thesmart
           severity: medium
           warroom_scope: thesmartai
         annotations:

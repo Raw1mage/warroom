@@ -12,7 +12,7 @@ services:
       GF_METRICS_ENABLED: "true"
       GF_SERVER_ROOT_URL: "${GRAFANA_ROOT_URL:-http://localhost:3000/warroom/}"
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/lishanmei-dlp-file-evidence.json"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/thesmart-dlp-file-evidence.json"
       GF_SMTP_ENABLED: "${GRAFANA_SMTP_ENABLED:-true}"
       GF_SMTP_HOST: "${GRAFANA_SMTP_HOST:-rawdb:25}"
       GF_SMTP_FROM_ADDRESS: "${GRAFANA_SMTP_FROM_ADDRESS:-service@sob.com.tw}"
@@ -23,7 +23,7 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     healthcheck:
-      test: ["CMD-SHELL", "test -f /var/lib/grafana/dashboards/lishanmei-dlp-file-evidence.json"]
+      test: ["CMD-SHELL", "test -f /var/lib/grafana/dashboards/thesmart-dlp-file-evidence.json"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -157,7 +157,7 @@ services:
       WARROOM_AI_ANOMALY_SCORER_PORT: "8020"
       WARROOM_AI_LOKI_QUERY_URL: "http://loki:3100/loki/api/v1/query"
       WARROOM_AI_LOKI_PUSH_URL: "http://loki:3100/loki/api/v1/push"
-      WARROOM_AI_NAS_HOST: "${WARROOM_AI_NAS_HOST:-lishanmei}"
+      WARROOM_AI_NAS_HOST: "${WARROOM_AI_NAS_HOST:-thesmart}"
       WARROOM_AI_SCORER_INTERVAL_SECONDS: "${WARROOM_AI_SCORER_INTERVAL_SECONDS:-60}"
       WARROOM_AI_OLLAMA_ENABLED: "${WARROOM_AI_OLLAMA_ENABLED:-true}"
       WARROOM_AI_OLLAMA_URL: "${WARROOM_AI_OLLAMA_URL:-http://host.docker.internal:11434/api/chat}"

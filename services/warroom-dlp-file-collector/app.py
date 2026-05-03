@@ -79,6 +79,18 @@ SOURCE_REGISTRY: dict[str, dict[str, Any]] = {
     },
 }
 
+FIELD_COVERAGE_KEYS = [
+    "actor",
+    "source_ip",
+    "source_country",
+    "source_region",
+    "file_name",
+    "folder_path",
+    "display_path",
+    "size_bytes",
+    "network_protocol",
+]
+
 
 def _metric_line(name: str, value: int | float) -> str:
     return f"{name} {value}"
@@ -157,6 +169,73 @@ def _capability_gap(source_key: str, stage: str, detail: str, nas_host: str | No
     if nas_host:
         event["nas_host"] = nas_host
     return event
+
+
+def _source_coverage_event(source_key: str, source_events: list[dict[str, Any]], nas_host: str, observed_at: int) -> dict[str, Any]:
+    contract = _source_contract(source_key)
+    gap_count = sum(1 for event in source_events if event.get("action") == "capability_gap")
+    evidence_count = sum(1 for event in source_events if event.get("action") != "capability_gap")
+    if evidence_count > 0:
+        coverage_status = "active"
+        coverage_value = 1
+    elif gap_count > 0:
+        coverage_status = "gap"
+        coverage_value = -1
+    else:
+        coverage_status = "no_events"
+        coverage_value = 0
+
+    return {
+        "event_id": f"coverage-{nas_host}-{source_key}-{observed_at}",
+        "action": "coverage_status",
+        "source_channel": "collector_coverage",
+        "source_app": "collector",
+        "nas_host": nas_host,
+        "source_key": source_key,
+        "covered_source_app": contract["source_app"],
+        "covered_source_channel": contract["source_channel"],
+        "covered_capability": contract["capability"],
+        "coverage_status": coverage_status,
+        "coverage_value": coverage_value,
+        "event_count": evidence_count,
+        "gap_count": gap_count,
+        "confidence": 1.0,
+        "observed_at": observed_at,
+        "policy_notes": [
+            "This is collector source coverage/status only; it does not infer user activity.",
+            "No fixture fallback or synthetic file/drive/download activity was generated.",
+        ],
+    }
+
+
+def _field_coverage_events(events: list[dict[str, Any]], nas_host: str, observed_at: int) -> list[dict[str, Any]]:
+    evidence = [event for event in events if event.get("action") not in {"capability_gap", "coverage_status", "field_coverage_status"}]
+    event_count = len(evidence)
+    coverage_events = []
+    for field_name in FIELD_COVERAGE_KEYS:
+        present_count = sum(1 for event in evidence if event.get(field_name) not in (None, "", []))
+        coverage_status = "active" if present_count > 0 else "no_events"
+        coverage_events.append(
+            {
+                "event_id": f"field-coverage-{nas_host}-{field_name}-{observed_at}",
+                "action": "field_coverage_status",
+                "source_channel": "collector_coverage",
+                "source_app": "collector",
+                "nas_host": nas_host,
+                "field_name": field_name,
+                "coverage_status": coverage_status,
+                "coverage_value": 1 if coverage_status == "active" else 0,
+                "present_count": present_count,
+                "event_count": event_count,
+                "confidence": 1.0,
+                "observed_at": observed_at,
+                "policy_notes": [
+                    "This is field coverage/status only; missing fields remain missing instead of being guessed.",
+                    "No fallback values were generated for empty evidence fields.",
+                ],
+            }
+        )
+    return coverage_events
 
 
 def _geoip_reader() -> tuple[Any | None, dict[str, Any] | None]:
@@ -719,6 +798,7 @@ def _network_socket_remote_events(target: dict[str, Any]) -> list[dict[str, Any]
 def _collect_target(target: dict[str, Any]) -> list[dict[str, Any]]:
     nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas")
     events: list[dict[str, Any]] = []
+    observed_at = int(time.time())
     if target.get("enabled") is False:
         return events
     sources = target.get("sources") if isinstance(target.get("sources"), list) else SOURCES
@@ -733,8 +813,10 @@ def _collect_target(target: dict[str, Any]) -> list[dict[str, Any]]:
             if isinstance(event, dict) and event.get("action") != "capability_gap":
                 event.setdefault("source_key", source)
         events.extend(source_events)
+        events.append(_source_coverage_event(source, [event for event in source_events if isinstance(event, dict)], nas_host, observed_at))
     for event in events:
         event.setdefault("nas_host", nas_host)
+    events.extend(_field_coverage_events(events, nas_host, observed_at))
     return events
 
 

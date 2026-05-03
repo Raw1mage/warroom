@@ -7,7 +7,7 @@
 ## 範圍 IN
 
 - 保留 `/tools` 作為 global adapter/tool layer。
-- 新增 `rawdb/` 與 `lishanmei/` server roots。
+- 新增 `rawdb/` 與 `thesmart/` server roots。
 - 支援 `/<server>/config/target.json` 與 `/<server>/config/sources.json`。
 - 支援 collector 將 normalized events 與 run state 寫到 `/<server>/data`。
 - 保留舊 `config/nas-targets.json` 相容回退。
@@ -44,7 +44,7 @@
 ### Execution
 
 - Added `rawdb/config/target.json`, `rawdb/config/sources.json`, and `rawdb/data/{raw,normalized,metrics,state}` skeletons.
-- Added `lishanmei/config/target.json`, `lishanmei/config/sources.json`, and `lishanmei/data/{raw,normalized,metrics,state}` skeletons.
+- Added `thesmart/config/target.json`, `thesmart/config/sources.json`, and `thesmart/data/{raw,normalized,metrics,state}` skeletons.
 - Updated `services/warroom-dlp-file-collector/app.py` to prefer `WARROOM_SERVER_ROOTS_DIR` server roots, merge `target.json` SSH settings into each source, and keep `config/nas-targets.json` as fallback.
 - Updated collector to write per-server local spool/state when `data_root` exists: `data/normalized/events.jsonl`, `data/normalized/capability_gaps.jsonl`, and `data/state/last_run.json`.
 - Updated `docker-compose.yml` to set `WARROOM_SERVER_ROOTS_DIR=/servers` and mount the repo at `/servers` for server-root discovery/spool.
@@ -58,12 +58,12 @@ Central target config is functional but mixes per-server config into one global 
 ### Validation
 
 - `python3 -m py_compile services/warroom-dlp-file-collector/app.py tools/dlp_event_collector.py`: pass.
-- Server-root loading check with `WARROOM_SERVER_ROOTS_DIR=.` returned `lishanmei` and `rawdb` targets with expected source lists, data roots, and SSH hosts.
+- Server-root loading check with `WARROOM_SERVER_ROOTS_DIR=.` returned `thesmart` and `rawdb` targets with expected source lists, data roots, and SSH hosts.
 - Temporary spool unit check wrote `events.jsonl`, `capability_gaps.jsonl`, and `last_run.json`: pass.
 - `docker compose config`: pass.
 - `docker compose up -d warroom-dlp-file-collector`: pass; collector recreated with `WARROOM_SERVER_ROOTS_DIR=/servers`.
-- Runtime check inside `warroom-dlp-file-collector`: `/servers/lishanmei/config/target.json` and `/servers/rawdb/config/target.json` visible, `/metrics` healthy.
-- Actual runtime spool observed: `lishanmei/data/state/last_run.json` and `rawdb/data/state/last_run.json` created after collector start.
+- Runtime check inside `warroom-dlp-file-collector`: `/servers/thesmart/config/target.json` and `/servers/rawdb/config/target.json` visible, `/metrics` healthy.
+- Actual runtime spool observed: `thesmart/data/state/last_run.json` and `rawdb/data/state/last_run.json` created after collector start.
 
 ## Architecture Sync
 

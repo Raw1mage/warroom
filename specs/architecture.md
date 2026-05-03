@@ -12,7 +12,7 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 - Response posture: observe-only / dry-run / approval-gated; no automatic destructive response in the POC.
 - Deployment posture: local Docker Compose stack for Grafana, Prometheus, Loki, supporting exporters, and local collector utilities.
 - Reboot recovery posture: host-level recovery is handled by `scripts/warroom-recover-after-boot.sh` and the optional `deploy/systemd/warroom-compose-recover.service` oneshot unit. The recovery path waits for the Warroom project and provisioned dashboard files before starting Compose, then verifies the Grafana dashboard bind mount inside `warroom-grafana`. It must not remove Grafana/Loki/Prometheus volumes.
-- NAS-side posture: least-intrusive SSH read-only payload execution from the Warroom side for all monitored NAS hosts, including `rawdb` and `lishanmei`; no persistent NAS-side Warroom agent/exporter/container and no direct syslog dependency unless explicitly approved for an exception.
+- NAS-side posture: least-intrusive SSH read-only payload execution from the Warroom side for all monitored NAS hosts, including `rawdb` and `thesmart`; no persistent NAS-side Warroom agent/exporter/container and no direct syslog dependency unless explicitly approved for an exception.
 
 ## Runtime Components
 
@@ -22,10 +22,13 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 - Image: `registore.thesmart.cc/warroom/grafana:11.5.2-zh-hant`.
 - Role: dashboard and visualization plane.
 - Public route: `/warroom` via opencode gateway to port `3000`.
-- Provisioned dashboard folder display name: `利善美智能`; this reuses the original Warroom/陽光沙灘 dashboard JSON layout while targeting `lishanmei` data streams.
+- Provisioned dashboard folder display name: `利善美智能`; this reuses the original Warroom/陽光沙灘 dashboard JSON layout while targeting `thesmart` data streams.
 - Alerting posture: Grafana-managed alerting is the first alert-system layer. Provisioned TheSmartAI alert rules live under `grafana/provisioning/alerting/`, send to contact point `warroom-thesmartai-email`, and use the LAN `rawdb:25` MTA relay by default with sender `service@sob.com.tw`. Grafana owns alert state, grouping, deduplication, notification policy, and email delivery; Warroom collector remains the evidence producer.
 - Current home dashboard: `warroom-dlp-web-ingress`.
-- DLP dashboards include `warroom-dlp-web-ingress`, `warroom-dlp-file-evidence`, `warroom-dlp-terminal-stream`, `warroom-local-overview`, and `warroom-dlp-insights`.
+- DLP dashboards include `warroom-dlp-web-ingress`, `warroom-dlp-file-evidence`, `thesmart-recent-file-access-table`, `warroom-dlp-terminal-stream`, `thesmart-anomaly-alert-center`, `warroom-local-overview`, and `warroom-dlp-insights`.
+- `thesmart-recent-file-access-table` presents a table of recently accessed files from Loki payload fields only: event time, `file_name`, `actor`, `source_app`, and `source_ip`. Missing users or IPs remain empty rather than being inferred.
+- `warroom-dlp-terminal-stream` is management-facing despite the legacy uid: it presents an evidence-category pie chart, a recent important-event table, source/field coverage status, trend by source/action, and a table of actionable collection problems. It must not show raw JSON/log lines as the primary human interface.
+- `thesmart-anomaly-alert-center` is an actionable alert summary, not a raw log stream. It presents alert counts, auth-failure and TCP-readiness indicators, signal composition, trend aggregation, AI anomaly rows, auth failure actor/IP rankings, large-download candidates, and capability gaps. TCP socket readiness panels aggregate unwrapped `tcp_established_count` into bounded single-series values for management readability.
 - `warroom-dlp-insights` provides Webalizer-style evidence statistics from existing Loki payload fields only: event trends, actor/IP/protocol/file/folder rankings, GeoIP country/region rankings when local MMDB enrichment exists, source channel rankings, and capability-gap rankings.
 - Non-responsibilities: Grafana must not own NAS credentials, response approvals, or Warroom policy state.
 
@@ -41,7 +44,7 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 
 - Service: `loki` in `docker-compose.yml`.
 - Role: normalized DLP event stream and web-ingress evidence storage.
-- Receives bounded-label events from one-shot local DLP event collector tooling and the long-running `warroom-dlp-file-collector` service. For `rawdb` and `lishanmei`, log and DB evidence is pulled by SSH payload execution and then pushed to Loki by the local collector. Alloy nginx/syslog ingestion remains an explicitly enabled compatibility profile, not the default NAS collection path.
+- Receives bounded-label events from one-shot local DLP event collector tooling and the long-running `warroom-dlp-file-collector` service. For `rawdb` and `thesmart`, log and DB evidence is pulled by SSH payload execution and then pushed to Loki by the local collector. Alloy nginx/syslog ingestion remains an explicitly enabled compatibility profile, not the default NAS collection path.
 
 ### Non-intrusive SSH payload collection for NAS targets
 
@@ -59,7 +62,7 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 - Service: `synology-nginx-log-exporter` in `docker-compose.yml`.
 - Implementation: Grafana Alloy config at `loki/synology-nginx-alloy.template.alloy`.
 - Activation: gated behind the `synology-nginx-logs` Compose profile.
-- Role: compatibility/experimental path for approved read-only mounted nginx logs and/or Synology nginx syslog on port `1514`; this is not the default `rawdb` or `lishanmei` collection model.
+- Role: compatibility/experimental path for approved read-only mounted nginx logs and/or Synology nginx syslog on port `1514`; this is not the default `rawdb` or `thesmart` collection model.
 - Safety boundary: no raw cookies, session IDs, credentials, or sensitive filenames are committed to repo artifacts.
 
 ### SNMP exporter
@@ -73,11 +76,12 @@ Warroom is an enterprise internal monitoring platform. The current POC focuses o
 - Service: `warroom-dlp-file-collector` in `docker-compose.yml`.
 - Implementation: `services/warroom-dlp-file-collector/app.py`.
 - Role: interval collector for `DLP 檔案證據總覽`; emits dashboard-compatible Drive, File Station, and NAS home-scope normalized file evidence into Loki.
-- NAS target configuration: server roots are preferred (`rawdb/config`, `lishanmei/config`, and future `/<server>/config` folders). Each target has an `id`, optional `display_name`, enabled flag, source list, and per-source settings such as SSH host/user, File Station DB path, home-scope log paths, tail window, limit, and timeout. Legacy `config/nas-targets.json` and `config/nas-targets.example.json` remain compatibility references during migration.
+- NAS target configuration: server roots are preferred (`rawdb/config`, `thesmart/config`, and future `/<server>/config` folders). Each target has an `id`, optional `display_name`, enabled flag, source list, and per-source settings such as SSH host/user, File Station DB path, home-scope log paths, tail window, limit, and timeout. Legacy `config/nas-targets.json` and `config/nas-targets.example.json` remain compatibility references during migration.
 - Default monitored target: `rawdb`, using `host_health_remote`, `file_station_remote`, and `nas_home_log_remote` against explicit SSH endpoint `192.168.100.40` with SSH user `yeatsluo`. Missing or failing remote access emits `capability_gap`; the collector does not silently fall back to fixture or placeholder events.
-- Additional monitored target: `lishanmei` (display name `TheSmartAI`) points to `nas.wuyang.co` with SSH user `wuyangadmin` for read-only File Station transfer DB and NAS home-scope log metadata collection. Warroom does not deploy containers, persistent agents, exporters, Promtail, or Grafana on this NAS.
-- TheSmartAI anomaly sources include structured auth log metadata (`auth_log_remote`) and network socket snapshots (`network_socket_remote`) for login failure/session and connection-spike readiness. The `lishanmei-anomaly-alert-center` dashboard is the first-batch POC alert center for auth failures, large downloads, TCP connection spikes, and capability gaps while retaining `nas_host="lishanmei"` as the stable Loki selector.
+- Additional monitored target: `thesmart` (display name `TheSmartAI`) points to `nas.wuyang.co` with SSH user `wuyangadmin` for read-only File Station transfer DB and NAS home-scope log metadata collection. Warroom does not deploy containers, persistent agents, exporters, Promtail, or Grafana on this NAS.
+- TheSmartAI anomaly sources include structured auth log metadata (`auth_log_remote`) and network socket snapshots (`network_socket_remote`) for login failure/session and connection-spike readiness. The `thesmart-anomaly-alert-center` dashboard is the first-batch POC alert center for auth failures, large downloads, TCP connection spikes, and capability gaps while retaining `nas_host="thesmart"` as the stable Loki selector.
 - Source registry: collector source onboarding is centralized in `SOURCE_REGISTRY` inside `services/warroom-dlp-file-collector/app.py`. Each source has an internal `source_key` (for config/dispatch, e.g. `auth_log_remote`), evidence labels (`source_app` / `source_channel`, e.g. `nas_auth` / `auth_log`), an `affected_capability`, and a handler. Capability-gap events use `source_app="collector"` and `source_channel="collector_capability_gap"`, while storing `source_key`, `affected_source_app`, `affected_source_channel`, and `affected_capability` in the payload. Dashboard gap panels must use those registry fields instead of treating internal source keys as evidence channels.
+- Coverage status: every configured source emits `action="coverage_status"` with `source_app="collector"`, `source_channel="collector_coverage"`, `covered_source_app`, `covered_source_channel`, `coverage_status`, and numeric `coverage_value` (`1=active`, `0=no_events`, `-1=gap`). The collector also emits `action="field_coverage_status"` for selected payload fields such as `source_ip`, GeoIP fields, paths, file names, sizes, and protocol. These coverage events are dashboard health metadata only; they must not be interpreted as user activity or used to fabricate missing File Station/Drive/nginx/GeoIP evidence.
 - Remote NAS adapters require an SSH client in the local collector runtime. In the Docker Compose POC, `app.py`, `tools/`, server roots mounted at `/servers`, `config/`, `geoip/`, and the operator-provided SSH directory are mounted into the local collector container so Warroom can pull metadata from configured NAS targets and write per-server local spool/state.
 - Fallback env mode: if `WARROOM_NAS_TARGETS_CONFIG` is unset or missing, legacy environment variables can still define one target, but config file mode is preferred for adding future NAS targets.
 - Optional GeoIP enrichment: `WARROOM_GEOIP_MMDB_PATH` points to a locally mounted MaxMind-compatible `.mmdb` file under `./geoip`. When configured, the collector enriches global `source_ip` values with `source_country` and `source_region`; missing or unreadable MMDB files emit `capability_gap` instead of using an external API or guessing.
@@ -215,7 +219,8 @@ Viewing duration is currently an estimate derived from viewer/open timing window
 - File Station transfer adapter and DLP event collector compile; explicit File Station download is observable through `/volume1/@database/synolog/.DSMFMXFERDB` table `logs`, while pure preview/open is currently a capability gap.
 - NAS home-scope log adapter compiles and is wired into `rawdb` target config as `nas_home_log_remote`; current dry-run emits rawdb capability gaps when remote SSH/log access is unavailable, with no fixture or placeholder fallback.
 - `warroom-dlp-file-collector` builds and runs under Docker Compose.
-- Dashboard queries now cover `source_app="synology_drive"`, `source_app="file_station"`, and `source_app="nas_file_service"` real-source evidence/capability gaps.
+- Dashboard queries now separate observed DLP evidence from collector coverage metadata. `warroom-dlp-web-ingress` counts actual non-collector evidence and shows `collector_coverage` status for configured but quiet/gapped sources instead of presenting missing File Station/Drive/nginx evidence as No data activity panels.
+- `thesmart-recent-file-access-table` and the matching panel in `warroom-dlp-file-evidence` validate as Grafana JSON and use Loki payload extraction to show recent file access rows without grouping on high-cardinality labels.
 - `warroom-dlp-insights` JSON validates and is linked from the other Warroom dashboards. Its queries do not reference fixture, placeholder, or synthetic streams.
 - Prometheus target `warroom-dlp-file-collector:8010` is up and exposes `warroom_dlp_file_collector_events_pushed_total`.
 - GeoIP helper validation maps MaxMind-style records into `source_country/source_region`, and dashboard line rendering shows protocol as a raw network value (`http`) followed by country/region or `-`.

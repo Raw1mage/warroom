@@ -30,7 +30,7 @@
       "title": "開啟檔案證據",
       "tooltip": "切換到 DLP file evidence dashboard",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-file-evidence"
+      "uid": "thesmart-dlp-file-evidence"
     },
     {
       "asDropdown": false,
@@ -42,7 +42,7 @@
       "title": "開啟即時事件流",
       "tooltip": "切換到 terminal-like DLP evidence stream",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-terminal-stream"
+      "uid": "thesmart-dlp-terminal-stream"
     },
     {
       "asDropdown": false,
@@ -54,7 +54,7 @@
       "title": "開啟 Web ingress",
       "tooltip": "切換到 Synology nginx web ingress dashboard",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-web-ingress"
+      "uid": "thesmart-dlp-web-ingress"
     },
     {
       "asDropdown": false,
@@ -66,7 +66,7 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
-      "uid": "lishanmei-nas-host-health"
+      "uid": "thesmart-nas-host-health"
     }
   ],
   "panels": [
@@ -125,7 +125,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"}[$__range]))",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"}[$__range]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -192,7 +192,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\"}[$__range])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__range])) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
@@ -286,7 +286,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (action) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"}[$__interval]))",
+          "expr": "sum by (action) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"}[$__interval]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -349,7 +349,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | actor != \"\" [$__range])))",
+          "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | actor != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -412,7 +412,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | source_ip != \"\" [$__range])))",
+          "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_ip != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -475,7 +475,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (network_protocol) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | network_protocol != \"\" [$__range])))",
+          "expr": "topk(10, sum by (network_protocol) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | network_protocol != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -538,7 +538,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(15, sum by (folder_path) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | folder_path != \"\" [$__range])))",
+          "expr": "topk(15, sum by (folder_path) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | folder_path != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -601,7 +601,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(15, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | file_name != \"\" [$__range])))",
+          "expr": "topk(15, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | file_name != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -664,7 +664,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=~\"webapp_file_download|webapp_file_export|file_read\"} | json | file_name != \"\" [$__range])))",
+          "expr": "topk(10, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=~\"webapp_file_download|webapp_file_export|file_read\"} | json | file_name != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -727,7 +727,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (source_country) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | source_country != \"\" [$__range])))",
+          "expr": "topk(10, sum by (source_country) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_country != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -790,7 +790,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (source_country, source_region) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | source_country != \"\" | source_region != \"\" [$__range])))",
+          "expr": "topk(10, sum by (source_country, source_region) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_country != \"\" | source_region != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -853,7 +853,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(10, sum by (source_app, source_channel) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | source_app != \"\" [$__range])))",
+          "expr": "topk(10, sum by (source_app, source_channel) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_app != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -916,7 +916,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(15, sum by (source_channel, gap_stage) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\"} | json | source_channel != \"\" [$__range])))",
+          "expr": "topk(15, sum by (source_channel, gap_stage) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"} | json | source_channel != \"\" [$__range])))",
           "queryType": "range",
           "refId": "A"
         }
@@ -933,7 +933,7 @@
     "dlp",
     "insights",
     "webalizer-style",
-    "lishanmei",
+    "thesmart",
     "利善美智能",
     "data-security"
   ],
@@ -942,8 +942,8 @@
       {
         "current": {
           "selected": true,
-          "text": "lishanmei",
-          "value": "lishanmei"
+          "text": "thesmart",
+          "value": "thesmart"
         },
         "datasource": {
           "type": "loki",
@@ -957,7 +957,7 @@
         "options": [],
         "query": "label_values({job=\"warroom-dlp-event-collector\"}, nas_host)",
         "refresh": 1,
-        "regex": "^lishanmei$",
+        "regex": "^thesmart$",
         "type": "query"
       }
     ]
@@ -969,7 +969,7 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "利善美智能 / DLP 行為統計與資料安全 Insights",
-  "uid": "lishanmei-dlp-insights",
+  "uid": "thesmart-dlp-insights",
   "version": 1,
   "weekStart": ""
 }

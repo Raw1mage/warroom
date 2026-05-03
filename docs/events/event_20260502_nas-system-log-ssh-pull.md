@@ -25,7 +25,7 @@ OUT:
 - [x] 更新 `services/warroom-dlp-file-collector/app.py` 支援 `nas_system_log_remote`。
 - [x] 更新 `config/nas-targets.json` / `config/nas-targets.example.json` / `.env*` / `docker-compose.yml`。
 - [x] 重建 `warroom-dlp-file-collector` 並驗證 Loki 有 `source_channel="nas_system_log"`。
-- [x] 更新 `grafana/dashboards/lishanmei-dlp-file-evidence.json` 加入系統 / 服務 log stream panel。
+- [x] 更新 `grafana/dashboards/thesmart-dlp-file-evidence.json` 加入系統 / 服務 log stream panel。
 
 ## Debug checkpoints
 
@@ -37,8 +37,8 @@ OUT:
   - `python3 -m py_compile services/warroom-dlp-file-collector/app.py tools/*.py` passed。
   - `jq empty config/nas-targets.json config/nas-targets.example.json` passed。
   - `docker compose up -d --build --force-recreate warroom-dlp-file-collector` passed。
-  - Loki query: `source_channel="nas_system_log"` for `nas_host="lishanmei"` returned 200 entries in 5m。
-  - Dashboard JSON validation passed for `grafana/dashboards/lishanmei-dlp-file-evidence.json`。
+  - Loki query: `source_channel="nas_system_log"` for `nas_host="thesmart"` returned 200 entries in 5m。
+  - Dashboard JSON validation passed for `grafana/dashboards/thesmart-dlp-file-evidence.json`。
 
 ## Key decisions
 

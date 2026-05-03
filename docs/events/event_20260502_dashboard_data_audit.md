@@ -30,28 +30,28 @@ OUT:
 
 ### Execution
 
-- `lishanmei-dlp-file-evidence` No data investigation:
-  - User URL: `/warroom/d/lishanmei-dlp-file-evidence/...&from=now-30m&to=now&var-nas=lishanmei`.
-  - Baseline Loki evidence for `now-30m`: `{job="warroom-dlp-event-collector", nas_host="lishanmei"}` returned `7061` events.
+- `thesmart-dlp-file-evidence` No data investigation:
+  - User URL: `/warroom/d/thesmart-dlp-file-evidence/...&from=now-30m&to=now&var-nas=thesmart`.
+  - Baseline Loki evidence for `now-30m`: `{job="warroom-dlp-event-collector", nas_host="thesmart"}` returned `7061` events.
   - Existing dashboard file evidence panels were mostly hard-coded to `source_app="file_station"` and `action=~"webapp_file_download|webapp_file_export"`.
   - `file_station` download/export for `now-30m` returned `0`; `24h` historical download returned `731`, confirming this was a source/window mismatch rather than Loki/collector outage.
   - Live file evidence for `now-30m` exists under `source_app="nas_file_service"`, `source_channel="nas_home_log"`, `action=~"file_activity|file_read"`, with sample fields `actor`, `display_path`, `folder_path`, `file_name`, `network_protocol`, and optional GeoIP fields.
-- Updated `grafana/dashboards/lishanmei-dlp-file-evidence.json`:
+- Updated `grafana/dashboards/thesmart-dlp-file-evidence.json`:
   - Top stat panels now use live `nas_file_service/nas_home_log` evidence.
   - Actor/path/folder/file-name/country/region panels now use live file evidence instead of File Station download-only queries.
   - File size histogram remains a File Station download/export historical view but now includes `or vector(0)` so an empty short window reports zero instead of looking broken.
   - Descriptions/titles now distinguish live NAS home-scope file evidence from File Station download DB evidence.
 - Full dashboard audit after retry:
-  - Audited all provisioned `grafana/dashboards/*.json` files: `lishanmei-anomaly-alert-center`, `lishanmei-dlp-file-evidence`, `lishanmei-dlp-insights`, `lishanmei-dlp-terminal-stream`, `lishanmei-dlp-web-ingress`, `lishanmei-local-overview`, and `lishanmei-nas-host-health`.
+  - Audited all provisioned `grafana/dashboards/*.json` files: `thesmart-anomaly-alert-center`, `thesmart-dlp-file-evidence`, `thesmart-dlp-insights`, `thesmart-dlp-terminal-stream`, `thesmart-dlp-web-ingress`, `thesmart-local-overview`, and `thesmart-nas-host-health`.
   - Confirmed no dashboard UID or dashboard link still points to `warroom-*` legacy UIDs.
   - Initial false positives came from testing Grafana log panels as Loki instant queries and from not substituting `$__interval`; audit script was corrected to use `query_range` for log/range panels and substitute `$__interval=1m`.
-  - Added zero-vector fallback to `lishanmei-dlp-terminal-stream` pie-chart categories so absent event classes render as `0` rather than No data.
-  - Added zero-vector fallback to `lishanmei-dlp-insights` capability-gap stat; detailed capability-gap tables/logs intentionally remain empty when there are no gaps.
+  - Added zero-vector fallback to `thesmart-dlp-terminal-stream` pie-chart categories so absent event classes render as `0` rather than No data.
+  - Added zero-vector fallback to `thesmart-dlp-insights` capability-gap stat; detailed capability-gap tables/logs intentionally remain empty when there are no gaps.
 
 ## Verification
 
-- `json.loads(grafana/dashboards/lishanmei-dlp-file-evidence.json)` passed; dashboard has 18 panels.
-- Extracted every Loki target from `lishanmei-dlp-file-evidence.json` and executed against Loki with `$__range=30m`:
+- `json.loads(grafana/dashboards/thesmart-dlp-file-evidence.json)` passed; dashboard has 18 panels.
+- Extracted every Loki target from `thesmart-dlp-file-evidence.json` and executed against Loki with `$__range=30m`:
   - 19 query targets returned data/vector results.
   - Representative results: live file evidence `2170`, unique actors `1`, unique source IPs `3`, actor volume `2160`, path/folder/file panels non-empty, auth failures `41`, large downloads `0` via vector fallback.
   - Remaining empty panels were expected optional views: historical capability gap and NAS system/service log frequency.
@@ -61,10 +61,10 @@ OUT:
   - Query errors: `0`.
   - Non-empty/vector results: `86` targets.
   - Remaining empty targets: `6`, all classified as expected no-event panels:
-    - `lishanmei-anomaly-alert-center`: large download evidence log; capability gaps by registry source/capability/stage.
-    - `lishanmei-dlp-file-evidence`: historical capability gap frequency; NAS system/service log frequency.
-    - `lishanmei-dlp-insights`: capability gap detail table.
-    - `lishanmei-dlp-terminal-stream`: collector fail-fast error log.
+    - `thesmart-anomaly-alert-center`: large download evidence log; capability gaps by registry source/capability/stage.
+    - `thesmart-dlp-file-evidence`: historical capability gap frequency; NAS system/service log frequency.
+    - `thesmart-dlp-insights`: capability gap detail table.
+    - `thesmart-dlp-terminal-stream`: collector fail-fast error log.
   - Restarted `grafana` again after retry fixes; container health returned `healthy`.
 
 ## Architecture Sync

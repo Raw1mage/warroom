@@ -30,7 +30,7 @@
       "title": "開啟行為統計",
       "tooltip": "切換到 DLP Webalizer-style insights dashboard",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-insights"
+      "uid": "thesmart-dlp-insights"
     },
     {
       "asDropdown": false,
@@ -42,79 +42,14 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
-      "uid": "lishanmei-nas-host-health"
+      "uid": "thesmart-nas-host-health"
     }
   ],
   "panels": [
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 0
-      },
-      "id": 1,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "warroom_dlp_file_collector_up{job=\"warroom-dlp-file-collector\"}",
-          "legendFormat": "collector up",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "DLP file collector up",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "loki",
+        "uid": "loki"
       },
       "fieldConfig": {
         "defaults": {
@@ -125,100 +60,6 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 18,
-        "x": 6,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "rate(warroom_dlp_file_collector_events_pushed_total{job=\"warroom-dlp-file-collector\"}[5m])",
-          "legendFormat": "events pushed/sec",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "DLP collector event push rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "events/sec",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -265,9 +106,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 0
       },
-      "id": 3,
+      "id": 1,
       "options": {
         "legend": {
           "calcs": [],
@@ -285,18 +126,82 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "loki",
+            "uid": "loki"
           },
+          "direction": "backward",
           "editorMode": "code",
-          "expr": "rate(warroom_dlp_file_collector_capability_gaps_total{job=\"warroom-dlp-file-collector\"}[5m]) or rate(warroom_dlp_file_collector_collection_failures_total{job=\"warroom-dlp-file-collector\"}[5m])",
-          "legendFormat": "{{__name__}}",
-          "range": true,
+          "expr": "sum by (source_app, action) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app!=\"collector\"}[5m]))",
+          "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Collector capability gaps and failures",
-      "type": "timeseries"
+      "title": "利善美 / DLP evidence activity trend",
+      "type": "timeseries",
+      "description": "以 collector 實際回收的正規化 NAS evidence 為資料源；File Station / Drive 是否覆蓋請看 coverage panel，不用 No data 假裝成活動。"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app!=\"collector\"}[15m])) or vector(0)",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "最近區間 DLP evidence 數",
+      "type": "stat",
+      "description": "目前時間範圍內 thesmart 正規化 DLP 事件總數。"
     },
     {
       "datasource": {
@@ -305,8 +210,59 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum by (covered_source_app, coverage_status) (last_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"collector_coverage\", action=\"coverage_status\"} | json | unwrap coverage_value [15m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Collector source coverage",
+      "type": "bargauge",
+      "description": "顯示各 configured source 最近是否 active/gap/no_events；這是覆蓋狀態，不是使用者活動量。"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
         "y": 8
       },
       "id": 4,
@@ -314,7 +270,7 @@
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": false,
-        "showCommonLabels": false,
+        "showCommonLabels": true,
         "showLabels": false,
         "showTime": false,
         "sortOrder": "Descending",
@@ -329,19 +285,27 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"}",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | line_format \"{{__timestamp__ | date \\\"2006-01-02T15:04:05Z07:00\\\"}} {{if .source_ip}}{{.source_ip}}{{else}}-{{end}} {{if .actor}}{{.actor}}{{else}}-{{end}} {{.source_app}} {{.action}} \\\"{{if .display_path}}{{.display_path}}{{else if .file_name}}{{.file_name}}{{else}}-{{end}}\\\" {{if .network_protocol}}{{.network_protocol}}{{else if .protocol}}{{.protocol}}{{else}}-{{end}}\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "利善美 DLP Loki event stream",
-      "type": "logs"
+      "title": "利善美資料安全原始證據流",
+      "type": "logs",
+      "description": "顯示 thesmart 的正規化 DLP evidence payload。"
     }
   ],
   "preload": false,
   "refresh": "10s",
   "schemaVersion": 40,
-  "tags": ["warroom", "local-poc", "lishanmei", "利善美智能", "data-security"],
+  "tags": [
+    "warroom",
+    "dlp",
+    "web-ingress",
+    "thesmart",
+    "利善美智能",
+    "data-security"
+  ],
   "templating": {
     "list": []
   },
@@ -351,8 +315,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "利善美智能 / Warroom 本地總覽",
-  "uid": "lishanmei-local-overview",
+  "title": "利善美智能 / DLP Web/File Evidence Coverage",
+  "uid": "thesmart-dlp-web-ingress",
   "version": 1,
   "weekStart": ""
 }

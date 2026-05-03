@@ -6,7 +6,7 @@
 
 ## 範圍 IN
 
-- 盤點 `lishanmei` 現有 sources。
+- 盤點 `thesmart` 現有 sources。
 - 查 Loki 中 active/historical capability gaps。
 - 評估 SSH transient scripts 與 bounded long-running execution plan。
 - 整理 anomaly detection 的資料需求與 gaps。
@@ -29,7 +29,7 @@
 
 ## Output
 
-- `docs/ops/lishanmei-anomaly-readiness.md`
+- `docs/ops/thesmart-anomaly-readiness.md`
 
 ## Architecture Sync
 

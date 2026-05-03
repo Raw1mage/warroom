@@ -30,7 +30,7 @@
       "title": "開啟網頁入口統計",
       "tooltip": "切換到 nginx web ingress route 統計 dashboard",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-web-ingress"
+      "uid": "thesmart-dlp-web-ingress"
     },
     {
       "asDropdown": false,
@@ -42,7 +42,7 @@
       "title": "開啟即時事件流",
       "tooltip": "切換到 terminal-like DLP evidence stream",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-terminal-stream"
+      "uid": "thesmart-dlp-terminal-stream"
     },
     {
       "asDropdown": false,
@@ -54,7 +54,7 @@
       "title": "開啟行為統計",
       "tooltip": "切換到 DLP Webalizer-style insights dashboard",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-insights"
+      "uid": "thesmart-dlp-insights"
     },
     {
       "asDropdown": false,
@@ -66,7 +66,7 @@
       "title": "開啟 NAS 主機監控",
       "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
       "type": "dashboard",
-      "uid": "lishanmei-nas-host-health"
+      "uid": "thesmart-nas-host-health"
     },
     {
       "asDropdown": false,
@@ -78,7 +78,7 @@
       "title": "開啟異常警訊中心",
       "tooltip": "查看登入、下載、連線與收集能力缺口的 POC 異常警訊",
       "type": "dashboard",
-      "uid": "lishanmei-anomaly-alert-center"
+      "uid": "thesmart-anomaly-alert-center"
     }
   ],
   "panels": [
@@ -137,7 +137,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"}[30m])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"}[30m])) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
@@ -200,7 +200,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "count(sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | actor != \"\" [30m]))) or vector(0)",
+          "expr": "count(sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | actor != \"\" [30m]))) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
@@ -263,7 +263,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "count(sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" [30m]))) or vector(0)",
+          "expr": "count(sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" [30m]))) or vector(0)",
           "queryType": "range",
           "refId": "A"
         }
@@ -355,7 +355,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"} | json | label_format category=\"{{.source_app}}/{{.network_protocol}}/{{.service}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | label_format category=\"{{.source_app}}/{{.network_protocol}}/{{.service}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -470,7 +470,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | actor != \"\" | label_format category=\"{{.actor}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | actor != \"\" | label_format category=\"{{.actor}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -585,7 +585,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" | label_format category=\"{{.source_ip}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" | label_format category=\"{{.source_ip}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -700,7 +700,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | display_path != \"\" | label_format category=\"{{.display_path}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | display_path != \"\" | label_format category=\"{{.display_path}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -815,7 +815,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | folder_path != \"\" | label_format category=\"{{.folder_path}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | folder_path != \"\" | label_format category=\"{{.folder_path}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -930,7 +930,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | file_name != \"\" | label_format category=\"{{.file_name}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | file_name != \"\" | label_format category=\"{{.file_name}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1045,7 +1045,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_country != \"\" | label_format category=\"{{.source_country}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_country != \"\" | label_format category=\"{{.source_country}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1160,7 +1160,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_region != \"\" | label_format category=\"{{.source_region}}\" [$__range])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_region != \"\" | label_format category=\"{{.source_region}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1275,7 +1275,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes < 10485760 [$__range])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes < 10485760 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "<10MB"
@@ -1287,7 +1287,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 10485760 | size_bytes < 104857600 [$__range])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 10485760 | size_bytes < 104857600 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "B",
           "legendFormat": "10-100MB"
@@ -1299,7 +1299,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 104857600 | size_bytes < 1073741824 [$__range])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 104857600 | size_bytes < 1073741824 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "C",
           "legendFormat": "100MB-1GB"
@@ -1311,7 +1311,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 1073741824 [$__range])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"file_station\", action=~\"webapp_file_download|webapp_file_export\"} | json | size_bytes >= 1073741824 [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "D",
           "legendFormat": ">=1GB"
@@ -1426,7 +1426,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"} | json | label_format category=\"{{.source_key}}/{{.affected_capability}}/{{.gap_stage}}\" [24h])))",
+          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"} | json | label_format category=\"{{.source_key}}/{{.affected_capability}}/{{.gap_stage}}\" [24h])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1516,7 +1516,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"}[2m])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"}[2m])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -1587,7 +1587,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"auth_log\", action=\"auth_failure\"}[1h])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"}[1h])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -1658,7 +1658,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [15m]) or vector(0)",
+          "expr": "max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [15m]) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -1729,7 +1729,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 [1h])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 [1h])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -1821,7 +1821,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(30, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\", source_channel=\"nas_system_log\"} | json | label_format category=\"{{.service}}/{{.action}}\" [$__range])))",
+          "expr": "topk(30, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"nas_system_log\"} | json | label_format category=\"{{.service}}/{{.action}}\" [$__range])))",
           "queryType": "instant",
           "refId": "A",
           "legendFormat": "{{category}}"
@@ -1851,6 +1851,119 @@
       ],
       "title": "NAS system/service log frequency histogram",
       "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "最近被存取的檔案清單。欄位直接來自 Loki JSON payload：時間、file_name、actor、source_app、source_ip；缺 IP 或使用者時保持空值，不推測補值。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 58
+      },
+      "id": 105,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"$nas\", source_app!=\"collector\", action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|file_activity|file_read|file_write|file_delete|file_rename\"} | json | file_name != \"\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "最近被存取的檔案",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "json",
+            "replace": false,
+            "source": "Line"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Line": true,
+              "__error__": true,
+              "__error_details__": true,
+              "action": true,
+              "collector": true,
+              "confidence": true,
+              "display_path": true,
+              "event_id": true,
+              "folder_path": true,
+              "ingested_at": true,
+              "nas_host": true,
+              "network_protocol": true,
+              "observed_at": true,
+              "policy_notes": true,
+              "protocol": true,
+              "size_bytes": true,
+              "source_channel": true,
+              "source_country": true,
+              "source_key": true,
+              "source_region": true
+            },
+            "indexByName": {
+              "Time": 0,
+              "file_name": 1,
+              "actor": 2,
+              "source_app": 3,
+              "source_ip": 4
+            },
+            "renameByName": {
+              "Time": "時間",
+              "actor": "使用者",
+              "file_name": "檔名",
+              "source_app": "途徑（app名）",
+              "source_ip": "IP"
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "preload": false,
@@ -1860,7 +1973,7 @@
     "warroom",
     "dlp",
     "file-evidence",
-    "lishanmei",
+    "thesmart",
     "利善美智能",
     "data-security"
   ],
@@ -1869,23 +1982,23 @@
       {
         "current": {
           "selected": true,
-          "text": "lishanmei",
-          "value": "lishanmei"
+          "text": "thesmart",
+          "value": "thesmart"
         },
         "datasource": {
           "type": "loki",
           "uid": "loki"
         },
-        "definition": "label_values({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"}, nas_host)",
+        "definition": "label_values({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"}, nas_host)",
         "hide": 0,
         "includeAll": false,
         "label": "NAS",
         "multi": false,
         "name": "nas",
         "options": [],
-        "query": "label_values({job=\"warroom-dlp-event-collector\", nas_host=\"lishanmei\"}, nas_host)",
+        "query": "label_values({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"}, nas_host)",
         "refresh": 1,
-        "regex": "^lishanmei$",
+        "regex": "^thesmart$",
         "sort": 1,
         "type": "query"
       }
@@ -1898,7 +2011,7 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "利善美智能 / DLP 檔案證據總覽",
-  "uid": "lishanmei-dlp-file-evidence",
+  "uid": "thesmart-dlp-file-evidence",
   "version": 1,
   "weekStart": ""
 }

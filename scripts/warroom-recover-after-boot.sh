@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_DIR="${WARROOM_PROJECT_DIR:-/home/pkcs12/projects/warroom}"
-DASHBOARD_FILE="${WARROOM_HOME_DASHBOARD_FILE:-grafana/dashboards/lishanmei-dlp-file-evidence.json}"
+DASHBOARD_FILE="${WARROOM_HOME_DASHBOARD_FILE:-grafana/dashboards/thesmart-dlp-file-evidence.json}"
 GRAFANA_CONTAINER="${WARROOM_GRAFANA_CONTAINER:-warroom-grafana}"
 WAIT_TIMEOUT_SECONDS="${WARROOM_BOOT_WAIT_TIMEOUT_SECONDS:-180}"
 WAIT_INTERVAL_SECONDS="${WARROOM_BOOT_WAIT_INTERVAL_SECONDS:-5}"

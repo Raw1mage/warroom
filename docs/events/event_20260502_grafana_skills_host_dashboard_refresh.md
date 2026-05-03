@@ -32,7 +32,7 @@ OUT:
 
 - `python3 -m json.tool grafana/dashboards/warroom-nas-host-health.json`: pass
 - Dashboard structural check: `panel_count=18`, `non_row_count=13`, required rows present.
-- Loki query validation: all 28 dashboard targets pass after substituting `$nas=lishanmei`, `$__range=30m`, `$__interval=5m`.
+- Loki query validation: all 28 dashboard targets pass after substituting `$nas=thesmart`, `$__range=30m`, `$__interval=5m`.
 - `docker compose config`: pass
 - Architecture Sync: Verified (No doc changes). Existing architecture already documents `host_health_remote` SSH transient payload and network counters; this change is dashboard presentation only.
 

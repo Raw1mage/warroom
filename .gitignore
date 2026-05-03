@@ -11,6 +11,7 @@ id_rsa*
 id_ed25519*
 
 # Runtime data
+incoming/
 synology-nginx-logs/*
 *.log
 *.sqlite
@@ -25,9 +26,9 @@ __pycache__/
 rawdb/data/**/*
 !rawdb/data/**/
 !rawdb/data/**/.gitkeep
-lishanmei/data/**/*
-!lishanmei/data/**/
-!lishanmei/data/**/.gitkeep
+thesmart/data/**/*
+!thesmart/data/**/
+!thesmart/data/**/.gitkeep
 
 # Private planning / event artifacts retained locally only
 docs/events/

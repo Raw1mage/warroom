@@ -4,7 +4,7 @@
 
 目前利善美智能使用 `/<server>/config` 設定，`/tools` 為 global reusable adapter layer。
 
-`lishanmei/config/sources.json` 已啟用：
+`thesmart/config/sources.json` 已啟用：
 
 - `host_health_remote`
 - `file_station_remote`
@@ -140,7 +140,7 @@ local collector
 ```json
 {
   "schema_version": 1,
-  "nas_host": "lishanmei",
+  "nas_host": "thesmart",
   "ttl_seconds": 300,
   "interval_seconds": 30,
   "sources": [
@@ -155,7 +155,7 @@ local collector
 stdout JSONL envelope：
 
 ```json
-{"type":"heartbeat","nas_host":"lishanmei","observed_at":1777690000}
+{"type":"heartbeat","nas_host":"thesmart","observed_at":1777690000}
 {"type":"events","source":"auth_log","events":[...]}
 {"type":"capability_gap","source":"network_socket","stage":"command_missing","detail":"ss not found"}
 ```

@@ -37,7 +37,7 @@ The remote runner runs only inside the SSH process. It exits when TTL, max cycle
 ```json
 {
   "schema_version": 1,
-  "nas_host": "lishanmei",
+  "nas_host": "thesmart",
   "ttl_seconds": 300,
   "max_cycles": 10,
   "heartbeat_interval_seconds": 30,
@@ -53,10 +53,10 @@ The remote runner runs only inside the SSH process. It exits when TTL, max cycle
 ## JSONL envelopes
 
 ```json
-{"type":"heartbeat","nas_host":"lishanmei","observed_at":1777690000}
+{"type":"heartbeat","nas_host":"thesmart","observed_at":1777690000}
 {"type":"events","source":"auth_log","events":[...]}
 {"type":"capability_gap","source":"network_socket","stage":"command_missing","detail":"ss not found"}
-{"type":"runner_done","nas_host":"lishanmei","cycles":10,"observed_at":1777690300}
+{"type":"runner_done","nas_host":"thesmart","cycles":10,"observed_at":1777690300}
 ```
 
 ## Phase decision

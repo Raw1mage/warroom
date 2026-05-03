@@ -9,7 +9,7 @@
 IN:
 - 檢查 Docker Compose 服務狀態。
 - 檢查 `warroom-dlp-file-collector` metrics/logs。
-- 直接查 Loki 是否收到 `lishanmei` 與 `host_health` events。
+- 直接查 Loki 是否收到 `thesmart` 與 `host_health` events。
 - 判斷是資料流中斷、collector push 失敗、Loki 查詢空值，或 dashboard query 分類失效。
 
 OUT:
@@ -26,7 +26,7 @@ OUT:
 
 - Boundary 1: Docker Compose service health。
 - Boundary 2: collector `/metrics` counters：up、cycles、events pushed、failures、last success。
-- Boundary 3: Loki labels/query：`nas_host="lishanmei"`、`source_channel="host_health"`。
+- Boundary 3: Loki labels/query：`nas_host="thesmart"`、`source_channel="host_health"`。
 - Boundary 4: Grafana dashboard query 是否因 pie insight 分類 matcher 太嚴格而空值。
 
 ### Execution
@@ -39,11 +39,11 @@ OUT:
   - `warroom_dlp_file_collector_collection_failures_total = 0`
   - `warroom_dlp_file_collector_last_success_timestamp` 為檢查當下最新時間。
 - Loki direct query:
-  - 最近 10 分鐘 `nas_host="lishanmei"` 事件數：816。
+  - 最近 10 分鐘 `nas_host="thesmart"` 事件數：816。
   - 最近 10 分鐘 `source_channel="host_health"` 事件數：17。
   - 最近 sample 能取回 `source_channel="nas_home_log"` / `action="file_activity"` 事件。
 - Root cause: dataflow 未中斷；空白/低辨識度畫面來自 pie chart query 寫法。`label_format category="..."` 在 Loki API 可回傳，但 Grafana pie panel 仍顯示 `No data`，因此不能作為此 panel 的穩定呈現方式。
-- Fix: `grafana/dashboards/lishanmei-dlp-terminal-stream.json` 的 pie chart targets 改回 Grafana pie 最穩的 scalar instant query，每個分類用獨立 target + `legendFormat` 命名。
+- Fix: `grafana/dashboards/thesmart-dlp-terminal-stream.json` 的 pie chart targets 改回 Grafana pie 最穩的 scalar instant query，每個分類用獨立 target + `legendFormat` 命名。
 - Follow-up: 使用者回報不明黑色圖後，移除 pie chart 內的 `or vector(0)`，因為 0 值向量適合 stat 防 `No data`，但在 pie chart 會製造無意義的黑色/0 值 slice。
 
 ## Verification

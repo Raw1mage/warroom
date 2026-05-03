@@ -26,7 +26,7 @@
       "targetBlank": false,
       "title": "開啟利善美 DLP 檔案證據",
       "type": "dashboard",
-      "uid": "lishanmei-dlp-file-evidence"
+      "uid": "thesmart-dlp-file-evidence"
     },
     {
       "asDropdown": false,
@@ -37,7 +37,7 @@
       "targetBlank": false,
       "title": "開啟利善美本地總覽",
       "type": "dashboard",
-      "uid": "lishanmei-local-overview"
+      "uid": "thesmart-local-overview"
     }
   ],
   "panels": [
@@ -877,7 +877,7 @@
     "host-health",
     "infrastructure",
     "use-method",
-    "lishanmei",
+    "thesmart",
     "利善美智能"
   ],
   "templating": {
@@ -885,8 +885,8 @@
       {
         "current": {
           "selected": false,
-          "text": "lishanmei",
-          "value": "lishanmei"
+          "text": "thesmart",
+          "value": "thesmart"
         },
         "datasource": { "type": "loki", "uid": "loki" },
         "definition": "label_values({job=\"warroom-dlp-event-collector\", source_channel=\"host_health\", source_app=\"nas_host_health\"}, nas_host)",
@@ -908,7 +908,7 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "TheSmartAI / NAS Host Health",
-  "uid": "lishanmei-nas-host-health",
+  "uid": "thesmart-nas-host-health",
   "version": 3,
   "weekStart": ""
 }

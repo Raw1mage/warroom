@@ -1,0 +1,666 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟 DLP 統計圖表",
+      "tooltip": "切換到 Drive/File/Sharing 活動統計 dashboard",
+      "type": "dashboard",
+      "uid": "thesmart-dlp-web-ingress"
+    },
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟行為統計",
+      "tooltip": "切換到 DLP Webalizer-style insights dashboard",
+      "type": "dashboard",
+      "uid": "thesmart-dlp-insights"
+    },
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "開啟 NAS 主機監控",
+      "tooltip": "查看利善美 NAS CPU、記憶體、Disk 與 service/network-facing 狀態",
+      "type": "dashboard",
+      "uid": "thesmart-nas-host-health"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "把大量 raw log 重新歸類成可決策的證據語意：外流/下載、開檔/預覽、NAS 檔案服務活動、主機健康、系統服務事件、能力缺口與其他。只統計已進 Loki 的 evidence，不推估缺漏。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "displayLabels": ["name", "percent"],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": ["value", "percent"]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=~\"webapp_file_download|webapp_file_export\"}[$__range])) or vector(0)",
+          "legendFormat": "檔案外流/下載匯出",
+          "queryType": "instant",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=~\"webapp_file_open|webapp_file_preview|public_share_page_load|sharing_link_access\"}[$__range])) or vector(0)",
+          "legendFormat": "開檔/預覽/分享瀏覽",
+          "queryType": "instant",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=~\"file_activity|file_read|file_write|file_delete|file_rename\"}[$__range])) or vector(0)",
+          "legendFormat": "NAS 檔案服務活動",
+          "queryType": "instant",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_host_health\"}[$__range])) or vector(0)",
+          "legendFormat": "主機健康/資源監測",
+          "queryType": "instant",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"nas_system_log\"}[$__range])) or vector(0)",
+          "legendFormat": "NAS 系統/服務事件",
+          "queryType": "instant",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__range])) or vector(0)",
+          "legendFormat": "能力缺口/收集失敗",
+          "queryType": "instant",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action!~\"webapp_file_download|webapp_file_export|webapp_file_open|webapp_file_preview|public_share_page_load|sharing_link_access|file_activity|file_read|file_write|file_delete|file_rename|capability_gap\", source_app!=\"nas_host_health\", source_channel!=\"nas_system_log\"}[$__range]))",
+          "legendFormat": "其他/未歸類 evidence",
+          "queryType": "instant",
+          "refId": "G"
+        }
+      ],
+      "title": "DLP 綜合 evidence insight 比例",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "用表格列出最近重要 DLP evidence。欄位直接來自 Loki JSON payload；缺使用者、檔名或 IP 時保持空值，不推測補值。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 11,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app!=\"collector\"} | json | action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|file_activity|file_read|file_write|file_delete|file_rename|auth_failure|session_opened|session_closed|host_health_snapshot|network_socket_snapshot\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "最近重要事件表",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "json",
+            "replace": false,
+            "source": "Line"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Line": true,
+              "__error__": true,
+              "__error_details__": true,
+              "collector": true,
+              "confidence": true,
+              "event_id": true,
+              "folder_path": true,
+              "ingested_at": true,
+              "nas_host": true,
+              "observed_at": true,
+              "policy_notes": true,
+              "raw_ref": true,
+              "raw_ref_line_ref": true,
+              "raw_ref_path": true,
+              "raw_ref_sha256_24": true,
+              "raw_ref_type": true,
+              "service_name": true,
+              "source_channel": true,
+              "source_country": true,
+              "source_key": true,
+              "source_region": true,
+              "source_surface": true
+            },
+            "indexByName": {
+              "Time": 0,
+              "action": 1,
+              "source_app": 2,
+              "actor": 3,
+              "file_name": 4,
+              "display_path": 5,
+              "source_ip": 6,
+              "network_protocol": 7,
+              "protocol": 8
+            },
+            "renameByName": {
+              "Time": "時間",
+              "action": "事件",
+              "actor": "使用者",
+              "display_path": "路徑",
+              "file_name": "檔名",
+              "network_protocol": "協定",
+              "protocol": "原始協定",
+              "source_app": "來源系統",
+              "source_ip": "IP"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "顯示每個資料來源目前是否有資料、沒有新事件，或發生收集缺口。這是 coverage 狀態，不是使用者活動量。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 12,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"collector_coverage\", action=~\"coverage_status|field_coverage_status\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "資料來源與欄位覆蓋狀態",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "json",
+            "replace": false,
+            "source": "Line"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Line": true,
+              "__error__": true,
+              "__error_details__": true,
+              "action": true,
+              "collector": true,
+              "confidence": true,
+              "event_id": true,
+              "ingested_at": true,
+              "nas_host": true,
+              "observed_at": true,
+              "policy_notes": true,
+              "source_app": true,
+              "source_channel": true
+            },
+            "indexByName": {
+              "Time": 0,
+              "covered_source_app": 1,
+              "covered_source_channel": 2,
+              "field_name": 3,
+              "coverage_status": 4,
+              "event_count": 5,
+              "present_count": 6,
+              "gap_count": 7
+            },
+            "renameByName": {
+              "Time": "時間",
+              "coverage_status": "覆蓋狀態",
+              "covered_source_app": "資料來源",
+              "covered_source_channel": "來源通道",
+              "event_count": "事件數",
+              "field_name": "欄位",
+              "gap_count": "缺口數",
+              "present_count": "有值筆數"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "依 bounded action 與 source_app label 統計 collector 事件，用於快速確認預覽、下載、匯出等正規化事件是否進入 Loki。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 36
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum by (source_app, action) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app!=\"collector\"}[5m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "5 分鐘事件趨勢（依來源/事件）",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "需要管理者注意的收集問題。包含 capability gap 或 collector fail-fast 訊號；正常情況下應該很少或為空。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 36
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "需要處理的收集問題",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "json",
+            "replace": false,
+            "source": "Line"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Line": true,
+              "__error__": true,
+              "__error_details__": true,
+              "collector": true,
+              "confidence": true,
+              "event_id": true,
+              "ingested_at": true,
+              "nas_host": true,
+              "observed_at": true,
+              "policy_notes": true,
+              "source_app": true
+            },
+            "indexByName": {
+              "Time": 0,
+              "action": 1,
+              "affected_source_app": 2,
+              "affected_source_channel": 3,
+              "gap_stage": 4,
+              "gap_detail": 5,
+              "source_channel": 6
+            },
+            "renameByName": {
+              "Time": "時間",
+              "action": "問題類型",
+              "affected_source_app": "受影響來源",
+              "affected_source_channel": "受影響通道",
+              "gap_detail": "細節",
+              "gap_stage": "階段",
+              "source_channel": "來源通道"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 40,
+  "tags": [
+    "warroom",
+    "dlp",
+    "summary",
+    "table",
+    "thesmart",
+    "利善美智能",
+    "data-security"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "利善美智能 / DLP 事件摘要",
+  "uid": "thesmart-dlp-terminal-stream",
+  "version": 1,
+  "weekStart": ""
+}
