@@ -137,12 +137,12 @@
         "y": 0
       },
       "datasource": {
-        "type": "loki",
-        "uid": "loki"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "targets": [
         {
-          "expr": "count(count by (src_ip) (count_over_time({job=\"asus-router\"} |~ `ban: ` [$__range])))",
+          "expr": "asusrouter_active_bans",
           "refId": "A"
         }
       ],
@@ -158,7 +158,8 @@
         "defaults": {
           "unit": "short"
         }
-      }
+      },
+      "description": "Number of DROP rules in router raw/PREROUTING (truth from /proc-poll exporter)."
     },
     {
       "id": 4,

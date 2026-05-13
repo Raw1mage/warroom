@@ -1,189 +1,963 @@
 {
-  "annotations": {"list": [{"builtIn": 1, "datasource": {"type": "grafana", "uid": "-- Grafana --"}, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard"}]},
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
   "title": "[80 跨域威脅] 多面向攻擊者 (cross-channel correlation)",
   "uid": "cross-channel-attackers",
-  "tags": ["warroom", "security", "correlation", "陽光沙灘"],
+  "tags": [
+    "warroom",
+    "security",
+    "correlation",
+    "陽光沙灘"
+  ],
   "timezone": "Asia/Taipei",
   "schemaVersion": 39,
   "version": 1,
   "refresh": "1m",
-  "time": {"from": "now-24h", "to": "now"},
-  "templating": {"list": []},
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "templating": {
+    "list": []
+  },
   "panels": [
-    {"type": "row", "id": 100, "title": "Overview", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}, "panels": []},
     {
-      "id": 1, "type": "stat", "title": "IPs hitting 2+ surfaces",
+      "type": "row",
+      "id": 100,
+      "title": "Overview",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "IPs hitting 2+ surfaces",
       "description": "Unique attacker IPs that show up in at least two distinct attack channels (ssh / nginx / mail) within the selected range.",
-      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 1},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "targets": [{"expr": "count(warroom_attacker_channels >= 2)", "refId": "A"}],
-      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "area"},
-      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 1}, {"color": "red", "value": 10}]}}}
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "count(warroom_attacker_channels >= 2)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      }
     },
     {
-      "id": 2, "type": "stat", "title": "Currently banned (all reasons)",
-      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 1},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "targets": [{"expr": "count(asusrouter_ban_expires_at_seconds > time())", "refId": "A"}],
-      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value"},
-      "fieldConfig": {"defaults": {"unit": "short"}}
+      "id": 2,
+      "type": "stat",
+      "title": "Currently banned (all reasons)",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "count(asusrouter_ban_expires_at_seconds > time())",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
     },
     {
-      "id": 3, "type": "stat", "title": "Total attacker IPs seen (range)",
-      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 1},
-      "datasource": {"type": "loki", "uid": "loki"},
-      "targets": [{"expr": "count(count by (src_ip) (count_over_time({job=~\"asus-router|rawdb-nginx|rawdb-mail\"} | regexp `(?:SRC=|client: |from \\[|rip=)(?P<src_ip>[0-9.]+)` [$__range])))", "refId": "A"}],
-      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value"},
-      "fieldConfig": {"defaults": {"unit": "short"}}
+      "id": 3,
+      "type": "stat",
+      "title": "Total attacker IPs seen (range)",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "count(count by (src_ip) (count_over_time({job=~\"asus-router|rawdb-nginx|rawdb-mail\"} | regexp `(?:SRC=|client: |from \\[|rip=)(?P<src_ip>[0-9.]+)` [$__range])))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
     },
     {
-      "id": 4, "type": "stat", "title": "Auto-ban tick log (last)",
-      "description": "Time since last fail2ban tick log update (cron heartbeat).",
-      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 1},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "targets": [{"expr": "time() - max(asusrouter_uptime_seconds * 0 + (time() - 60))", "refId": "A"}],
-      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value"},
-      "fieldConfig": {"defaults": {"unit": "s"}}
+      "id": 4,
+      "type": "stat",
+      "title": "Active bans now",
+      "description": "Live count of router-side DROP rules.",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "asusrouter_active_bans",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          }
+        }
+      }
     },
-
-    {"type": "row", "id": 200, "title": "Multi-channel attacker matrix", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6}, "panels": []},
     {
-      "id": 10, "type": "table",
+      "type": "row",
+      "id": 200,
+      "title": "Multi-channel attacker matrix",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "panels": []
+    },
+    {
+      "id": 10,
+      "type": "table",
       "title": "Cross-channel correlation (IP × channel × GeoIP)",
       "description": "Each row joins IP across SSH/NGINX/MAIL Loki counts and GeoIP enrichment. Score = number of channels with non-zero hits. Sort by Score, then totals.",
-      "gridPos": {"h": 18, "w": 24, "x": 0, "y": 7},
-      "datasource": {"type": "datasource", "uid": "-- Mixed --"},
+      "gridPos": {
+        "h": 18,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
       "targets": [
-        {"refId": "A", "datasource": {"type": "loki", "uid": "loki"}, "expr": "topk(200, sum by (src_ip) (count_over_time({job=\"asus-router\", prog=\"kernel\"} |= `WSLSSH-` | regexp `SRC=(?P<src_ip>[\\d.]+)` [$__range])))", "instant": true, "format": "table"},
-        {"refId": "B", "datasource": {"type": "loki", "uid": "loki"}, "expr": "topk(200, sum by (src_ip) (count_over_time({job=\"rawdb-nginx\"} | regexp `client: (?P<src_ip>[\\d.]+)` [$__range])))", "instant": true, "format": "table"},
-        {"refId": "C", "datasource": {"type": "loki", "uid": "loki"}, "expr": "topk(200, sum by (src_ip) (count_over_time({job=\"rawdb-mail\"} | regexp `(?:from \\[|rip=)(?P<src_ip>[\\d.]+)` [$__range])))", "instant": true, "format": "table"},
-        {"refId": "D", "datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "warroom_ip_info", "format": "table", "instant": true}
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "topk(200, sum by (src_ip) (count_over_time({job=\"asus-router\", prog=\"kernel\"} |= `WSLSSH-` | regexp `SRC=(?P<src_ip>[\\d.]+)` [$__range])))",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "topk(200, sum by (src_ip) (count_over_time({job=\"rawdb-nginx\"} | regexp `client: (?P<src_ip>[\\d.]+)` [$__range])))",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "topk(200, sum by (src_ip) (count_over_time({job=\"rawdb-mail\"} | regexp `(?:from \\[|rip=)(?P<src_ip>[\\d.]+)` [$__range])))",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "warroom_ip_info",
+          "format": "table",
+          "instant": true
+        }
       ],
       "transformations": [
-        {"id": "merge", "options": {}},
-        {"id": "renameByRegex", "options": {"regex": "^ip$", "renamePattern": "src_ip"}},
-        {"id": "joinByField", "options": {"byField": "src_ip", "mode": "outer"}},
-        {"id": "organize", "options": {
-          "excludeByName": {
-            "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true,
-            "__name__": true, "instance": true, "job": true, "latitude": true, "longitude": true
-          },
-          "indexByName": {
-            "src_ip": 0,
-            "country_iso": 1, "city": 2, "asn_org": 3, "asn_number": 4,
-            "Value #A": 5, "Value #B": 6, "Value #C": 7
-          },
-          "renameByName": {
-            "src_ip": "IP",
-            "country_iso": "Country", "city": "City",
-            "asn_org": "AS Org", "asn_number": "ASN",
-            "Value #A": "SSH hits", "Value #B": "Nginx hits", "Value #C": "Mail hits"
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^ip$",
+            "renamePattern": "src_ip"
           }
-        }},
-        {"id": "filterFieldsByName", "options": {"include": {"names": ["IP", "Country", "City", "AS Org", "ASN", "SSH hits", "Nginx hits", "Mail hits"]}}},
-        {"id": "calculateField", "options": {
-          "mode": "reduceRow",
-          "reduce": {"reducer": "count", "include": ["SSH hits", "Nginx hits", "Mail hits"]},
-          "alias": "Channels hit"
-        }},
-        {"id": "calculateField", "options": {
-          "mode": "reduceRow",
-          "reduce": {"reducer": "sum", "include": ["SSH hits", "Nginx hits", "Mail hits"]},
-          "alias": "Total hits"
-        }},
-        {"id": "filterByValue", "options": {"filters": [{"fieldName": "Total hits", "config": {"id": "greater", "options": {"value": 0}}}], "type": "include", "match": "any"}},
-        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Channels hit", "desc": true}, {"field": "Total hits", "desc": true}]}}
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "src_ip",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "__name__": true,
+              "instance": true,
+              "job": true,
+              "latitude": true,
+              "longitude": true
+            },
+            "indexByName": {
+              "src_ip": 0,
+              "country_iso": 1,
+              "city": 2,
+              "asn_org": 3,
+              "asn_number": 4,
+              "Value #A": 5,
+              "Value #B": 6,
+              "Value #C": 7
+            },
+            "renameByName": {
+              "src_ip": "IP",
+              "country_iso": "Country",
+              "city": "City",
+              "asn_org": "AS Org",
+              "asn_number": "ASN",
+              "Value #A": "SSH hits",
+              "Value #B": "Nginx hits",
+              "Value #C": "Mail hits"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "IP",
+                "Country",
+                "City",
+                "AS Org",
+                "ASN",
+                "SSH hits",
+                "Nginx hits",
+                "Mail hits"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "reducer": "count",
+              "include": [
+                "SSH hits",
+                "Nginx hits",
+                "Mail hits"
+              ]
+            },
+            "alias": "Channels hit"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "reducer": "sum",
+              "include": [
+                "SSH hits",
+                "Nginx hits",
+                "Mail hits"
+              ]
+            },
+            "alias": "Total hits"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Total hits",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "any"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Channels hit",
+                "desc": true
+              },
+              {
+                "field": "Total hits",
+                "desc": true
+              }
+            ]
+          }
+        }
       ],
       "fieldConfig": {
-        "defaults": {"custom": {"align": "auto"}},
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
         "overrides": [
-          {"matcher": {"id": "byName", "options": "Channels hit"}, "properties": [
-            {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}},
-            {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 2}, {"color": "red", "value": 3}]}},
-            {"id": "min", "value": 0},
-            {"id": "max", "value": 3}
-          ]},
-          {"matcher": {"id": "byName", "options": "Total hits"}, "properties": [
-            {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}}
-          ]},
-          {"matcher": {"id": "byName", "options": "SSH hits"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-text"}}, {"id": "color", "value": {"mode": "thresholds"}}, {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "text"}, {"color": "orange", "value": 5}]}}]},
-          {"matcher": {"id": "byName", "options": "Nginx hits"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-text"}}, {"id": "color", "value": {"mode": "thresholds"}}, {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "text"}, {"color": "orange", "value": 5}]}}]},
-          {"matcher": {"id": "byName", "options": "Mail hits"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-text"}}, {"id": "color", "value": {"mode": "thresholds"}}, {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "text"}, {"color": "orange", "value": 5}]}}]}
-        ]
-      }
-    },
-
-    {"type": "row", "id": 300, "title": "Active bans (router truth)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 25}, "panels": []},
-    {
-      "id": 20, "type": "table", "title": "Currently banned IPs (with reason + geo)",
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 26},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "targets": [
-        {"refId": "A", "expr": "asusrouter_ban_banned_at_seconds", "instant": true, "format": "table"},
-        {"refId": "B", "expr": "asusrouter_ban_expires_at_seconds", "instant": true, "format": "table"},
-        {"refId": "C", "expr": "asusrouter_ban_expires_at_seconds - time()", "instant": true, "format": "table"},
-        {"refId": "D", "expr": "warroom_ip_info", "instant": true, "format": "table"}
-      ],
-      "transformations": [
-        {"id": "renameByRegex", "options": {"regex": "^ip$", "renamePattern": "src_ip"}},
-        {"id": "joinByField", "options": {"byField": "src_ip", "mode": "outer"}},
-        {"id": "organize", "options": {
-          "excludeByName": {
-            "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true,
-            "__name__": true, "__name__ 1": true, "__name__ 2": true, "__name__ 3": true, "__name__ 4": true,
-            "instance": true, "instance 1": true, "instance 2": true, "instance 3": true, "instance 4": true,
-            "job": true, "job 1": true, "job 2": true, "job 3": true, "job 4": true,
-            "device": true, "device 1": true, "device 2": true, "device 3": true,
-            "latitude": true, "longitude": true, "state": true
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Channels hit"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 2
+                    },
+                    {
+                      "color": "red",
+                      "value": 3
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 3
+              }
+            ]
           },
-          "indexByName": {"src_ip": 0, "country_iso": 1, "city": 2, "asn_org": 3, "Value #A": 4, "Value #B": 5, "Value #C": 6},
-          "renameByName": {"src_ip": "IP", "country_iso": "Country", "city": "City", "asn_org": "AS Org", "Value #A": "Banned at", "Value #B": "Expires at", "Value #C": "Remaining"}
-        }},
-        {"id": "filterFieldsByName", "options": {"include": {"names": ["IP", "Country", "City", "AS Org", "Banned at", "Expires at", "Remaining"]}}},
-        {"id": "filterByValue", "options": {"filters": [{"fieldName": "Remaining", "config": {"id": "greater", "options": {"value": 0}}}], "type": "include", "match": "any"}},
-        {"id": "convertFieldType", "options": {"conversions": [
-          {"targetField": "Banned at", "destinationType": "time"},
-          {"targetField": "Expires at", "destinationType": "time"}
-        ]}},
-        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Remaining", "desc": true}]}}
-      ],
-      "fieldConfig": {
-        "defaults": {"custom": {"align": "auto"}},
-        "overrides": [
-          {"matcher": {"id": "byName", "options": "Remaining"}, "properties": [
-            {"id": "unit", "value": "s"},
-            {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}},
-            {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "orange", "value": 300}, {"color": "green", "value": 1800}]}}
-          ]}
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total hits"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SSH hits"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Nginx hits"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mail hits"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         ]
       }
     },
-
-    {"type": "row", "id": 400, "title": "Geographic + ASN aggregation", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 36}, "panels": []},
     {
-      "id": 30, "type": "piechart", "title": "Attacker countries (all channels)",
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 37},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "targets": [{"expr": "count by (country_iso) (warroom_ip_info)", "refId": "A", "legendFormat": "{{country_iso}}"}],
-      "options": {"legend": {"showLegend": true, "displayMode": "table", "placement": "right", "values": ["value", "percent"]}, "pieType": "donut"}
+      "type": "row",
+      "id": 300,
+      "title": "Active bans (router truth)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "panels": []
     },
     {
-      "id": 31, "type": "table", "title": "Top hostile ASNs (all channels combined)",
-      "gridPos": {"h": 8, "w": 16, "x": 8, "y": 37},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "targets": [{"expr": "topk(20, count by (asn_org, country_iso) (warroom_ip_info))", "format": "table", "instant": true, "refId": "A"}],
+      "id": 20,
+      "type": "table",
+      "title": "Currently banned IPs (with reason + geo)",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "asusrouter_ban_banned_at_seconds",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "expr": "asusrouter_ban_expires_at_seconds",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "C",
+          "expr": "asusrouter_ban_expires_at_seconds - time()",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "D",
+          "expr": "warroom_ip_info",
+          "instant": true,
+          "format": "table"
+        }
+      ],
       "transformations": [
-        {"id": "organize", "options": {
-          "excludeByName": {"Time": true, "__name__": true, "city": true, "state": true, "ip": true, "instance": true, "job": true, "asn_number": true},
-          "indexByName": {"asn_org": 0, "country_iso": 1, "Value": 2},
-          "renameByName": {"asn_org": "AS Organization", "country_iso": "Country", "Value": "Unique IPs"}
-        }},
-        {"id": "filterFieldsByName", "options": {"include": {"names": ["AS Organization", "Country", "Unique IPs"]}}},
-        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Unique IPs", "desc": true}]}}
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^ip$",
+            "renamePattern": "src_ip"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "src_ip",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "__name__": true,
+              "__name__ 1": true,
+              "__name__ 2": true,
+              "__name__ 3": true,
+              "__name__ 4": true,
+              "instance": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "instance 4": true,
+              "job": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "job 4": true,
+              "device": true,
+              "device 1": true,
+              "device 2": true,
+              "device 3": true,
+              "latitude": true,
+              "longitude": true,
+              "state": true
+            },
+            "indexByName": {
+              "src_ip": 0,
+              "country_iso": 1,
+              "city": 2,
+              "asn_org": 3,
+              "Value #A": 4,
+              "Value #B": 5,
+              "Value #C": 6
+            },
+            "renameByName": {
+              "src_ip": "IP",
+              "country_iso": "Country",
+              "city": "City",
+              "asn_org": "AS Org",
+              "Value #A": "Banned at",
+              "Value #B": "Expires at",
+              "Value #C": "Remaining"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "IP",
+                "Country",
+                "City",
+                "AS Org",
+                "Banned at",
+                "Expires at",
+                "Remaining"
+              ]
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Remaining",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "any"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Banned at",
+                "destinationType": "time"
+              },
+              {
+                "targetField": "Expires at",
+                "destinationType": "time"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Remaining",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Remaining"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 300
+                    },
+                    {
+                      "color": "green",
+                      "value": 1800
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "id": 400,
+      "title": "Geographic + ASN aggregation",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "panels": []
+    },
+    {
+      "id": 30,
+      "type": "piechart",
+      "title": "Attacker countries (all channels)",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 37
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "count by (country_iso) (warroom_ip_info)",
+          "refId": "A",
+          "legendFormat": "{{country_iso}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut"
+      }
+    },
+    {
+      "id": 31,
+      "type": "table",
+      "title": "Top hostile ASNs (all channels combined)",
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 8,
+        "y": 37
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "topk(20, count by (asn_org, country_iso) (warroom_ip_info))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "city": true,
+              "state": true,
+              "ip": true,
+              "instance": true,
+              "job": true,
+              "asn_number": true
+            },
+            "indexByName": {
+              "asn_org": 0,
+              "country_iso": 1,
+              "Value": 2
+            },
+            "renameByName": {
+              "asn_org": "AS Organization",
+              "country_iso": "Country",
+              "Value": "Unique IPs"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "AS Organization",
+                "Country",
+                "Unique IPs"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Unique IPs",
+                "desc": true
+              }
+            ]
+          }
+        }
       ]
     }
   ]
