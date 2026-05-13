@@ -177,7 +177,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -215,26 +217,65 @@
         "y": 0
       },
       "id": 3,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "-1": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "gap"
+                },
+                "0": {
+                  "color": "orange",
+                  "index": 1,
+                  "text": "no_events"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 2,
+                  "text": "active"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "options": {
-        "displayMode": "gradient",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 8,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
           "fields": "",
-          "values": false
+          "reducer": [
+            "sum"
+          ],
+          "show": false
         },
-        "showUnfilled": true,
-        "valueMode": "color"
+        "showHeader": true
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -245,14 +286,32 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (covered_source_app, coverage_status) (last_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"collector_coverage\", action=\"coverage_status\"} | json | unwrap coverage_value [15m]))",
-          "queryType": "range",
+          "expr": "max by (covered_source_app) (last_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"collector_coverage\", action=\"coverage_status\"} | json | unwrap coverage_value [15m]))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
-      "title": "Collector source coverage",
-      "type": "bargauge",
-      "description": "顯示各 configured source 最近是否 active/gap/no_events；這是覆蓋狀態，不是使用者活動量。"
+      "title": "收集器狀態",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "covered_source_app": 0,
+              "Value": 1
+            },
+            "renameByName": {
+              "Value": "狀態",
+              "covered_source_app": "來源"
+            }
+          }
+        }
+      ],
+      "type": "table",
+      "description": "每列是一個 collector source 的最近覆蓋狀態：active=有資料、no_events=目前無事件、gap=收集缺口；這不是使用者活動量。"
     },
     {
       "datasource": {
@@ -314,8 +373,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
-  "title": "利善美智能 / DLP Web/File Evidence Coverage",
+  "timezone": "Asia/Taipei",
+  "title": "[23 DLP] 利善美智能 Web/File Evidence Coverage",
   "uid": "thesmart-dlp-web-ingress",
   "version": 1,
   "weekStart": ""

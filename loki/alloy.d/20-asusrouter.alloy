@@ -1,0 +1,50 @@
+// Warroom: asusrouter syslog → Loki pipeline.
+//
+// Reads the local stream file written by warroom-asusrouter-tail.service
+// (pulling from rawdb's Synology Log Center SQLite DB).
+// Stream format per line:   <id>|<utcsec>|<prog>|<prio>|<msg>
+//
+// Behind compose profile `asusrouter-logs`.
+
+local.file_match "asusrouter" {
+	path_targets = [{
+		__path__ = "/var/log/asusrouter/router-stream.log",
+		job      = "asus-router",
+		device   = "asusrouter_192.168.100.1",
+		host     = "RAWAX86U",
+	}]
+}
+
+loki.source.file "asusrouter" {
+	targets    = local.file_match.asusrouter.targets
+	forward_to = [loki.process.asusrouter.receiver]
+}
+
+loki.process "asusrouter" {
+	// 1) parse one row of the pipe-separated stream
+	stage.regex {
+		expression = "^(?P<id>\\d+)\\|(?P<utcsec>\\d+)\\|(?P<prog>[^|]*)\\|(?P<prio>[^|]*)\\|(?P<msg>.*)$"
+	}
+
+	// 2) use the embedded epoch as the entry timestamp
+	stage.timestamp {
+		source = "utcsec"
+		format = "Unix"
+	}
+
+	// 3) promote prog + prio to labels (low cardinality, OK)
+	stage.labels {
+		values = {
+			prog = "",
+			prio = "",
+		}
+	}
+
+	// 4) emit only the human message as the actual Loki line — WSLSSH src/dport
+	//    parsing is done at query time via LogQL (see grafana dashboard).
+	stage.output {
+		source = "msg"
+	}
+
+	forward_to = [loki.write.warroom_loki.receiver]
+}

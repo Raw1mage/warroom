@@ -1,0 +1,70 @@
+// Warroom: rawdb postfix/dovecot journald → Loki.
+// Source: ssh-tailed `journalctl -o short-iso` lines, e.g.:
+//   2026-05-14T02:50:46+0800 Rawdb postfix/postscreen[5509]: DNSBL rank 2 for [91.92.243.20]:50941
+//   2026-05-14T02:50:50+0800 Rawdb postfix/dnsblog[29059]: addr 3.134.216.108 listed by domain xbl.spamhaus.org as 127.0.0.4
+
+local.file_match "rawdb_mail" {
+	path_targets = [{
+		__path__ = "/var/log/rawdb-mail/mail-stream.log",
+		job      = "rawdb-mail",
+		nas_host = "rawdb",
+	}]
+}
+
+loki.source.file "rawdb_mail" {
+	targets    = local.file_match.rawdb_mail.targets
+	forward_to = [loki.process.rawdb_mail.receiver]
+}
+
+loki.process "rawdb_mail" {
+	// Top-level parse: ts host program[pid]: message
+	stage.regex {
+		expression = "^(?P<ts>\\S+)\\s+(?P<host>\\S+)\\s+(?P<program>[A-Za-z0-9_/.\\-]+)(?:\\[(?P<pid>\\d+)\\])?:\\s+(?P<msg>.*)$"
+	}
+	stage.timestamp {
+		source   = "ts"
+		format   = "2006-01-02T15:04:05-0700"
+		location = "Asia/Taipei"
+	}
+
+	// Extract postscreen / smtpd common fields. Multiple regex stages so each
+	// is best-effort (no-op if not matching).
+	stage.regex {
+		expression = "(?:^|\\s)(?P<event>CONNECT|DISCONNECT|HANGUP|REJECT|PASS NEW|PASS OLD|PREGREET|BARE NEWLINE|COMMAND PIPELINING|NOQUEUE|warning|connect|disconnect) "
+	}
+	stage.regex {
+		expression = "from \\[(?P<client_ip>[0-9.]+)\\](?::(?P<client_port>\\d+))?"
+	}
+	stage.regex {
+		expression = "to \\[(?P<server_ip>[0-9.]+)\\](?::(?P<server_port>\\d+))?"
+	}
+	stage.regex {
+		expression = "listed by domain (?P<dnsbl>\\S+) as"
+	}
+	stage.regex {
+		expression = "DNSBL rank (?P<dnsbl_rank>\\d+) for \\[(?P<dnsbl_ip>[0-9.]+)\\]"
+	}
+
+	// Low-cardinality labels.
+	stage.labels {
+		values = {
+			program = "",
+			event   = "",
+		}
+	}
+
+	// High-cardinality fields → structured metadata.
+	stage.structured_metadata {
+		values = {
+			client_ip = "",
+			dnsbl     = "",
+			dnsbl_rank = "",
+		}
+	}
+
+	stage.output {
+		source = "msg"
+	}
+
+	forward_to = [loki.write.warroom_loki.receiver]
+}

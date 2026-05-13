@@ -108,7 +108,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -131,73 +133,6 @@
         }
       ],
       "title": "總事件數",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "Capability gap events indicate sources that could not be collected. This is an evidence gap, not a synthetic activity estimate.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 6,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__range])) or vector(0)",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Capability gap 數",
       "type": "stat"
     },
     {
@@ -302,13 +237,6 @@
       "description": "Top actors from normalized JSON payload. This is a non-time ranking for the selected time range; empty actors are excluded rather than guessed. Empty table means no actor field is covered in the range.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -319,7 +247,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -331,14 +262,23 @@
       },
       "id": 4,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "使用者"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -350,12 +290,35 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | actor != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{actor}}"
         }
       ],
       "title": "Login user 活動量排行",
-      "type": "table"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "使用者",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "使用者": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -365,13 +328,6 @@
       "description": "Top source IP addresses from collected metadata. This is a non-time ranking for the selected time range. Empty table means current evidence has no source_ip coverage in the range.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -382,7 +338,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -394,14 +353,23 @@
       },
       "id": 5,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "來源 IP"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -413,28 +381,44 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_ip != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{source_ip}}"
         }
       ],
       "title": "來源 IP 排行",
-      "type": "table"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "來源 IP",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "來源 IP": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top normalized network protocols. This is a non-time ranking for the selected time range. HTTP may include Synology web surfaces normalized by the collector.",
+      "description": "依已正規化的 network_protocol 統計通訊協定事件數；這是選定時間範圍內的非時間排行，不是時間序列。HTTP 可能包含 collector 正規化後的 Synology web surface。",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -445,7 +429,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -457,14 +444,23 @@
       },
       "id": 6,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "通訊協定"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -476,12 +472,36 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (network_protocol) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | network_protocol != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{network_protocol}}"
         }
       ],
-      "title": "通訊協議比例 / 排行",
-      "type": "table"
+      "title": "通訊協定排行",
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "通訊協定",
+              "Value": "事件數",
+              "Value #A": "事件數"
+            },
+            "indexByName": {
+              "通訊協定": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -491,13 +511,6 @@
       "description": "Top home/file folders referenced by normalized evidence. This is a non-time ranking for the selected time range; missing folders are excluded rather than inferred.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -508,7 +521,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -520,14 +536,23 @@
       },
       "id": 7,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "資料夾"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -539,28 +564,44 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(15, sum by (folder_path) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | folder_path != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{folder_path}}"
         }
       ],
       "title": "被存取資料夾排行",
-      "type": "table"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "資料夾",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "資料夾": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
         "type": "loki",
         "uid": "loki"
       },
-      "description": "Top file names referenced by metadata evidence. This is a non-time ranking for the selected time range; empty table means no file_name field is covered in the range.",
+      "description": "選定時間範圍內的檔案存取事件排行。只統計明確的檔案存取、下載、匯出、讀取、寫入、刪除、改名 action；空白代表該範圍內沒有符合條件的檔案存取事件。",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -571,7 +612,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -583,14 +627,23 @@
       },
       "id": 8,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "檔案"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -601,13 +654,36 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(15, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | file_name != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "expr": "topk(15, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app!=\"collector\", action=~\"webapp_file_open|webapp_file_preview|webapp_file_download|webapp_file_export|file_read|file_write|file_delete|file_rename\"} | json | file_name != \"\" [$__range])))",
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{file_name}}"
         }
       ],
-      "title": "被存取檔案排行",
-      "type": "table"
+      "title": "檔案存取排行",
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "檔案",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "檔案": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -617,13 +693,6 @@
       "description": "Top download/export targets. This is a non-time ranking restricted to explicit download/export actions in the selected time range.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -634,7 +703,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -646,14 +718,23 @@
       },
       "id": 9,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "檔案"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -665,12 +746,35 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (file_name) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=~\"webapp_file_download|webapp_file_export|file_read\"} | json | file_name != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{file_name}}"
         }
       ],
       "title": "下載 / 匯出檔案排行",
-      "type": "table"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "檔案",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "檔案": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -680,13 +784,6 @@
       "description": "Top countries from GeoIP enrichment. This is a non-time ranking for the selected time range. Empty table means GeoIP is not covered or no public source_ip matched; no country is guessed.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -697,7 +794,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -709,14 +809,23 @@
       },
       "id": 10,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "國家"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -728,12 +837,37 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (source_country) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_country != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{source_country}}"
         }
       ],
       "title": "來源國家排行",
-      "type": "table"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "國家",
+              "Value": "事件數",
+              "Value #A": "事件數",
+              "Volume #A": "事件數"
+            },
+            "indexByName": {
+              "國家": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -743,13 +877,6 @@
       "description": "Top country/region pairs from GeoIP enrichment where both fields exist. Empty table means region-level GeoIP is not covered in the selected range.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -760,7 +887,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -772,14 +902,23 @@
       },
       "id": 11,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "地區"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -791,12 +930,35 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (source_country, source_region) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_country != \"\" | source_region != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{source_country}} / {{source_region}}"
         }
       ],
       "title": "來源地區排行",
-      "type": "table"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "地區",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "地區": 0,
+              "事件數": 1
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -806,13 +968,6 @@
       "description": "Which collector channel/app produced evidence or gap signals. This is a non-time ranking for the selected time range; use the event timeline for temporal interpretation.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -823,7 +978,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
@@ -835,14 +993,23 @@
       },
       "id": 12,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showHeader": true
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xField": "來源通道"
       },
       "pluginVersion": "11.5.2",
       "targets": [
@@ -854,75 +1021,35 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (source_app, source_channel) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | source_app != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "queryType": "instant",
+          "refId": "A",
+          "legendFormat": "{{source_app}} / {{source_channel}}"
         }
       ],
       "title": "來源通道排行",
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "Capability gaps grouped by source and stage so missing permissions/connectors remain visible. Empty table means no capability gap events occurred in the selected range.",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 29
-      },
-      "id": 13,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
+      "type": "barchart",
+      "transformations": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(15, sum by (source_channel, gap_stage) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"} | json | source_channel != \"\" [$__range])))",
-          "queryType": "range",
-          "refId": "A"
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Metric": "來源通道",
+              "Value": "事件數"
+            },
+            "indexByName": {
+              "來源通道": 0,
+              "事件數": 1
+            }
+          }
         }
-      ],
-      "title": "Capability gap 統計",
-      "type": "table"
+      ]
     }
   ],
   "preload": false,
@@ -967,8 +1094,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
-  "title": "利善美智能 / DLP 行為統計與資料安全 Insights",
+  "timezone": "Asia/Taipei",
+  "title": "[21 DLP] 利善美智能 行為統計 Insights",
   "uid": "thesmart-dlp-insights",
   "version": 1,
   "weekStart": ""

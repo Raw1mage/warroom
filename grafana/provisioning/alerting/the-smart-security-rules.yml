@@ -1,0 +1,206 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: TheSmartAI Security Alerts
+    folder: 利善美智能
+    interval: 1m
+    rules:
+      # ── 1. Cross-channel attacker detected ──
+      # An IP is attacking from 2+ distinct surfaces (ssh/nginx/mail) within
+      # the last feeder cycle. Whitelist applies separately at the auto-ban
+      # tick layer; this alert intentionally still fires so you see WHO's
+      # multi-channel even when ban skipped them.
+      - uid: warroom-cross-channel-attacker
+        title: Cross-channel attacker detected
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: A
+              expr: 'count(warroom_attacker_channels >= 2)'
+              datasource: {type: prometheus, uid: prometheus}
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource: {type: __expr__, uid: __expr__}
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [0]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource: {type: __expr__, uid: __expr__}
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: "{{ $values.B.Value }} IP(s) attacking 2+ surfaces simultaneously"
+          description: "See cross-channel dashboard for IP × country × ASN breakdown."
+          runbook_url: "/warroom/d/cross-channel-attackers"
+        labels:
+          severity: high
+          family: security
+          surface: cross-channel
+
+      # ── 2. Mail brute-force surge ──
+      # Sustained dovecot auth failures (≥ 30/5min) indicate active brute force.
+      - uid: warroom-mail-bruteforce-surge
+        title: Mail (Dovecot) brute force surge
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: loki
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: A
+              expr: 'sum(count_over_time({job="rawdb-mail", program="dovecot"} |= `auth failed` [5m]))'
+              datasource: {type: loki, uid: loki}
+              queryType: instant
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource: {type: __expr__, uid: __expr__}
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [30]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource: {type: __expr__, uid: __expr__}
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: "Dovecot auth failures: {{ $values.B.Value }} in 5 min"
+          description: "IMAP/POP3 brute force in progress. Check the mail dashboard for targeted accounts and source IPs."
+          runbook_url: "/warroom/d/thesmart-rawdb-mail"
+        labels:
+          severity: high
+          family: security
+          surface: mail
+
+      # ── 3. Active ban count explosion ──
+      # Banned count rising fast → many distinct attackers or a coordinated wave.
+      - uid: warroom-ban-count-explosion
+        title: Active router ban count is high
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange: {from: 600, to: 0}
+            model:
+              refId: A
+              expr: 'count(asusrouter_ban_expires_at_seconds > time())'
+              datasource: {type: prometheus, uid: prometheus}
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 600, to: 0}
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource: {type: __expr__, uid: __expr__}
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 600, to: 0}
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [30]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource: {type: __expr__, uid: __expr__}
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: "{{ $values.B.Value }} IPs currently banned on router (threshold 30)"
+          description: "Investigate whether thresholds are too low or you're under a real flood."
+          runbook_url: "/warroom/d/cross-channel-attackers"
+        labels:
+          severity: warning
+          family: security
+          surface: fail2ban
+
+      # ── 4. Postfix postscreen reject surge ──
+      # Sustained bot traffic > 100/5min through postscreen.
+      - uid: warroom-postscreen-surge
+        title: Mail postscreen reject surge
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: loki
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: A
+              expr: 'sum(count_over_time({job="rawdb-mail", program="postfix/postscreen"} |~ `HANGUP|PREGREET|BARE NEWLINE|COMMAND PIPELINING` [5m]))'
+              datasource: {type: loki, uid: loki}
+              queryType: instant
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource: {type: __expr__, uid: __expr__}
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [100]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource: {type: __expr__, uid: __expr__}
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: "{{ $values.B.Value }} postscreen rejects in 5 min"
+          description: "Heavy spam-bot traffic. Check mail dashboard / consider raising thresholds if false-positive flood."
+          runbook_url: "/warroom/d/thesmart-rawdb-mail"
+        labels:
+          severity: warning
+          family: security
+          surface: mail

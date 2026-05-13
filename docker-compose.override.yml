@@ -1,0 +1,30 @@
+# Warroom timezone unification.
+# All containers run in Asia/Taipei. Grafana additionally honours this for
+# default date format rendering.
+#
+# This file is auto-merged with docker-compose.yml by `docker compose`.
+# To verify which TZ a container sees:
+#   docker exec <container> date
+services:
+  grafana:
+    environment:
+      TZ: Asia/Taipei
+      GF_DATE_FORMATS_DEFAULT_TIMEZONE: Asia/Taipei
+  prometheus:
+    environment:
+      TZ: Asia/Taipei
+  loki:
+    environment:
+      TZ: Asia/Taipei
+  warroom-alloy:
+    environment:
+      TZ: Asia/Taipei
+  warroom-exporters:
+    environment:
+      TZ: Asia/Taipei
+  warroom-dlp-file-collector:
+    environment:
+      TZ: Asia/Taipei
+  warroom-ai-anomaly-scorer:
+    environment:
+      TZ: Asia/Taipei

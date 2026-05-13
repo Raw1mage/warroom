@@ -19,11 +19,6 @@ scrape_configs:
       - targets:
           - grafana:3000
 
-  - job_name: loki-canary
-    static_configs:
-      - targets:
-          - loki-canary:3500
-
   - job_name: warroom-dlp-file-collector
     metrics_path: /metrics
     static_configs:
@@ -36,8 +31,29 @@ scrape_configs:
       - targets:
           - warroom-ai-anomaly-scorer:8020
 
-  - job_name: snmp-exporter
+  # All three exporters live in the warroom-exporters container on
+  # different ports (post-consolidation).
+  - job_name: asusrouter
     metrics_path: /metrics
+    scrape_interval: 30s
     static_configs:
       - targets:
-          - snmp-exporter:9116
+          - warroom-exporters:9117
+        labels:
+          device: asusrouter_192.168.100.1
+
+  - job_name: warroom-geoip-enrich
+    metrics_path: /metrics
+    scrape_interval: 60s
+    static_configs:
+      - targets:
+          - warroom-exporters:9118
+
+  - job_name: warroom-securityscan-exporter
+    metrics_path: /metrics
+    scrape_interval: 1m
+    static_configs:
+      - targets:
+          - warroom-exporters:9119
+        labels:
+          nas_host: rawdb

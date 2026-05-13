@@ -1023,6 +1023,288 @@
         }
       ],
       "type": "table"
+    },
+    {
+      "type": "row",
+      "id": 900,
+      "title": "Scorer health (self-monitor)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "panels": []
+    },
+    {
+      "id": 901,
+      "type": "stat",
+      "title": "Scorer up",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 39
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "warroom_ai_anomaly_scorer_up",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 902,
+      "type": "stat",
+      "title": "Last success (age)",
+      "description": "Time since the scorer last completed a cycle without raising an exception. Spikes here mean the scoring loop is wedged.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 39
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "time() - warroom_ai_anomaly_scorer_last_success_timestamp",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 180
+              },
+              {
+                "color": "red",
+                "value": 600
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 903,
+      "type": "timeseries",
+      "title": "Cycles vs candidates vs alerts pushed (rate /min)",
+      "description": "Healthy state: cycles_total grows at ~1/min, candidates may be 0, alerts_pushed tracks candidates.",
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 8,
+        "y": 39
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "rate(warroom_ai_anomaly_scorer_cycles_total[5m]) * 60",
+          "refId": "A",
+          "legendFormat": "cycles/min"
+        },
+        {
+          "expr": "rate(warroom_ai_anomaly_scorer_candidates_total[5m]) * 60",
+          "refId": "B",
+          "legendFormat": "candidates/min"
+        },
+        {
+          "expr": "rate(warroom_ai_anomaly_scorer_alerts_pushed_total[5m]) * 60",
+          "refId": "C",
+          "legendFormat": "alerts_pushed/min"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15
+          }
+        }
+      }
+    },
+    {
+      "id": 904,
+      "type": "stat",
+      "title": "Collection failures (last 1h)",
+      "description": "Each tick is one scoring cycle that died with an exception (e.g. JSONDecodeError, Loki down, push schema mismatch). Should stay flat at 0 — any growth = pipeline bug.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 43
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "increase(warroom_ai_anomaly_scorer_collection_failures_total[1h])",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 905,
+      "type": "stat",
+      "title": "LLM failures (last 1h)",
+      "description": "Ollama triage call failures (host.docker.internal:11434). Non-zero just means LLM enrichment is unavailable — alerts still fire without LLM context.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 43
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "increase(warroom_ai_anomaly_scorer_llm_failures_total[1h])",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              }
+            ]
+          }
+        }
+      }
     }
   ],
   "refresh": "30s",
@@ -1042,8 +1324,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
-  "title": "TheSmartAI Anomaly Alert Center",
+  "timezone": "Asia/Taipei",
+  "title": "[10 警示] 利善美智能 AI 異常告警中心",
   "uid": "thesmart-anomaly-alert-center",
   "version": 1,
   "weekStart": ""

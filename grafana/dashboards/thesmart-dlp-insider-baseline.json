@@ -1,0 +1,208 @@
+{
+  "annotations": {"list": [{"builtIn": 1, "datasource": {"type": "grafana", "uid": "-- Grafana --"}, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard"}]},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "title": "[50 DLP-Insider] 利善美智能 員工行為基準觀察",
+  "uid": "thesmart-dlp-insider-baseline",
+  "tags": ["warroom", "dlp", "insider", "baseline", "利善美智能"],
+  "timezone": "Asia/Taipei",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {"from": "now-7d", "to": "now"},
+  "templating": {"list": []},
+  "panels": [
+    {"type": "row", "id": 100, "title": "Identity coverage", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}, "panels": []},
+    {
+      "id": 1, "type": "stat", "title": "Active home-folder users",
+      "description": "Distinct usernames extracted from /homes/<user>/ paths in nas_home_log.",
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 1},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "count(count by (home_user) (count_over_time({source_channel=\"nas_home_log\"} | json | regexp `/homes/(?P<home_user>[A-Za-z0-9_-]+)` [$__range])))", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "area"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "fixed", "fixedColor": "blue"}}}
+    },
+    {
+      "id": 2, "type": "stat", "title": "File Station actors",
+      "description": "Distinct actor values in file_station_transfer_db (webapp file ops).",
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 1},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "count(count by (actor) (count_over_time({source_channel=\"file_station_transfer_db\"} | json [$__range])))", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "area"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "fixed", "fixedColor": "purple"}}}
+    },
+    {
+      "id": 3, "type": "stat", "title": "Auth-log actors (incl. attack-attempted)",
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 1},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "count(count by (actor) (count_over_time({source_channel=\"auth_log\"} | json [$__range])))", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "area"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "fixed", "fixedColor": "orange"}}}
+    },
+    {
+      "id": 4, "type": "stat", "title": "Total auth failures (7d)",
+      "description": "Brute-force reconnaissance level.",
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 1},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "sum(count_over_time({source_channel=\"auth_log\", action=\"auth_failure\"}[$__range]))", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "area"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 500}, {"color": "red", "value": 5000}]}}}
+    },
+
+    {"type": "row", "id": 200, "title": "Per-user activity volume (NAS home folder)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6}, "panels": []},
+    {
+      "id": 10, "type": "table", "title": "Top home-folder users",
+      "description": "Volume baseline per user. Watch for relative changes, not absolute numbers.",
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 7},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "topk(20, sum by (home_user) (count_over_time({source_channel=\"nas_home_log\"} | json | regexp `/homes/(?P<home_user>[A-Za-z0-9_-]+)` [$__range])))", "refId": "A", "instant": true, "format": "table"}],
+      "transformations": [
+        {"id": "organize", "options": {"excludeByName": {"Time": true}, "renameByName": {"home_user": "User", "Value": "Events"}}},
+        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Events", "desc": true}]}}
+      ],
+      "fieldConfig": {
+        "defaults": {"custom": {"align": "auto"}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Events"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}}, {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 100000}, {"color": "red", "value": 1000000}]}}]}
+        ]
+      }
+    },
+    {
+      "id": 11, "type": "timeseries", "title": "Hourly activity rate per user (60-min bucket)",
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 7},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "sum by (home_user) (rate({source_channel=\"nas_home_log\"} | json | regexp `/homes/(?P<home_user>[A-Za-z0-9_-]+)` [1h])) * 3600", "refId": "A", "legendFormat": "{{home_user}}"}],
+      "fieldConfig": {"defaults": {"unit": "short", "custom": {"drawStyle": "line", "fillOpacity": 25}}}
+    },
+
+    {"type": "row", "id": 300, "title": "Hour-of-day distribution (baseline for off-hours detection)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 17}, "panels": []},
+    {
+      "id": 20, "type": "heatmap", "title": "User × hour-of-day heatmap",
+      "description": "Y axis: user. X axis: hour (Asia/Taipei). Color: event volume. Pattern outside business hours (09–18) is the baseline that any future off-hours alert sits on top of.",
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 18},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "sum by (home_user) (count_over_time({source_channel=\"nas_home_log\"} | json | regexp `/homes/(?P<home_user>[A-Za-z0-9_-]+)` [$__interval]))", "refId": "A", "legendFormat": "{{home_user}}"}],
+      "options": {"calculate": false, "cellGap": 1, "color": {"scheme": "Oranges", "mode": "scheme", "exponent": 0.5}, "yAxis": {"axisPlacement": "left"}}
+    },
+
+    {"type": "row", "id": 400, "title": "File Station webapp transfers (real download activity)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 30}, "panels": []},
+    {
+      "id": 30, "type": "table", "title": "Downloads + bytes per actor (7d) — proposed thresholds",
+      "description": "P95 size × 5 is a sensible alerting threshold for INSIDER_LARGE_DOWNLOAD; will refine after observing more data.",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 31},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {"refId": "A", "expr": "sum by (actor) (count_over_time({source_channel=\"file_station_transfer_db\", action=\"webapp_file_download\"} | json [$__range]))", "instant": true, "format": "table"},
+        {"refId": "B", "expr": "sum by (actor) (sum_over_time({source_channel=\"file_station_transfer_db\", action=\"webapp_file_download\"} | json | unwrap size_bytes [$__range]))", "instant": true, "format": "table"},
+        {"refId": "C", "expr": "max by (actor) (max_over_time({source_channel=\"file_station_transfer_db\", action=\"webapp_file_download\"} | json | unwrap size_bytes [$__range]))", "instant": true, "format": "table"},
+        {"refId": "D", "expr": "quantile_over_time(0.95, sum by (actor) (rate({source_channel=\"file_station_transfer_db\", action=\"webapp_file_download\"} | json | unwrap size_bytes [5m])) [$__range:5m])", "instant": true, "format": "table"}
+      ],
+      "transformations": [
+        {"id": "joinByField", "options": {"byField": "actor", "mode": "outer"}},
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true},
+          "indexByName": {"actor": 0, "Value #A": 1, "Value #B": 2, "Value #C": 3, "Value #D": 4},
+          "renameByName": {"actor": "Actor", "Value #A": "Downloads", "Value #B": "Total bytes", "Value #C": "Max single", "Value #D": "5m P95 rate"}
+        }},
+        {"id": "filterFieldsByName", "options": {"include": {"names": ["Actor", "Downloads", "Total bytes", "Max single", "5m P95 rate"]}}}
+      ],
+      "fieldConfig": {
+        "defaults": {"custom": {"align": "auto"}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Total bytes"}, "properties": [{"id": "unit", "value": "bytes"}, {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}}]},
+          {"matcher": {"id": "byName", "options": "Max single"}, "properties": [{"id": "unit", "value": "bytes"}, {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}}]},
+          {"matcher": {"id": "byName", "options": "5m P95 rate"}, "properties": [{"id": "unit", "value": "Bps"}]}
+        ]
+      }
+    },
+    {
+      "id": 31, "type": "timeseries", "title": "Download bytes rate per actor (1m)",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 39},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "sum by (actor) (rate({source_channel=\"file_station_transfer_db\", action=\"webapp_file_download\"} | json | unwrap size_bytes [1m]))", "refId": "A", "legendFormat": "{{actor}}"}],
+      "fieldConfig": {"defaults": {"unit": "Bps", "custom": {"drawStyle": "line", "fillOpacity": 25, "lineWidth": 2}}}
+    },
+
+    {"type": "row", "id": 500, "title": "Auth pressure (login / failure)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 47}, "panels": []},
+    {
+      "id": 40, "type": "table", "title": "Per-actor auth breakdown — sessions vs failures",
+      "description": "Spot accounts being brute-forced (high failure, zero opened) vs. legit accounts (opens, near-zero failures).",
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 48},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {"refId": "A", "expr": "sum by (actor) (count_over_time({source_channel=\"auth_log\", action=\"session_opened\"} | json [$__range]))", "instant": true, "format": "table"},
+        {"refId": "B", "expr": "sum by (actor) (count_over_time({source_channel=\"auth_log\", action=\"auth_failure\"} | json [$__range]))", "instant": true, "format": "table"}
+      ],
+      "transformations": [
+        {"id": "joinByField", "options": {"byField": "actor", "mode": "outer"}},
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "Time 1": true, "Time 2": true},
+          "indexByName": {"actor": 0, "Value #A": 1, "Value #B": 2},
+          "renameByName": {"actor": "Actor", "Value #A": "Sessions opened", "Value #B": "Auth failures"}
+        }},
+        {"id": "filterFieldsByName", "options": {"include": {"names": ["Actor", "Sessions opened", "Auth failures"]}}},
+        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Auth failures", "desc": true}]}}
+      ],
+      "fieldConfig": {
+        "defaults": {"custom": {"align": "auto"}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Auth failures"}, "properties": [
+            {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}},
+            {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 10}, {"color": "red", "value": 100}]}}
+          ]},
+          {"matcher": {"id": "byName", "options": "Sessions opened"}, "properties": [
+            {"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}}
+          ]}
+        ]
+      }
+    },
+    {
+      "id": 41, "type": "timeseries", "title": "Auth failure rate by actor (1h bucket)",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 60},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "sum by (actor) (count_over_time({source_channel=\"auth_log\", action=\"auth_failure\"} | json [1h]))", "refId": "A", "legendFormat": "{{actor}}"}],
+      "fieldConfig": {"defaults": {"unit": "short", "custom": {"drawStyle": "bars", "stacking": {"mode": "normal"}, "fillOpacity": 70}}}
+    },
+
+    {"type": "row", "id": 600, "title": "Suspect attempted accounts (no real owner)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 68}, "panels": []},
+    {
+      "id": 50, "type": "table", "title": "Accounts with failures but never any successful session (likely attack targets)",
+      "description": "Operationally these accounts should not exist on the NAS. Each one is an attacker probe surface.",
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 69},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {"refId": "A", "expr": "sum by (actor) (count_over_time({source_channel=\"auth_log\", action=\"auth_failure\"} | json [$__range]))", "instant": true, "format": "table"},
+        {"refId": "B", "expr": "sum by (actor) (count_over_time({source_channel=\"auth_log\", action=\"session_opened\"} | json [$__range]))", "instant": true, "format": "table"}
+      ],
+      "transformations": [
+        {"id": "joinByField", "options": {"byField": "actor", "mode": "outer"}},
+        {"id": "filterByValue", "options": {"filters": [{"fieldName": "Value #B", "config": {"id": "isNull", "options": {}}, "matchAll": false}], "type": "include", "match": "any"}},
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "Time 1": true, "Time 2": true, "Value #B": true},
+          "indexByName": {"actor": 0, "Value #A": 1},
+          "renameByName": {"actor": "Suspect account", "Value #A": "Auth failures"}
+        }},
+        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Auth failures", "desc": true}]}}
+      ]
+    },
+
+    {"type": "row", "id": 700, "title": "Drill-down logs", "collapsed": true, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 79}, "panels": [
+      {
+        "id": 60, "type": "logs", "title": "Recent auth_failure events",
+        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 80},
+        "datasource": {"type": "loki", "uid": "loki"},
+        "targets": [{"expr": "{source_channel=\"auth_log\", action=\"auth_failure\"} | json | line_format `[{{.actor}}] {{.message_excerpt}}`", "refId": "A"}],
+        "options": {"showTime": true, "wrapLogMessage": true, "enableLogDetails": true, "sortOrder": "Descending"}
+      },
+      {
+        "id": 61, "type": "logs", "title": "Recent webapp downloads",
+        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 92},
+        "datasource": {"type": "loki", "uid": "loki"},
+        "targets": [{"expr": "{source_channel=\"file_station_transfer_db\", action=\"webapp_file_download\"} | json | line_format `[{{.actor}}] {{.display_path}} ({{.size_bytes}}B)`", "refId": "A"}],
+        "options": {"showTime": true, "wrapLogMessage": true, "enableLogDetails": true, "sortOrder": "Descending"}
+      }
+    ]}
+  ]
+}

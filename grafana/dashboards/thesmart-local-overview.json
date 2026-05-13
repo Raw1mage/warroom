@@ -86,7 +86,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -299,49 +301,383 @@
       "type": "timeseries"
     },
     {
+      "id": 4,
+      "type": "timeseries",
+      "title": "DLP event流量分佈（依 source_channel / action）",
+      "description": "取代原來的純文字 stream — 看每個 channel 的事件率，異常下沉/暴增立刻顯眼。",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
       "datasource": {
         "type": "loki",
         "uid": "loki"
       },
+      "targets": [
+        {
+          "expr": "sum by (source_channel, action) (rate({job=\"warroom-dlp-event-collector\"}[1m]))",
+          "refId": "A",
+          "legendFormat": "{{source_channel}} / {{action}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "bars",
+            "stacking": {
+              "mode": "normal"
+            },
+            "fillOpacity": 70
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum"
+          ]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Field coverage matrix（field × nas，5m 窗口）",
+      "description": "collector 自報的欄位覆蓋率。低 ratio = 該 NAS 沒在採該欄位（regression 警告）。0/N = 完全死區。",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
         "y": 8
       },
-      "id": 4,
-      "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": false,
-        "showCommonLabels": false,
-        "showLabels": false,
-        "showTime": false,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
+          "expr": "max by (nas_host, field_name, coverage_status, present_count, event_count) (last_over_time({source_channel=\"collector_coverage\", action=\"field_coverage_status\"} | json | __error__=\"\" | unwrap coverage_value [5m]))",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__error__": true,
+              "__error_details__": true,
+              "action": true,
+              "source_channel": true,
+              "service_name": true,
+              "job": true,
+              "source_app": true,
+              "instance": true,
+              "action_extracted": true,
+              "source_channel_extracted": true,
+              "nas_host_extracted": true,
+              "source_app_extracted": true,
+              "confidence": true,
+              "event_count": false,
+              "present_count": false,
+              "coverage_status": false,
+              "event_id": true,
+              "observed_at": true,
+              "policy_notes": true,
+              "source_key": true,
+              "source_surface": true,
+              "ai_anomaly_summary": true,
+              "object_type": true
+            },
+            "indexByName": {
+              "nas_host": 0,
+              "field_name": 1,
+              "coverage_status": 2,
+              "present_count": 3,
+              "event_count": 4,
+              "Value": 5
+            },
+            "renameByName": {
+              "nas_host": "NAS",
+              "field_name": "Field",
+              "coverage_status": "Status",
+              "present_count": "Present",
+              "event_count": "Total",
+              "Value": "Coverage"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "NAS",
+                "Field",
+                "Status",
+                "Present",
+                "Total",
+                "Coverage"
+              ]
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Coverage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.3
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.7
+                    }
+                  ]
+                }
+              }
+            ]
           },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"}",
-          "queryType": "range",
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "no_events": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "active": {
+                        "color": "green",
+                        "index": 1
+                      },
+                      "no_field": {
+                        "color": "orange",
+                        "index": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "id": 600,
+      "title": "Data quality (collector coverage telemetry)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "panels": []
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "No-event fields (5m, all NAS)",
+      "description": "Steady-state baseline = 8 (4 known dead fields × 2 NAS). Spike past 9 means NEW regression.",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 17
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "count(count by (nas_host, field_name) (count_over_time({source_channel=\"collector_coverage\", action=\"field_coverage_status\"} | json | coverage_status=\"no_events\" [5m])))",
           "refId": "A"
         }
       ],
-      "title": "利善美 DLP Loki event stream",
-      "type": "logs"
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 9
+              },
+              {
+                "color": "red",
+                "value": 12
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "No-event fields over time (by NAS)",
+      "description": "Track regression: 若一台 NAS 的死區欄位數突然上升 → collector 在那台失能。",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 6,
+        "y": 17
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "count by (nas_host) (count by (nas_host, field_name) (count_over_time({source_channel=\"collector_coverage\", action=\"field_coverage_status\"} | json | coverage_status=\"no_events\" [5m])))",
+          "refId": "A",
+          "legendFormat": "{{nas_host}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "lineWidth": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Active capability gaps (5m)",
+      "description": "collector_capability_gap 通道：collector 自報「我這個能力線斷了」。0 = 健康；任何 >0 都該調查。",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 17
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({source_channel=\"collector_capability_gap\", action=\"capability_gap\"}[5m]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        }
+      }
     }
   ],
   "preload": false,
   "refresh": "10s",
   "schemaVersion": 40,
-  "tags": ["warroom", "local-poc", "thesmart", "利善美智能", "data-security"],
+  "tags": [
+    "warroom",
+    "local-poc",
+    "thesmart",
+    "利善美智能",
+    "data-security"
+  ],
   "templating": {
     "list": []
   },
@@ -350,8 +686,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
-  "title": "利善美智能 / Warroom 本地總覽",
+  "timezone": "Asia/Taipei",
+  "title": "[00 總覽] 利善美智能 Warroom 本地總覽",
   "uid": "thesmart-local-overview",
   "version": 1,
   "weekStart": ""

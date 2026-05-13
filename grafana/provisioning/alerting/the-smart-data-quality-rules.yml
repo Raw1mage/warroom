@@ -1,0 +1,183 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: TheSmartAI Data Quality
+    folder: 利善美智能
+    interval: 5m
+    rules:
+      - uid: thesmartai-coverage-no-event-spike
+        title: Collector coverage — too many no-event fields
+        condition: C
+        # Fires when, in any 5m window, the count of distinct
+        # (nas_host, field_name) pairs reporting coverage_status=no_events
+        # exceeds 10. Steady state today is ~8 (the known dead fields
+        # source_ip/source_country/source_region/size_bytes × 2 NAS = 8).
+        # Anything above that means a NEW field went dark = regression.
+        data:
+          - refId: A
+            datasourceUid: loki
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'count(count by (nas_host, field_name) (count_over_time({source_channel="collector_coverage", action="field_coverage_status"} | json | coverage_status="no_events" [5m])))'
+              queryType: instant
+              datasource:
+                type: loki
+                uid: loki
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [10]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource:
+                type: __expr__
+                uid: __expr__
+        for: 5m
+        noDataState: NoData
+        execErrState: Error
+        annotations:
+          summary: "Collector coverage regressed: {{ $values.B.Value }} fields with no_events (baseline 8)"
+          description: "More (nas_host, field_name) pairs are reporting no_events than the steady-state baseline of 8. Check the field coverage matrix on the data-quality dashboard."
+          runbook_url: "/warroom/d/thesmart-data-quality"
+        labels:
+          severity: warning
+          family: data_quality
+          nas_host: all
+
+      - uid: thesmartai-coverage-emitter-silent
+        title: Collector coverage telemetry stopped
+        condition: C
+        # If the collector_coverage channel stops producing events for >5m,
+        # the data quality view goes blind. Fires when push rate drops to 0.
+        data:
+          - refId: A
+            datasourceUid: loki
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'sum(count_over_time({source_channel="collector_coverage"}[5m]))'
+              queryType: instant
+              datasource:
+                type: loki
+                uid: loki
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: lt, params: [1]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource:
+                type: __expr__
+                uid: __expr__
+        for: 10m
+        noDataState: Alerting
+        execErrState: Error
+        annotations:
+          summary: "Collector coverage channel silent for >10 min"
+          description: "No collector_coverage events received in 5m. Check warroom-dlp-file-collector / collector pipeline."
+          runbook_url: "/warroom/d/thesmart-data-quality"
+        labels:
+          severity: critical
+          family: data_quality
+          nas_host: all
+
+      - uid: thesmartai-capability-gap-active
+        title: Collector capability gap is active
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: loki
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'sum(count_over_time({source_channel="collector_capability_gap", action="capability_gap"}[5m]))'
+              queryType: instant
+              datasource:
+                type: loki
+                uid: loki
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource: {type: __expr__, uid: __expr__}
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange: {from: 300, to: 0}
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [0]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+              datasource: {type: __expr__, uid: __expr__}
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: "Collector reported capability_gap events in the last 5 minutes"
+          description: "Collector signaled at least one capability_gap. Investigate the source_key dimension on the data-quality dashboard."
+          runbook_url: "/warroom/d/thesmart-data-quality"
+        labels:
+          severity: high
+          family: data_quality
+          nas_host: all

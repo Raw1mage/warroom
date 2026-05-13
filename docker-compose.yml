@@ -22,6 +22,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./grafana/dashboards-sunshine:/var/lib/grafana/dashboards-sunshine:ro
     healthcheck:
       test: ["CMD-SHELL", "test -f /var/lib/grafana/dashboards/thesmart-dlp-file-evidence.json"]
       interval: 30s
@@ -52,13 +53,6 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
 
-  snmp-exporter:
-    image: quay.io/prometheus/snmp-exporter:v0.30.1
-    container_name: warroom-snmp-exporter
-    restart: unless-stopped
-    expose:
-      - "9116"
-
   loki:
     image: grafana/loki:3.4.2
     container_name: warroom-loki
@@ -71,38 +65,62 @@ services:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
       - loki-data:/loki
 
-  loki-canary:
-    image: grafana/loki-canary:3.4.2
-    container_name: warroom-loki-canary
-    restart: unless-stopped
-    command:
-      - "-addr=loki"
-      - "-port=3100"
-      - "-labelname=job"
-      - "-labelvalue=loki-canary"
-    depends_on:
-      loki:
-        condition: service_started
-
-  synology-nginx-log-exporter:
+  # All log shippers merged into one alloy container reading loki/alloy.d/*.alloy.
+  warroom-alloy:
     image: grafana/alloy:v1.8.2
-    container_name: warroom-synology-nginx-log-exporter
-    profiles:
-      - synology-nginx-logs
+    container_name: warroom-alloy
     restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
     command:
       - "run"
       - "--server.http.listen-addr=0.0.0.0:12345"
-      - "/etc/alloy/config.alloy"
+      - "--storage.path=/var/lib/alloy/data"
+      - "/etc/alloy"
     ports:
       - "${SYNOLOGY_NGINX_SYSLOG_TCP_PORT:-1514}:1514/tcp"
       - "${SYNOLOGY_NGINX_SYSLOG_UDP_PORT:-1514}:1514/udp"
     volumes:
-      - ./loki/synology-nginx-alloy.template.alloy:/etc/alloy/config.alloy:ro
+      - ./loki/alloy.d:/etc/alloy:ro
+      - alloy-data:/var/lib/alloy/data
       - ${SYNOLOGY_NGINX_LOG_DIR:-./synology-nginx-logs}:/var/log/synology-nginx:ro
+      - ./devices/asusrouter_192.168.100.1/state:/var/log/asusrouter:ro
+      - ./services/warroom-rawdb-nginx-tail/state:/var/log/rawdb-nginx:ro
+      - ./services/warroom-rawdb-mail-tail/state:/var/log/rawdb-mail:ro
     depends_on:
       loki:
         condition: service_started
+
+  # All Python HTTP exporters merged into one container running 3 threads.
+  warroom-exporters:
+    build:
+      context: ./services/warroom-exporters
+    container_name: warroom-exporters
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
+      # asusrouter (port 9117)
+      ROUTER_HOST: "192.168.100.1"
+      ROUTER_USER: "admin"
+      ROUTER_SSH_KEY: "/id_ed25519"
+      BANS_FILE: "/state/banned.json"
+      # geoip (port 9118)
+      CITY_DB_PATH: "/data/dbip-city-mmdb/dbip-city-ipv4.mmdb"
+      ASN_DB_PATH: "/data/asn-mmdb/asn.mmdb"
+      IP_FEED_URL: "http://loki:3100/loki/api/v1/query"
+      # securityscan (port 9119)
+      RAWDB_HOST: "192.168.100.40"
+      RAWDB_USER: "yeatsluo"
+      RAWDB_SSH_KEY: "/id_ed25519"
+      NAS_HOST: "rawdb"
+    volumes:
+      - ${HOME}/.ssh/id_ed25519:/id_ed25519:ro
+      - ./refs/ip-location-db:/data:ro
+      - ./devices/asusrouter_192.168.100.1/state:/state:ro
+    expose:
+      - "9117"
+      - "9118"
+      - "9119"
 
   warroom-dlp-file-collector:
     build:
@@ -190,3 +208,4 @@ volumes:
   grafana-data:
   prometheus-data:
   loki-data:
+  alloy-data:

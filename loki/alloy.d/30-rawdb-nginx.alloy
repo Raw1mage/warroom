@@ -1,0 +1,115 @@
+// Warroom: rawdb DSM nginx error.log → Loki.
+// Format example (DSM nginx):
+//   2026/05/14 01:07:16 [error] 17297#17297: *40235267 upstream prematurely closed connection while reading upstream, client: 192.168.100.1, server: miat.thesmart.cc, request: "GET /mcp HTTP/2.0", upstream: "http://192.168.100.10:1222/mcp", host: "miat.thesmart.cc"
+
+local.file_match "rawdb_nginx_error" {
+	path_targets = [{
+		__path__ = "/var/log/rawdb-nginx/nginx-error-stream.log",
+		job      = "rawdb-nginx",
+		log_type = "error",
+		nas_host = "rawdb",
+	}]
+}
+
+local.file_match "rawdb_nginx_access" {
+	path_targets = [{
+		__path__ = "/var/log/rawdb-nginx/nginx-access-stream.log",
+		job      = "rawdb-nginx",
+		log_type = "access",
+		nas_host = "rawdb",
+	}]
+}
+
+loki.source.file "rawdb_nginx_access" {
+	targets    = local.file_match.rawdb_nginx_access.targets
+	forward_to = [loki.process.rawdb_nginx_access.receiver]
+}
+
+loki.process "rawdb_nginx_access" {
+	// Combined format with our additions:
+	//   $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent
+	//   "$http_referer" "$http_user_agent" "$http_x_forwarded_for"
+	//   rt=$request_time uct=$upstream_connect_time uht=$upstream_header_time urt=$upstream_response_time host=$host
+	stage.regex {
+		expression = "^(?P<remote_addr>[\\d.]+) - (?P<remote_user>\\S+) \\[(?P<ts>[^\\]]+)\\] \"(?P<method>\\S+) (?P<path>\\S+) (?P<proto>HTTP/[^\"]+)\" (?P<status>\\d+) (?P<body_bytes>\\d+) \"(?P<referer>[^\"]*)\" \"(?P<ua>[^\"]*)\" \"(?P<xff>[^\"]*)\" rt=(?P<rt>\\S+) uct=(?P<uct>\\S+) uht=(?P<uht>\\S+) urt=(?P<urt>\\S+) host=(?P<host>\\S+)"
+	}
+	stage.timestamp {
+		source   = "ts"
+		format   = "02/Jan/2006:15:04:05 -0700"
+		location = "Asia/Taipei"
+	}
+	stage.labels {
+		values = {
+			host   = "",
+			method = "",
+			status = "",
+		}
+	}
+	stage.structured_metadata {
+		values = {
+			client_ip = "remote_addr",
+			path      = "",
+			ua        = "",
+			xff       = "",
+			rt        = "",
+			body_bytes = "",
+		}
+	}
+	forward_to = [loki.write.warroom_loki.receiver]
+}
+
+loki.source.file "rawdb_nginx_error" {
+	targets    = local.file_match.rawdb_nginx_error.targets
+	forward_to = [loki.process.rawdb_nginx_error.receiver]
+}
+
+loki.process "rawdb_nginx_error" {
+	// Parse the leading timestamp + level.
+	stage.regex {
+		expression = "^(?P<ts>\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}) \\[(?P<level>\\w+)\\] (?P<rest>.*)$"
+	}
+
+	stage.timestamp {
+		source   = "ts"
+		format   = "2006/01/02 15:04:05"
+		location = "Asia/Taipei"
+	}
+
+	// Pull the structured fields nginx writes for HTTP errors.
+	stage.regex {
+		expression = ", client: (?P<client>[0-9.]+)"
+	}
+	stage.regex {
+		expression = ", server: (?P<server>[^,]+)"
+	}
+	stage.regex {
+		expression = ", request: \"(?P<method>\\w+) (?P<path>[^ ]+) (?P<proto>HTTP[^\"]+)\""
+	}
+	stage.regex {
+		expression = ", upstream: \"(?P<upstream>[^\"]+)\""
+	}
+	stage.regex {
+		expression = ", host: \"(?P<host>[^\"]+)\""
+	}
+
+	// Low-cardinality fields become labels.
+	stage.labels {
+		values = {
+			level  = "",
+			server = "",
+			method = "",
+			host   = "",
+		}
+	}
+
+	// High-cardinality fields (client IP, path, upstream) go to structured metadata.
+	stage.structured_metadata {
+		values = {
+			client_ip = "client",
+			path      = "",
+			upstream  = "",
+		}
+	}
+
+	forward_to = [loki.write.warroom_loki.receiver]
+}

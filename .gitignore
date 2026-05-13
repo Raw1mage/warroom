@@ -30,7 +30,15 @@ thesmart/data/**/*
 !thesmart/data/**/
 !thesmart/data/**/.gitkeep
 
+# Device / service runtime state (ban lists, snapshots, log streams,
+# ssh known_hosts, baseline reports — local-only, regenerated at runtime)
+devices/**/state/
+devices/**/snapshots/
+devices/**/known_hosts
+services/**/state/
+
 # Private planning / event artifacts retained locally only
+.specbase/
 docs/events/
 specs/
 refs/

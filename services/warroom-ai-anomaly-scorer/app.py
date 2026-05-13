@@ -88,7 +88,12 @@ def _http_json(url: str, payload: Optional[dict[str, Any]] = None, timeout: int 
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(request, timeout=timeout) as response:
-        return json.loads(response.read().decode("utf-8"))
+        body = response.read().decode("utf-8")
+        # Loki's push endpoint replies 204 with empty body on success.
+        # Treat any non-JSON / empty body as "ok, nothing to parse".
+        if not body.strip():
+            return {}
+        return json.loads(body)
 
 
 def loki_query(query: str) -> list[dict[str, Any]]:

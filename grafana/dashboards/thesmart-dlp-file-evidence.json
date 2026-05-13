@@ -120,7 +120,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -183,7 +185,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -246,7 +250,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -477,121 +483,6 @@
         }
       ],
       "title": "NAS file evidence by actor",
-      "type": "barchart",
-      "transformations": [
-        {
-          "id": "seriesToRows",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "Metric": "category",
-              "Value": "events"
-            },
-            "indexByName": {
-              "category": 0,
-              "events": 1
-            }
-          }
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "X 軸為來源 IP，Y 軸為目前時間範圍內 live file evidence 事件量。NAS home log metadata 不一定含 source_ip；無 IP 時此 panel 會顯示 0/空。",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "events",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 6
-      },
-      "id": 4,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.85,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "vertical",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xField": "category",
-        "xTickLabelRotation": 30,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_ip != \"\" | label_format category=\"{{.source_ip}}\" [$__range])))",
-          "queryType": "instant",
-          "refId": "A",
-          "legendFormat": "{{category}}"
-        }
-      ],
-      "title": "Source IP activity volume",
       "type": "barchart",
       "transformations": [
         {
@@ -966,236 +857,6 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "X 軸為 source_country，Y 軸為目前時間範圍內 live file evidence 事件量。只有 GeoIP enrichment 有資料時才會顯示。",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "events",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 0,
-        "y": 31
-      },
-      "id": 16,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.85,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "vertical",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xField": "category",
-        "xTickLabelRotation": 30,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_country != \"\" | label_format category=\"{{.source_country}}\" [$__range])))",
-          "queryType": "instant",
-          "refId": "A",
-          "legendFormat": "{{category}}"
-        }
-      ],
-      "title": "Country activity volume",
-      "type": "barchart",
-      "transformations": [
-        {
-          "id": "seriesToRows",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "Metric": "category",
-              "Value": "events"
-            },
-            "indexByName": {
-              "category": 0,
-              "events": 1
-            }
-          }
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "X 軸為 source_region，Y 軸為目前時間範圍內 live file evidence 事件量。只有 GeoIP enrichment 有資料時才會顯示。",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "events",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 12,
-        "y": 31
-      },
-      "id": 17,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.85,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "vertical",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xField": "category",
-        "xTickLabelRotation": 30,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(20, sum by (category) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_app=\"nas_file_service\", source_channel=\"nas_home_log\", action=~\"file_activity|file_read\"} | json | source_region != \"\" | label_format category=\"{{.source_region}}\" [$__range])))",
-          "queryType": "instant",
-          "refId": "A",
-          "legendFormat": "{{category}}"
-        }
-      ],
-      "title": "Region activity volume",
-      "type": "barchart",
-      "transformations": [
-        {
-          "id": "seriesToRows",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "Metric": "category",
-              "Value": "events"
-            },
-            "indexByName": {
-              "category": 0,
-              "events": 1
-            }
-          }
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
       "description": "依 size_bytes 分成級距統計 File Station download/export 頻率；這是歷史 download DB 視角，不代表目前 30m 一定有即時下載。",
       "fieldConfig": {
         "defaults": {
@@ -1499,7 +1160,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1570,7 +1233,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1641,7 +1306,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1712,7 +1379,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1892,7 +1561,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "showHeader": true
@@ -1980,8 +1651,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
-  "title": "利善美智能 / DLP 檔案證據總覽",
+  "timezone": "Asia/Taipei",
+  "title": "[20 DLP] 利善美智能 檔案證據總覽",
   "uid": "thesmart-dlp-file-evidence",
   "version": 1,
   "weekStart": ""

@@ -1,0 +1,164 @@
+{
+  "annotations": {"list": [{"builtIn": 1, "datasource": {"type": "grafana", "uid": "-- Grafana --"}, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard"}]},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "title": "[60 安全稽核] 利善美智能 Security Advisor",
+  "uid": "thesmart-security-advisor",
+  "tags": ["warroom", "security", "advisor", "audit", "利善美智能"],
+  "timezone": "Asia/Taipei",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {"from": "now-24h", "to": "now"},
+  "templating": {"list": []},
+  "panels": [
+    {"type": "row", "id": 100, "title": "Overall posture", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}, "panels": []},
+    {
+      "id": 1, "type": "stat", "title": "System status",
+      "description": "0=ok / 1=warning / 2=risk / 3=danger",
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 1},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "synology_security_system_status", "refId": "A", "legendFormat": "{{label}}"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "textMode": "value_and_name"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 1}, {"color": "orange", "value": 2}, {"color": "red", "value": 3}]}, "mappings": [{"type": "value", "options": {"0": {"text": "OK", "color": "green"}, "1": {"text": "WARNING", "color": "yellow"}, "2": {"text": "RISK", "color": "orange"}, "3": {"text": "DANGER", "color": "red"}}}]}}
+    },
+    {
+      "id": 2, "type": "stat", "title": "Failed checks",
+      "gridPos": {"h": 5, "w": 4, "x": 6, "y": 1},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(synology_security_check_total{status=\"fail\"})", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 1}, {"color": "red", "value": 5}]}}}
+    },
+    {
+      "id": 3, "type": "stat", "title": "Out-of-date items",
+      "gridPos": {"h": 5, "w": 4, "x": 10, "y": 1},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(synology_security_check_total{severity=\"outOfDate\"})", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 1}]}}}
+    },
+    {
+      "id": 4, "type": "stat", "title": "Skipped (not applicable)",
+      "gridPos": {"h": 5, "w": 4, "x": 14, "y": 1},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(synology_security_check_total{status=\"skip\"})", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value"},
+      "fieldConfig": {"defaults": {"unit": "short", "color": {"mode": "fixed", "fixedColor": "blue"}}}
+    },
+    {
+      "id": 5, "type": "stat", "title": "Last scan",
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 1},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "time() - synology_security_scan_lastupdate_seconds", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value"},
+      "fieldConfig": {"defaults": {"unit": "s", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 86400}, {"color": "red", "value": 604800}]}}}
+    },
+
+    {"type": "row", "id": 200, "title": "Findings", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6}, "panels": []},
+    {
+      "id": 10, "type": "table", "title": "All checks — sorted by severity / status",
+      "description": "Full rule inventory. Fail rows colored.",
+      "gridPos": {"h": 14, "w": 24, "x": 0, "y": 7},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "synology_security_check_status", "refId": "A", "format": "table", "instant": true}],
+      "transformations": [
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "__name__": true, "instance": true, "job": true, "Value": true},
+          "indexByName": {"nas_host": 0, "severity": 1, "category": 2, "status": 3, "rule_id": 4, "str_id": 5},
+          "renameByName": {"nas_host": "NAS", "severity": "Severity", "category": "Category", "status": "Status", "rule_id": "Rule ID", "str_id": "Locale key"}
+        }},
+        {"id": "filterFieldsByName", "options": {"include": {"names": ["NAS", "Severity", "Category", "Status", "Rule ID", "Locale key"]}}},
+        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Status", "desc": true}, {"field": "Severity", "desc": true}]}}
+      ],
+      "fieldConfig": {
+        "defaults": {"custom": {"align": "auto"}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Severity"}, "properties": [
+            {"id": "mappings", "value": [{"type": "value", "options": {
+              "danger": {"color": "red", "index": 0},
+              "risk": {"color": "orange", "index": 1},
+              "warning": {"color": "yellow", "index": 2},
+              "outOfDate": {"color": "yellow", "index": 3},
+              "info": {"color": "blue", "index": 4}
+            }}]},
+            {"id": "custom.cellOptions", "value": {"type": "color-text"}}
+          ]},
+          {"matcher": {"id": "byName", "options": "Status"}, "properties": [
+            {"id": "mappings", "value": [{"type": "value", "options": {
+              "fail": {"color": "red", "index": 0},
+              "pass": {"color": "green", "index": 1},
+              "skip": {"color": "gray", "index": 2}
+            }}]},
+            {"id": "custom.cellOptions", "value": {"type": "color-background"}}
+          ]}
+        ]
+      }
+    },
+
+    {"type": "row", "id": 300, "title": "Aggregations", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 21}, "panels": []},
+    {
+      "id": 20, "type": "piechart", "title": "Status distribution",
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 22},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (status) (synology_security_check_total)", "refId": "A", "legendFormat": "{{status}}"}],
+      "options": {"legend": {"showLegend": true, "displayMode": "table", "placement": "right", "values": ["value", "percent"]}, "pieType": "donut", "displayLabels": ["percent"]},
+      "fieldConfig": {"defaults": {"mappings": [], "color": {"mode": "palette-classic"}}}
+    },
+    {
+      "id": 21, "type": "piechart", "title": "Severity distribution (all)",
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 22},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (severity) (synology_security_check_total)", "refId": "A", "legendFormat": "{{severity}}"}],
+      "options": {"legend": {"showLegend": true, "displayMode": "table", "placement": "right", "values": ["value", "percent"]}, "pieType": "donut"}
+    },
+    {
+      "id": 22, "type": "bargauge", "title": "Failures by category",
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 22},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (category) (synology_security_category_fail)", "refId": "A", "legendFormat": "{{category}}"}],
+      "options": {"orientation": "horizontal", "displayMode": "gradient", "valueMode": "color", "showUnfilled": true},
+      "fieldConfig": {"defaults": {"min": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 1}, {"color": "red", "value": 3}]}}}
+    },
+
+    {"type": "row", "id": 400, "title": "Trend (over time)", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 30}, "panels": []},
+    {
+      "id": 30, "type": "timeseries", "title": "Failures over time",
+      "description": "Watch this trend after each rule fix to confirm it stays at 0.",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 31},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (severity) (synology_security_check_total{status=\"fail\"})", "refId": "A", "legendFormat": "{{severity}}"}],
+      "fieldConfig": {"defaults": {"unit": "short", "custom": {"drawStyle": "line", "fillOpacity": 30, "lineWidth": 2}}}
+    },
+
+    {"type": "row", "id": 500, "title": "Action — known failing rules", "collapsed": false, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39}, "panels": []},
+    {
+      "id": 40, "type": "table", "title": "Only FAILING rules (action needed)",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 40},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "synology_security_check_status{status=\"fail\"}", "refId": "A", "format": "table", "instant": true}],
+      "transformations": [
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "__name__": true, "instance": true, "job": true, "Value": true, "status": true},
+          "indexByName": {"severity": 0, "category": 1, "rule_id": 2, "str_id": 3, "nas_host": 4},
+          "renameByName": {"severity": "Severity", "category": "Category", "rule_id": "Rule", "str_id": "Locale key", "nas_host": "NAS"}
+        }},
+        {"id": "filterFieldsByName", "options": {"include": {"names": ["Severity", "Category", "Rule", "Locale key", "NAS"]}}},
+        {"id": "sortBy", "options": {"fields": {}, "sort": [{"field": "Severity", "desc": true}]}}
+      ],
+      "fieldConfig": {
+        "defaults": {"custom": {"cellOptions": {"type": "auto"}}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Severity"}, "properties": [
+            {"id": "mappings", "value": [{"type": "value", "options": {
+              "danger": {"color": "red", "index": 0}, "risk": {"color": "orange", "index": 1}, "warning": {"color": "yellow", "index": 2}, "outOfDate": {"color": "yellow", "index": 3}
+            }}]},
+            {"id": "custom.cellOptions", "value": {"type": "color-background"}}
+          ]}
+        ]
+      }
+    }
+  ]
+}
