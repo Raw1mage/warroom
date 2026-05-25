@@ -57,3 +57,25 @@ scrape_configs:
           - warroom-exporters:9119
         labels:
           nas_host: rawdb
+
+  - job_name: aisecurity-llm-sidecar
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - host.docker.internal:7731
+        labels:
+          service: aisecurity-llm-sidecar
+          model_family: qwen
+          telemetry_scope: proxy
+
+  - job_name: aisecurity-gpu
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - host.docker.internal:7732
+        labels:
+          service: aisecurity-gpu
+          gpu: rtx-3090
+          telemetry_scope: gpu

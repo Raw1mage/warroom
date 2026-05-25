@@ -1,0 +1,12 @@
+// Tail AI Security LLM sidecar privacy-safe JSONL telemetry.
+
+loki.source.file "aisecurity_llm_sidecar" {
+  targets = [
+    {
+      __path__ = "/var/log/aisecurity-llm-sidecar/llm-sidecar.jsonl",
+      service = "aisecurity-llm-sidecar",
+      telemetry_scope = "proxy",
+    },
+  ]
+  forward_to = [loki.write.warroom_loki.receiver]
+}

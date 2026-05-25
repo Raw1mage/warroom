@@ -87,6 +87,7 @@ services:
       - ./devices/asusrouter_192.168.100.1/state:/var/log/asusrouter:ro
       - ./services/warroom-rawdb-nginx-tail/state:/var/log/rawdb-nginx:ro
       - ./services/warroom-rawdb-mail-tail/state:/var/log/rawdb-mail:ro
+      - /home/pkcs12/projects/aisecurity/logs:/var/log/aisecurity-llm-sidecar:ro
     depends_on:
       loki:
         condition: service_started
