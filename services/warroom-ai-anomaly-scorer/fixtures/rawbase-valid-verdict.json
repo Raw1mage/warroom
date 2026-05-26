@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "is_anomaly": true,
+  "severity": "high",
+  "confidence": 0.86,
+  "reason": "Repeated authentication failures followed by a successful login indicate elevated compromise risk.",
+  "recommended_actions": [
+    "Review the related Loki auth evidence",
+    "Confirm whether the login was expected",
+    "Check follow-up file access activity"
+  ],
+  "missing_evidence": [],
+  "risk_tags": ["success_after_failure"]
+}

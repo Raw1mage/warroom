@@ -47,6 +47,12 @@ SOURCE_REGISTRY: dict[str, dict[str, Any]] = {
         "capability": "file_transfer_evidence",
         "handler": None,
     },
+    "drive_remote": {
+        "source_app": "synology_drive",
+        "source_channel": "drive_activity_db",
+        "capability": "drive_activity_evidence",
+        "handler": None,
+    },
     "nas_home_log_remote": {
         "source_app": "nas_file_service",
         "source_channel": "nas_home_log",
@@ -75,6 +81,12 @@ SOURCE_REGISTRY: dict[str, dict[str, Any]] = {
         "source_app": "nas_network",
         "source_channel": "network_socket",
         "capability": "network_socket_snapshot",
+        "handler": None,
+    },
+    "docker_service_remote": {
+        "source_app": "host_docker",
+        "source_channel": "docker_service",
+        "capability": "docker_service_health",
         "handler": None,
     },
 }
@@ -490,6 +502,73 @@ def _file_station_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
     return new_events
 
 
+def _drive_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
+    settings = target.get("drive_remote") if isinstance(target.get("drive_remote"), dict) else {}
+    nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
+    host = str(settings.get("host") or "").strip()
+    user = str(settings.get("user") or "").strip()
+    if not host:
+        return [_capability_gap("drive_remote", "remote_config_missing", "remote host must be explicitly configured", nas_host)]
+
+    adapter = TOOLS_DIR / "drive_activity_adapter.py"
+    limit = str(settings.get("limit") or 50)
+    timeout = str(settings.get("timeout_seconds") or 30)
+    sync_root = str(settings.get("sync_root") or "/volume1/@synologydrive/@sync")
+    command = [
+        sys.executable,
+        str(adapter),
+        "--mode",
+        "remote",
+        "--host",
+        host,
+        "--nas-host",
+        nas_host,
+        "--sync-root",
+        sync_root,
+        "--limit",
+        limit,
+        "--timeout-sec",
+        timeout,
+    ]
+    if user:
+        command.extend(["--user", user])
+    try:
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=int(timeout) + 5, check=False)
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _bump("collection_failures_total")
+        return [_capability_gap("drive_remote", "adapter_execution_failed", exc.__class__.__name__, nas_host)]
+    if proc.returncode != 0:
+        _bump("collection_failures_total")
+        detail = f"returncode={proc.returncode}"
+        try:
+            payload = json.loads(proc.stdout)
+            if isinstance(payload, dict):
+                detail = str(payload.get("stage") or detail)
+        except json.JSONDecodeError:
+            pass
+        return [_capability_gap("drive_remote", "adapter_returned_failure", detail, nas_host)]
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        _bump("collection_failures_total")
+        return [_capability_gap("drive_remote", "adapter_invalid_json", "adapter stdout was not valid JSON", nas_host)]
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        _bump("collection_failures_total")
+        return [_capability_gap("drive_remote", "adapter_events_invalid", "adapter events field was not a list", nas_host)]
+
+    new_events = []
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        event_id = str(event.get("event_id") or "")
+        if not event_id or event_id in REMOTE_SEEN_EVENT_IDS:
+            continue
+        REMOTE_SEEN_EVENT_IDS.add(event_id)
+        new_events.append(event)
+    return new_events
+
+
 def _nas_home_log_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
     settings = target.get("nas_home_log_remote") if isinstance(target.get("nas_home_log_remote"), dict) else {}
     nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
@@ -795,6 +874,60 @@ def _network_socket_remote_events(target: dict[str, Any]) -> list[dict[str, Any]
     return [event for event in events if isinstance(event, dict)]
 
 
+def _docker_service_remote_events(target: dict[str, Any]) -> list[dict[str, Any]]:
+    settings = target.get("docker_service_remote") if isinstance(target.get("docker_service_remote"), dict) else {}
+    nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas").strip()
+    host = str(settings.get("host") or "").strip()
+    user = str(settings.get("user") or "").strip()
+    if not host:
+        return [_capability_gap("docker_service_remote", "remote_config_missing", "remote host must be explicitly configured", nas_host)]
+
+    adapter = TOOLS_DIR / "docker_service_adapter.py"
+    timeout = str(settings.get("timeout_seconds") or 30)
+    limit = str(settings.get("limit") or 100)
+    command = [
+        sys.executable,
+        str(adapter),
+        "--mode",
+        "remote",
+        "--host",
+        host,
+        "--nas-host",
+        nas_host,
+        "--limit",
+        limit,
+        "--timeout-sec",
+        timeout,
+    ]
+    if user:
+        command.extend(["--user", user])
+    try:
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=int(timeout) + 5, check=False)
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        _bump("collection_failures_total")
+        return [_capability_gap("docker_service_remote", "adapter_execution_failed", exc.__class__.__name__, nas_host)]
+    if proc.returncode != 0:
+        _bump("collection_failures_total")
+        detail = f"returncode={proc.returncode}"
+        try:
+            payload = json.loads(proc.stdout)
+            if isinstance(payload, dict):
+                detail = str(payload.get("stage") or detail)
+        except json.JSONDecodeError:
+            pass
+        return [_capability_gap("docker_service_remote", "adapter_returned_failure", detail, nas_host)]
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        _bump("collection_failures_total")
+        return [_capability_gap("docker_service_remote", "adapter_invalid_json", "adapter stdout was not valid JSON", nas_host)]
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        _bump("collection_failures_total")
+        return [_capability_gap("docker_service_remote", "adapter_events_invalid", "adapter events field was not a list", nas_host)]
+    return [event for event in events if isinstance(event, dict)]
+
+
 def _collect_target(target: dict[str, Any]) -> list[dict[str, Any]]:
     nas_host = str(target.get("id") or target.get("nas_host") or "configured-nas")
     events: list[dict[str, Any]] = []
@@ -821,11 +954,13 @@ def _collect_target(target: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 SOURCE_REGISTRY["file_station_remote"]["handler"] = _file_station_remote_events
+SOURCE_REGISTRY["drive_remote"]["handler"] = _drive_remote_events
 SOURCE_REGISTRY["nas_home_log_remote"]["handler"] = _nas_home_log_remote_events
 SOURCE_REGISTRY["host_health_remote"]["handler"] = _host_health_remote_events
 SOURCE_REGISTRY["nas_system_log_remote"]["handler"] = _nas_system_log_remote_events
 SOURCE_REGISTRY["auth_log_remote"]["handler"] = _auth_log_remote_events
 SOURCE_REGISTRY["network_socket_remote"]["handler"] = _network_socket_remote_events
+SOURCE_REGISTRY["docker_service_remote"]["handler"] = _docker_service_remote_events
 
 
 def _append_jsonl(path: Path, items: list[dict[str, Any]]) -> None:

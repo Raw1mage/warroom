@@ -3,6 +3,7 @@
   "sources": [
     "host_health_remote",
     "file_station_remote",
+    "drive_remote",
     "nas_home_log_remote",
     "nas_system_log_remote",
     "auth_log_remote",
@@ -14,6 +15,11 @@
   "file_station_remote": {
     "db_path": "/volume1/@database/synolog/.DSMFMXFERDB",
     "limit": 50,
+    "timeout_seconds": 90
+  },
+  "drive_remote": {
+    "sync_root": "/volume1/@synologydrive/@sync",
+    "limit": 100,
     "timeout_seconds": 90
   },
   "nas_home_log_remote": {

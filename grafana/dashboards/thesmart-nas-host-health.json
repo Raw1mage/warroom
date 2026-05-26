@@ -1303,7 +1303,7 @@
         "definition": "label_values({job=\"warroom-dlp-event-collector\", source_channel=\"host_health\", source_app=\"nas_host_health\"}, nas_host)",
         "hide": 0,
         "includeAll": false,
-        "label": "NAS",
+        "label": "Host",
         "multi": false,
         "name": "nas",
         "options": [],
@@ -1321,7 +1321,7 @@
   },
   "timepicker": {},
   "timezone": "Asia/Taipei",
-  "title": "[30 基礎設施] 利善美智能 NAS Host Health",
+  "title": "[30 基礎設施] Warroom System Host Health",
   "uid": "thesmart-nas-host-health",
   "version": 3,
   "weekStart": ""

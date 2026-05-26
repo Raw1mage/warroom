@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 42,
   "links": [
     {
       "asDropdown": false,
@@ -57,6 +57,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -90,6 +91,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -129,6 +131,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -162,6 +165,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -201,6 +205,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -234,6 +239,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -273,6 +279,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -302,6 +309,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -335,25 +343,72 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "把本 dashboard 監看的異常訊號分成 AI 告警、登入失敗、收集缺口、大檔下載與連線突增，用於回答：現在是哪一類風險最多？",
+      "description": "把本 dashboard 監看的異常/告警訊號分成 AI 告警、登入失敗、收集缺口與大檔下載，用於回答：現在是哪一類風險最多？正常觀測快照不納入統計。",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
               {
-                "color": "green",
-                "value": null
+                "id": "displayName",
+                "value": "AI 告警"
               }
             ]
           },
-          "unit": "short"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "登入失敗"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "收集缺口"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "大檔下載"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
@@ -399,10 +454,10 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"anomaly_alert\"}[$__range])) or vector(0)",
+          "expr": "sum(count_over_time({job=\"warroom-ai-anomaly-scorer\", nas_host=\"thesmart\", source_channel=\"ai_anomaly_alert\", action=\"anomaly_alert\"}[$__range])) or vector(0)",
+          "legendFormat": "AI 告警",
           "queryType": "instant",
-          "refId": "A",
-          "legendFormat": "AI 告警"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -412,9 +467,9 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"}[$__range])) or vector(0)",
+          "legendFormat": "登入失敗",
           "queryType": "instant",
-          "refId": "B",
-          "legendFormat": "登入失敗"
+          "refId": "B"
         },
         {
           "datasource": {
@@ -424,9 +479,9 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__range])) or vector(0)",
+          "legendFormat": "收集缺口",
           "queryType": "instant",
-          "refId": "C",
-          "legendFormat": "收集缺口"
+          "refId": "C"
         },
         {
           "datasource": {
@@ -436,21 +491,9 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 [$__range])) or vector(0)",
+          "legendFormat": "大檔下載",
           "queryType": "instant",
-          "refId": "D",
-          "legendFormat": "大檔下載"
-        },
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"network_socket\"}[$__range])) or vector(0)",
-          "queryType": "instant",
-          "refId": "E",
-          "legendFormat": "連線快照"
+          "refId": "D"
         }
       ],
       "title": "異常訊號組成",
@@ -468,14 +511,37 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
-            "spanNulls": false
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -500,6 +566,7 @@
       "id": 6,
       "options": {
         "legend": {
+          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -520,9 +587,9 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"}[$__interval])) or vector(0)",
+          "legendFormat": "登入失敗",
           "queryType": "range",
-          "refId": "A",
-          "legendFormat": "登入失敗"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -532,9 +599,9 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__interval])) or vector(0)",
+          "legendFormat": "收集缺口",
           "queryType": "range",
-          "refId": "B",
-          "legendFormat": "收集缺口"
+          "refId": "B"
         },
         {
           "datasource": {
@@ -544,13 +611,491 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "max(max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"network_socket\"} | json | unwrap tcp_established_count [$__interval])) or vector(0)",
+          "legendFormat": "TCP established",
           "queryType": "range",
-          "refId": "C",
-          "legendFormat": "TCP established"
+          "refId": "C"
         }
       ],
       "title": "異常指標趨勢",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "用來辨識哪個帳號被集中嘗試登入。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "actor",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | actor != \"\" [$__range])))",
+          "legendFormat": "{{actor}}",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "登入失敗使用者排行",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "actor": 0,
+              "事件數": 1
+            },
+            "renameByName": {
+              "Metric": "actor",
+              "Value": "事件數"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "用來辨識可疑來源 IP。若資料源未提供 IP，圖表會為空。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "id": 9,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "source_ip",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | source_ip != \"\" [$__range])))",
+          "legendFormat": "{{source_ip}}",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "登入失敗來源 IP 排行",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "source_ip": 0,
+              "事件數": 1
+            },
+            "renameByName": {
+              "Metric": "source_ip",
+              "Value": "事件數"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "最近檔案傳輸紀錄依 size 排行。size 欄位放在第三欄，Grafana 以 bytes 單位自動換算顯示 KB/MB；不設定 100MB 門檻。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.align",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "topk(100, max by (actor, file_name, source_app, source_ip) (max_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\"} | json | action =~ \"webapp_file_download|drive_file_activity\" | size_bytes > 0 | label_format actor=\"{{.actor}}\", file_name=\"{{.file_name}}\", source_app=\"{{.source_app}}\", source_ip=\"{{.source_ip}}\" | unwrap size_bytes [$__range])))",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "大檔傳輸紀錄",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "indexByName": {
+              "Value #A": 2,
+              "actor": 0,
+              "file_name": 1,
+              "source_app": 3,
+              "source_ip": 4
+            },
+            "renameByName": {
+              "Value #A": "size",
+              "actor": "使用者",
+              "file_name": "檔名",
+              "source_app": "來源",
+              "source_ip": "IP"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "size",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "整合監測資料流各環節健康度；每個元件一條獨立軌道，1=UP、0=DOWN。Prometheus 本身 down 時 dashboard 會呈現 datasource 查詢失敗。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 903,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "expr": "max(up{job=\"prometheus\"}) or vector(0)",
+          "legendFormat": "Prometheus",
+          "refId": "A"
+        },
+        {
+          "expr": "max(up{job=\"loki\"}) or vector(0)",
+          "legendFormat": "Loki",
+          "refId": "B"
+        },
+        {
+          "expr": "max(up{job=\"grafana\"}) or vector(0)",
+          "legendFormat": "Grafana",
+          "refId": "C"
+        },
+        {
+          "expr": "max(up{job=\"warroom-dlp-file-collector\"}) or vector(0)",
+          "legendFormat": "Collector",
+          "refId": "D"
+        },
+        {
+          "expr": "max(up{job=\"warroom-ai-anomaly-scorer\"}) or vector(0)",
+          "legendFormat": "AI scorer scrape",
+          "refId": "E"
+        },
+        {
+          "expr": "max(warroom_ai_anomaly_scorer_up) or vector(0)",
+          "legendFormat": "AI scorer app",
+          "refId": "F"
+        },
+        {
+          "expr": "max(up{job=\"aisecurity-llm-sidecar\"}) or vector(0)",
+          "legendFormat": "AI/rawbase sidecar",
+          "refId": "G"
+        }
+      ],
+      "title": "監測元件健康度",
+      "type": "state-timeline"
     },
     {
       "datasource": {
@@ -584,7 +1129,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 29
       },
       "id": 7,
       "options": {
@@ -608,7 +1153,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"anomaly_alert\"} | json",
+          "expr": "{job=\"warroom-ai-anomaly-scorer\", nas_host=\"thesmart\", source_channel=\"ai_anomaly_alert\", action=\"anomaly_alert\"} | json",
           "queryType": "range",
           "refId": "A"
         }
@@ -644,23 +1189,29 @@
             },
             "indexByName": {
               "Time": 0,
-              "severity": 1,
-              "rule_id": 2,
-              "status": 3,
-              "score": 4,
-              "summary": 5,
+              "llm_confidence": 8,
+              "llm_reason": 9,
+              "llm_status": 7,
               "recommended_action": 6,
-              "llm_status": 7
+              "recommended_actions": 10,
+              "rule_id": 2,
+              "score": 4,
+              "severity": 1,
+              "status": 3,
+              "summary": 5
             },
             "renameByName": {
               "Time": "時間",
-              "severity": "嚴重度",
-              "rule_id": "規則",
-              "status": "狀態",
-              "score": "分數",
-              "summary": "摘要",
+              "llm_confidence": "AI 信心",
+              "llm_reason": "AI 理由",
+              "llm_status": "AI 狀態",
               "recommended_action": "建議處置",
-              "llm_status": "AI 狀態"
+              "recommended_actions": "AI 建議",
+              "rule_id": "規則",
+              "score": "分數",
+              "severity": "嚴重度",
+              "status": "狀態",
+              "summary": "摘要"
             }
           }
         }
@@ -668,579 +1219,36 @@
       "type": "table"
     },
     {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "用來辨識哪個帳號被集中嘗試登入。",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 21
-      },
-      "id": 8,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.85,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "horizontal",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xField": "actor"
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(10, sum by (actor) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | actor != \"\" [1h])))",
-          "queryType": "instant",
-          "refId": "A",
-          "legendFormat": "{{actor}}"
-        }
-      ],
-      "title": "登入失敗使用者排行 (1h)",
-      "transformations": [
-        {
-          "id": "seriesToRows",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "Metric": "actor",
-              "Value": "事件數"
-            },
-            "indexByName": {
-              "actor": 0,
-              "事件數": 1
-            }
-          }
-        }
-      ],
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "用來辨識可疑來源 IP。若資料源未提供 IP，圖表會為空。",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 21
-      },
-      "id": 9,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.85,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "horizontal",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xField": "source_ip"
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(10, sum by (source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", source_channel=\"auth_log\", action=\"auth_failure\"} | json | source_ip != \"\" [1h])))",
-          "queryType": "instant",
-          "refId": "A",
-          "legendFormat": "{{source_ip}}"
-        }
-      ],
-      "title": "登入失敗來源 IP 排行 (1h)",
-      "transformations": [
-        {
-          "id": "seriesToRows",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "Metric": "source_ip",
-              "Value": "事件數"
-            },
-            "indexByName": {
-              "source_ip": 0,
-              "事件數": 1
-            }
-          }
-        }
-      ],
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "大於 100MB 的下載 evidence 彙總。以使用者、檔名、來源與 IP 去重，證據筆數表示底層 File Station transfer DB/log row 數；無資料代表目前沒有大檔下載候選。",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 29
-      },
-      "id": 10,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "topk(100, sum by (actor, file_name, source_app, source_ip) (count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"webapp_file_download\"} | json | size_bytes >= 104857600 | label_format actor=\"{{.actor}}\", file_name=\"{{.file_name}}\", source_app=\"{{.source_app}}\", source_ip=\"{{.source_ip}}\" [$__range])))",
-          "queryType": "instant",
-          "refId": "A"
-        }
-      ],
-      "title": "大檔下載候選（去重彙總）",
-      "transformations": [
-        {
-          "id": "seriesToRows",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "indexByName": {
-              "Metric": 0,
-              "Value": 1
-            },
-            "renameByName": {
-              "Metric": "使用者 / 檔名 / 來源 / IP",
-              "Value": "證據筆數"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "列出目前或歷史 capability gap，指出是哪個來源/能力/階段出問題。空白代表目前查詢時間範圍內沒有收集缺口事件，不代表 panel 未開發。",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 29
-      },
-      "id": 11,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "loki"
-          },
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"} | json",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "收集能力缺口（目前無缺口時空白）",
-      "transformations": [
-        {
-          "id": "extractFields",
-          "options": {
-            "format": "json",
-            "replace": false,
-            "source": "Line"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Line": true,
-              "__error__": true,
-              "__error_details__": true,
-              "collector": true,
-              "confidence": true,
-              "event_id": true,
-              "ingested_at": true,
-              "nas_host": true,
-              "observed_at": true,
-              "policy_notes": true,
-              "raw_ref": true,
-              "source_channel": true,
-              "source_key": true,
-              "source_surface": true
-            },
-            "indexByName": {
-              "Time": 0,
-              "affected_source_app": 1,
-              "affected_capability": 2,
-              "gap_stage": 3,
-              "gap_detail": 4
-            },
-            "renameByName": {
-              "Time": "時間",
-              "affected_source_app": "受影響來源",
-              "affected_capability": "能力",
-              "gap_stage": "階段",
-              "gap_detail": "細節"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "type": "row",
-      "id": 900,
-      "title": "Scorer health (self-monitor)",
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 37
       },
-      "panels": []
+      "id": 900,
+      "panels": [],
+      "title": "Scorer health (self-monitor)",
+      "type": "row"
     },
     {
-      "id": 901,
-      "type": "stat",
-      "title": "Scorer up",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 39
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "targets": [
-        {
-          "expr": "warroom_ai_anomaly_scorer_up",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "colorMode": "value",
-        "graphMode": "none"
-      },
+      "description": "Each tick is one scoring cycle that died with an exception (e.g. JSONDecodeError, Loki down, push schema mismatch). Should stay flat at 0 — any growth = pipeline bug.",
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "red"
-              },
               {
                 "color": "green",
-                "value": 1
-              }
-            ]
-          },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
-                "1": {
-                  "text": "UP",
-                  "color": "green"
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": 902,
-      "type": "stat",
-      "title": "Last success (age)",
-      "description": "Time since the scorer last completed a cycle without raising an exception. Spikes here mean the scoring loop is wedged.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 39
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "expr": "time() - warroom_ai_anomaly_scorer_last_success_timestamp",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "colorMode": "value",
-        "graphMode": "area"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 180
-              },
-              {
-                "color": "red",
-                "value": 600
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": 903,
-      "type": "timeseries",
-      "title": "Cycles vs candidates vs alerts pushed (rate /min)",
-      "description": "Healthy state: cycles_total grows at ~1/min, candidates may be 0, alerts_pushed tracks candidates.",
-      "gridPos": {
-        "h": 8,
-        "w": 16,
-        "x": 8,
-        "y": 39
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "expr": "rate(warroom_ai_anomaly_scorer_cycles_total[5m]) * 60",
-          "refId": "A",
-          "legendFormat": "cycles/min"
-        },
-        {
-          "expr": "rate(warroom_ai_anomaly_scorer_candidates_total[5m]) * 60",
-          "refId": "B",
-          "legendFormat": "candidates/min"
-        },
-        {
-          "expr": "rate(warroom_ai_anomaly_scorer_alerts_pushed_total[5m]) * 60",
-          "refId": "C",
-          "legendFormat": "alerts_pushed/min"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 2,
-            "fillOpacity": 15
-          }
-        }
-      }
-    },
-    {
-      "id": 904,
-      "type": "stat",
-      "title": "Collection failures (last 1h)",
-      "description": "Each tick is one scoring cycle that died with an exception (e.g. JSONDecodeError, Loki down, push schema mismatch). Should stay flat at 0 — any growth = pipeline bug.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 43
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "expr": "increase(warroom_ai_anomaly_scorer_collection_failures_total[1h])",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "colorMode": "background",
-        "graphMode": "area"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
+                "value": null
               },
               {
                 "color": "orange",
@@ -1251,62 +1259,114 @@
                 "value": 10
               }
             ]
-          }
-        }
-      }
-    },
-    {
-      "id": 905,
-      "type": "stat",
-      "title": "LLM failures (last 1h)",
-      "description": "Ollama triage call failures (host.docker.internal:11434). Non-zero just means LLM enrichment is unavailable — alerts still fire without LLM context.",
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 4,
-        "y": 43
+        "x": 0,
+        "y": 38
       },
+      "id": 904,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "expr": "increase(warroom_ai_anomaly_scorer_collection_failures_total[1h])",
+          "refId": "A"
+        }
+      ],
+      "title": "Collection failures (last 1h)",
+      "type": "stat"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "targets": [
-        {
-          "expr": "increase(warroom_ai_anomaly_scorer_llm_failures_total[1h])",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "colorMode": "value",
-        "graphMode": "area"
-      },
+      "description": "Time since the scorer last completed a cycle without raising an exception. Spikes here mean the scoring loop is wedged.",
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
-                "color": "yellow",
-                "value": 1
+                "color": "orange",
+                "value": 180
+              },
+              {
+                "color": "red",
+                "value": 600
               }
             ]
-          }
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 38
+      },
+      "id": 902,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "expr": "time() - warroom_ai_anomaly_scorer_last_success_timestamp",
+          "refId": "A"
         }
-      }
+      ],
+      "title": "Last success (age)",
+      "type": "stat"
     }
   ],
+  "preload": false,
   "refresh": "30s",
   "schemaVersion": 40,
   "tags": [
@@ -1320,13 +1380,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "Asia/Taipei",
   "title": "[10 警示] 利善美智能 AI 異常告警中心",
   "uid": "thesmart-anomaly-alert-center",
-  "version": 1,
+  "version": 35,
   "weekStart": ""
 }

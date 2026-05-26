@@ -1,0 +1,16 @@
+{
+  "rule_id": "AUTH_SUCCESS_AFTER_FAILURE_V1",
+  "severity": "high",
+  "score": 0.85,
+  "summary": "Auth success occurred after an auth failure burst window.",
+  "entity_type": "auth_pattern",
+  "entity_value_hash": "sha256:examplehashonly00000000",
+  "evidence": {
+    "window": "10m",
+    "count": 1,
+    "threshold": 20,
+    "observation_basis": "aggregate_success_count_with_failure_threshold",
+    "bounded": true,
+    "redacted": true
+  }
+}

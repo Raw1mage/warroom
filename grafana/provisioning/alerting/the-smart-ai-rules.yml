@@ -450,3 +450,259 @@ groups:
           warroom_scope: thesmartai
         annotations:
           summary: TCP established connections exceeded the POC threshold.
+
+      - uid: thesmartai-rawbase-llm-unavailable
+        title: TheSmartAI rawbase LLM triage unavailable
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: warroom_ai_llm_unavailable{provider_id="rawbase"}
+              instant: true
+              range: false
+              datasource:
+                type: prometheus
+                uid: prometheus
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [C]
+                  reducer:
+                    type: last
+                    params: []
+              datasource:
+                type: __expr__
+                uid: __expr__
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels:
+          nas_host: thesmart
+          severity: high
+          warroom_scope: thesmartai
+        annotations:
+          summary: rawbase LLM triage is unavailable; deterministic anomaly alerts continue in degraded mode.
+
+      - uid: thesmartai-llm-json-parse-failures
+        title: TheSmartAI LLM JSON parse failures spike
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              refId: A
+              expr: increase(warroom_ai_llm_json_parse_failures_total{provider_id="rawbase"}[10m])
+              instant: true
+              range: false
+              datasource:
+                type: prometheus
+                uid: prometheus
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator:
+                    type: gt
+                    params: [2]
+                  operator:
+                    type: and
+                  query:
+                    params: [C]
+                  reducer:
+                    type: last
+                    params: []
+              datasource:
+                type: __expr__
+                uid: __expr__
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels:
+          nas_host: thesmart
+          severity: medium
+          warroom_scope: thesmartai
+        annotations:
+          summary: rawbase returned invalid or non-schema JSON repeatedly in the last 10 minutes.
+
+      - uid: thesmartai-high-ai-anomaly-promql
+        title: TheSmartAI high AI anomaly alert active by metrics
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: increase(warroom_ai_anomaly_alerts_total{severity="high",llm_status="ok"}[5m])
+              instant: true
+              range: false
+              datasource:
+                type: prometheus
+                uid: prometheus
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [C]
+                  reducer:
+                    type: last
+                    params: []
+              datasource:
+                type: __expr__
+                uid: __expr__
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels:
+          nas_host: thesmart
+          severity: high
+          warroom_scope: thesmartai
+        annotations:
+          summary: AI anomaly scorer emitted a high-severity rawbase-enriched anomaly.
+
+      - uid: thesmartai-deterministic-without-llm
+        title: TheSmartAI deterministic anomaly without LLM enrichment
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: increase(warroom_ai_anomaly_alerts_total{severity=~"medium|high",llm_status!="ok"}[5m])
+              instant: true
+              range: false
+              datasource:
+                type: prometheus
+                uid: prometheus
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+              datasource:
+                type: __expr__
+                uid: __expr__
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - type: query
+                  evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [C]
+                  reducer:
+                    type: last
+                    params: []
+              datasource:
+                type: __expr__
+                uid: __expr__
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels:
+          nas_host: thesmart
+          severity: high
+          warroom_scope: thesmartai
+        annotations:
+          summary: Deterministic anomaly alert emitted while rawbase triage was degraded or disabled.

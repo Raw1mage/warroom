@@ -7,6 +7,7 @@
       "sources": [
         "host_health_remote",
         "file_station_remote",
+        "drive_remote",
         "nas_home_log_remote",
         "nas_system_log_remote"
       ],
@@ -100,6 +101,13 @@
         "limit": 50,
         "timeout_seconds": 90
       },
+      "drive_remote": {
+        "host": "nas.wuyang.co",
+        "user": "wuyangadmin",
+        "sync_root": "/volume1/@synologydrive/@sync",
+        "limit": 100,
+        "timeout_seconds": 90
+      },
       "nas_home_log_remote": {
         "host": "nas.wuyang.co",
         "user": "wuyangadmin",
@@ -153,6 +161,56 @@
         ],
         "tail_lines": 2000,
         "limit": 200,
+        "timeout_seconds": 90
+      }
+    },
+    {
+      "id": "unraid",
+      "display_name": "Unraid",
+      "enabled": true,
+      "sources": [
+        "host_health_remote",
+        "nas_system_log_remote",
+        "auth_log_remote",
+        "network_socket_remote",
+        "docker_service_remote"
+      ],
+      "host_health_remote": {
+        "host": "unraid",
+        "timeout_seconds": 90
+      },
+      "nas_system_log_remote": {
+        "host": "unraid",
+        "log_paths": [
+          "/var/log/syslog",
+          "/var/log/messages",
+          "/var/log/kern.log",
+          "/var/log/daemon.log",
+          "/var/log/auth.log"
+        ],
+        "tail_lines": 2000,
+        "limit": 200,
+        "timeout_seconds": 90
+      },
+      "auth_log_remote": {
+        "host": "unraid",
+        "log_paths": [
+          "/var/log/auth.log",
+          "/var/log/secure",
+          "/var/log/messages"
+        ],
+        "tail_lines": 2000,
+        "limit": 100,
+        "timeout_seconds": 90
+      },
+      "network_socket_remote": {
+        "host": "unraid",
+        "top_limit": 20,
+        "timeout_seconds": 90
+      },
+      "docker_service_remote": {
+        "host": "unraid",
+        "limit": 100,
         "timeout_seconds": 90
       }
     }
