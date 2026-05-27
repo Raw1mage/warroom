@@ -1,0 +1,1317 @@
+{
+  "title": "AI Security - LLM Telemetry Group",
+  "uid": "aisecurity-llm-telemetry-group",
+  "schemaVersion": 39,
+  "version": 24,
+  "tags": [
+    "aisecurity",
+    "opencms",
+    "llm",
+    "sidecar",
+    "gpu",
+    "llama.cpp",
+    "warroom"
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "10s",
+  "templating": {
+    "list": [
+      {
+        "name": "sidecar_job",
+        "type": "constant",
+        "query": "aisecurity-llm-sidecar",
+        "current": {
+          "text": "aisecurity-llm-sidecar",
+          "value": "aisecurity-llm-sidecar"
+        }
+      },
+      {
+        "name": "gpu_job",
+        "type": "constant",
+        "query": "aisecurity-gpu",
+        "current": {
+          "text": "aisecurity-gpu",
+          "value": "aisecurity-gpu"
+        }
+      },
+      {
+        "name": "runtime_job",
+        "type": "constant",
+        "query": "aisecurity-llamacpp-runtime",
+        "current": {
+          "text": "aisecurity-llamacpp-runtime",
+          "value": "aisecurity-llamacpp-runtime"
+        }
+      },
+      {
+        "name": "service",
+        "type": "constant",
+        "query": "aisecurity-llm-sidecar",
+        "current": {
+          "text": "aisecurity-llm-sidecar",
+          "value": "aisecurity-llm-sidecar"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "1. Pipeline Health",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 19,
+      "type": "state-timeline",
+      "title": "Three-Port UP/DOWN Timeline",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "max(up{job=\"$runtime_job\"})",
+          "legendFormat": "7730 runtime"
+        },
+        {
+          "expr": "max(up{job=\"$sidecar_job\"})",
+          "legendFormat": "7731 sidecar"
+        },
+        {
+          "expr": "max(up{job=\"$gpu_job\"})",
+          "legendFormat": "7732 gpu exporter"
+        },
+        {
+          "expr": "1 - clamp_max(sum(increase(llm_sidecar_upstream_errors_total{job=\"$sidecar_job\"}[$__rate_interval])), 1)",
+          "legendFormat": "7731 upstream"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "always",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0,
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "row",
+      "title": "2. Experiment Traffic and Workload",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Chat Request Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "rate(llm_sidecar_requests_total[5m])",
+          "legendFormat": "chat requests/s"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 9
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Sidecar Event Rate",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json [5m]))",
+          "legendFormat": "events / 5m"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 9
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Sidecar Latency Quantiles",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(llm_sidecar_request_latency_seconds_bucket[5m]))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(llm_sidecar_request_latency_seconds_bucket[5m]))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(llm_sidecar_request_latency_seconds_bucket[5m]))",
+          "legendFormat": "p99"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 9
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Token Throughput",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(sum_over_time({service=\"$service\"} | json | unwrap prompt_tokens [5m]))",
+          "legendFormat": "prompt tokens / 5m"
+        },
+        {
+          "expr": "sum(sum_over_time({service=\"$service\"} | json | unwrap completion_tokens [5m]))",
+          "legendFormat": "completion tokens / 5m"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "OpenCMS Client / Project Mix",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum by (opencode_client) (count_over_time({service=\"$service\"} | json | opencode_client != \"\" [5m]))",
+          "legendFormat": "client={{opencode_client}}"
+        },
+        {
+          "expr": "sum by (opencode_project) (count_over_time({service=\"$service\"} | json | opencode_project != \"\" [5m]))",
+          "legendFormat": "project={{opencode_project}}"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Upstream Error Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "rate(llm_sidecar_upstream_errors_total[5m])",
+          "legendFormat": "errors/s"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      }
+    },
+    {
+      "type": "row",
+      "title": "3. Collision and Reuse Candidate Signals",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Source / Fingerprint / Prefix Cardinality",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "count(sum by (opencode_session_id) (count_over_time({service=\"$service\"} | json | opencode_session_id != \"\" [$__range])))",
+          "legendFormat": "active sessions"
+        },
+        {
+          "expr": "count(sum by (opencode_account_id) (count_over_time({service=\"$service\"} | json | opencode_account_id != \"\" [$__range])))",
+          "legendFormat": "active accounts"
+        },
+        {
+          "expr": "count(sum by (prompt_fingerprint) (count_over_time({service=\"$service\"} | json | prompt_fingerprint != \"\" [$__range])))",
+          "legendFormat": "unique fingerprints"
+        },
+        {
+          "expr": "count(sum by (prefix_hash) (count_over_time({service=\"$service\"} | json | prefix_hash != \"\" [$__range])))",
+          "legendFormat": "unique prefixes"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 30
+      },
+      "options": {
+        "displayMode": "gradient",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "valueMode": "color"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Repeated Prefix Signal from Logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json | cache_event = \"repeated_prefix\" [5m]))",
+          "legendFormat": "repeated prefix / 5m"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 30
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Fingerprint Cache Event Mix",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum by (cache_event) (count_over_time({service=\"$service\"} | json | cache_event != \"\" [5m]))",
+          "legendFormat": "{{cache_event}}"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 30
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Fingerprint / Prefix Observation Volume",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json | prompt_fingerprint != \"\" [5m]))",
+          "legendFormat": "fingerprint observations / 5m"
+        },
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json | prefix_hash != \"\" [5m]))",
+          "legendFormat": "prefix observations / 5m"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      }
+    },
+    {
+      "type": "row",
+      "title": "4. KV Experiment Comparison",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      }
+    },
+    {
+      "type": "stat",
+      "title": "KV Experiment Requests",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" [$__range]))",
+          "legendFormat": "requests"
+        }
+      ],
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 44
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Trace Pair Coverage",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"candidate\" [$__range]))",
+          "legendFormat": "candidate"
+        },
+        {
+          "expr": "sum(count_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"repeated_prefix\" [$__range]))",
+          "legendFormat": "repeated"
+        }
+      ],
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 44
+      }
+    },
+    {
+      "type": "stat",
+      "title": "External Latency Ratio (candidate / repeated)",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "avg(avg_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"candidate\" | unwrap latency_ms [$__range])) / avg(avg_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"repeated_prefix\" | unwrap latency_ms [$__range]))",
+          "legendFormat": "candidate / repeated"
+        }
+      ],
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 44
+      },
+      "description": "External latency comparison from 7731 JSONL. Values above 1 mean repeated-prefix requests are faster than candidate requests in the selected window."
+    },
+    {
+      "type": "timeseries",
+      "title": "KV Experiment Error Rate",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum by (cache_event) (count_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | status_code >= 400 [5m])) or vector(0)",
+          "legendFormat": "{{cache_event}} errors"
+        }
+      ],
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 44
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "KV Experiment Phase Mix",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "sum by (cache_event) (count_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event != \"\" [5m]))",
+          "legendFormat": "{{cache_event}}"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 49
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "KV Latency Distribution",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "avg(quantile_over_time(0.50, {service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"candidate\" | unwrap latency_ms [5m]))",
+          "legendFormat": "candidate p50"
+        },
+        {
+          "expr": "avg(quantile_over_time(0.95, {service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"candidate\" | unwrap latency_ms [5m]))",
+          "legendFormat": "candidate p95"
+        },
+        {
+          "expr": "avg(quantile_over_time(0.50, {service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"repeated_prefix\" | unwrap latency_ms [5m]))",
+          "legendFormat": "repeated p50"
+        },
+        {
+          "expr": "avg(quantile_over_time(0.95, {service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"repeated_prefix\" | unwrap latency_ms [5m]))",
+          "legendFormat": "repeated p95"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 49
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Prompt / Completion Token Parity",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "targets": [
+        {
+          "expr": "avg(avg_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"candidate\" | unwrap prompt_tokens [5m]))",
+          "legendFormat": "candidate prompt"
+        },
+        {
+          "expr": "avg(avg_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"repeated_prefix\" | unwrap prompt_tokens [5m]))",
+          "legendFormat": "repeated prompt"
+        },
+        {
+          "expr": "avg(avg_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"candidate\" | unwrap completion_tokens [5m]))",
+          "legendFormat": "candidate completion"
+        },
+        {
+          "expr": "avg(avg_over_time({service=\"$service\"} | json | opencode_client=\"kv-cache-external-observe\" | cache_event=\"repeated_prefix\" | unwrap completion_tokens [5m]))",
+          "legendFormat": "repeated completion"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 49
+      }
+    },
+    {
+      "type": "row",
+      "title": "5. llama.cpp Runtime Cache Evidence (7730)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      }
+    },
+    {
+      "id": 10,
+      "type": "piechart",
+      "title": "Runtime Cache Outcome",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(llamacpp:aisecurity_prompt_cache_hit_total{job=\"$runtime_job\"}[$__range]))",
+          "legendFormat": "prompt hits"
+        },
+        {
+          "expr": "sum(increase(llamacpp:aisecurity_prompt_cache_miss_total{job=\"$runtime_job\"}[$__range]))",
+          "legendFormat": "prompt misses"
+        },
+        {
+          "expr": "sum(increase(llamacpp:aisecurity_kv_reuse_total{job=\"$runtime_job\"}[$__range]))",
+          "legendFormat": "KV reuse"
+        },
+        {
+          "expr": "sum(increase(llamacpp:aisecurity_kv_miss_total{job=\"$runtime_job\"}[$__range]))",
+          "legendFormat": "KV miss"
+        }
+      ],
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 57
+      },
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Runtime Cache Events",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_prompt_cache_hit_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "prompt cache hits/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_prompt_cache_miss_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "prompt cache misses/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_reuse_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "kv reuse/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_miss_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "kv miss/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_full_reprocess_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "full reprocess/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 62
+      }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Runtime Slot Token Gauges",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "llamacpp:aisecurity_slot_cached_prompt_tokens{job=\"$runtime_job\"}",
+          "legendFormat": "cached prompt tokens"
+        },
+        {
+          "expr": "llamacpp:aisecurity_slot_processed_prompt_tokens{job=\"$runtime_job\"}",
+          "legendFormat": "processed prompt tokens"
+        },
+        {
+          "expr": "llamacpp:aisecurity_slot_reused_tokens{job=\"$runtime_job\"}",
+          "legendFormat": "reused tokens"
+        },
+        {
+          "expr": "llamacpp:aisecurity_slot_prompt_tokens{job=\"$runtime_job\"}",
+          "legendFormat": "slot prompt tokens"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 62
+      }
+    },
+    {
+      "type": "row",
+      "title": "6. Proxy Capacity and Backpressure (7731)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 70
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "In-flight Requests",
+      "description": "Chat completion permits currently held.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 71
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(llm_sidecar_inflight)"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cap (max in-flight)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 71
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(llm_sidecar_max_concurrent)"
+        }
+      ],
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Rejected (range total)",
+      "description": "Requests dropped after waiting longer than --acquire-timeout-secs.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 71
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(llm_sidecar_rejected_concurrency_total[$__range]))"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Queue Wait avg (5m)",
+      "description": "Mean time chat requests spent waiting for a permit.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 71
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(llm_sidecar_queue_wait_seconds_sum[5m])) / clamp_min(sum(rate(llm_sidecar_queue_wait_seconds_count[5m])), 1e-9)"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "In-flight Over Time",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 76
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(llm_sidecar_inflight)",
+          "legendFormat": "inflight"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(llm_sidecar_max_concurrent)",
+          "legendFormat": "cap"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Queue Wait Rate + Rejections",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 76
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(llm_sidecar_queue_wait_seconds_sum[5m]))",
+          "legendFormat": "queue wait sec/s"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(llm_sidecar_rejected_concurrency_total[5m]))",
+          "legendFormat": "rejected/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "type": "row",
+      "title": "7. Resource Confounders (7732 GPU + Runtime Memory)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 83
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "GPU Load Trend",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "aisecurity_gpu_utilization_percent",
+          "legendFormat": "{{name}} load %"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 84
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "GPU + llama.cpp Memory Breakdown (GB)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "aisecurity_gpu_memory_used_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "VRAM used GB"
+        },
+        {
+          "expr": "llamacpp:aisecurity_model_memory_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "model GB"
+        },
+        {
+          "expr": "llamacpp:aisecurity_kv_cache_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "KV cache GB"
+        },
+        {
+          "expr": "llamacpp:aisecurity_compute_memory_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "compute GB"
+        },
+        {
+          "expr": "llamacpp:aisecurity_total_memory_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "runtime total GB"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 84
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Temperature and Fan Trend",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "aisecurity_gpu_temperature_celsius",
+          "legendFormat": "{{name}} °C"
+        },
+        {
+          "expr": "aisecurity_gpu_fan_speed_percent",
+          "legendFormat": "{{name}} fan %"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 84
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "GPU Power Draw",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "aisecurity_gpu_power_draw_watts",
+          "legendFormat": "{{name}} watts"
+        },
+        {
+          "expr": "aisecurity_gpu_power_limit_watts",
+          "legendFormat": "{{name}} power limit"
+        }
+      ],
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 91
+      }
+    },
+    {
+      "type": "row",
+      "title": "8. Cross-Port Causal Checks",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 98
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Request Rate vs Runtime Cache Activity",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(llm_sidecar_requests_total{job=\"$sidecar_job\"}[5m]))",
+          "legendFormat": "7731 requests/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_prompt_cache_hit_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 prompt cache hits/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_prompt_cache_miss_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 prompt cache misses/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_reuse_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 KV reuse/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_miss_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 KV miss/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 99
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Latency vs Cache Benefit Signals",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(llm_sidecar_request_latency_seconds_bucket{job=\"$sidecar_job\"}[5m]))",
+          "legendFormat": "7731 latency p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(llm_sidecar_request_latency_seconds_bucket{job=\"$sidecar_job\"}[5m]))",
+          "legendFormat": "7731 latency p95"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_reuse_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 KV reuse/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_full_reprocess_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 full reprocess/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 99
+      }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Runtime Cache Signals vs GPU Pressure",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "aisecurity_gpu_utilization_percent{job=\"$gpu_job\"}",
+          "legendFormat": "7732 GPU load %"
+        },
+        {
+          "expr": "aisecurity_gpu_memory_utilization_percent{job=\"$gpu_job\"}",
+          "legendFormat": "7732 VRAM %"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_reuse_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 KV reuse/s"
+        },
+        {
+          "expr": "sum(rate(llamacpp:aisecurity_kv_miss_total{job=\"$runtime_job\"}[$__rate_interval]))",
+          "legendFormat": "7730 KV miss/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 107
+      }
+    }
+  ]
+}

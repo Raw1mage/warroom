@@ -23,12 +23,19 @@ TTL_SEC="${TTL_SEC:-3600}"
 mkdir -p "$(dirname "$STATE")"
 [ -f "$STATE" ] || echo '{}' > "$STATE"
 
-# 1) Expire old bans across ALL reasons (shared with ssh fail2ban)
+# 1) Expire old bans + stale grace entries (shared with ssh fail2ban)
 NOW=$(date +%s)
-expired=$(jq -r --argjson now "$NOW" 'to_entries[] | select(.value.expires_at <= $now) | .key' "$STATE")
+expired=$(jq -r --argjson now "$NOW" \
+  'to_entries[] | select(.value.expires_at and (.value.expires_at <= $now) and (.value.suppressed | not)) | .key' "$STATE")
 for ip in $expired; do
   echo "[$(date '+%F %T')] expiring ban: $ip"
   "$DEVICE_DIR/bin/ban-unset.sh" "$ip" || true
+done
+stale_grace=$(jq -r --argjson now "$NOW" \
+  'to_entries[] | select(.value.suppressed == true and .value.grace_until <= $now) | .key' "$STATE")
+for ip in $stale_grace; do
+  echo "[$(date '+%F %T')] clearing grace: $ip"
+  tmp="$(mktemp)"; jq --arg ip "$ip" 'del(.[$ip])' "$STATE" > "$tmp" && mv "$tmp" "$STATE"
 done
 
 # 2) Tally offenders via LogQL.

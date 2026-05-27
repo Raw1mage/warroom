@@ -22,6 +22,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./grafana/dashboards-root:/var/lib/grafana/dashboards-root:ro
       - ./grafana/dashboards-sunshine:/var/lib/grafana/dashboards-sunshine:ro
     healthcheck:
       test: ["CMD-SHELL", "test -f '/var/lib/grafana/dashboards/[40 企業資料洩露監控]/thesmart-dlp-file-evidence.json'"]
@@ -52,6 +53,8 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   loki:
     image: grafana/loki:3.4.2

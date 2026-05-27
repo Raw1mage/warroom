@@ -1,6 +1,16 @@
 apiVersion: 1
 
 providers:
+  - name: warroom-root
+    orgId: 1
+    type: file
+    disableDeletion: false
+    editable: true
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards-root
+
   - name: warroom-local
     orgId: 1
     type: file
@@ -10,8 +20,8 @@ providers:
     updateIntervalSeconds: 30
     options:
       path: /var/lib/grafana/dashboards
-
       foldersFromFilesStructure: true
+
   - name: warroom-sunshine
     orgId: 1
     folder: 陽光沙灘

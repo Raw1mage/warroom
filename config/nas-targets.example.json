@@ -78,6 +78,61 @@
         "limit": 200,
         "timeout_seconds": 90
       }
+    },
+    {
+      "id": "example-unraid-01",
+      "display_name": "Example Unraid Host",
+      "enabled": true,
+      "sources": [
+        "host_health_remote",
+        "nas_system_log_remote",
+        "auth_log_remote",
+        "network_socket_remote",
+        "docker_service_remote"
+      ],
+      "host_health_remote": {
+        "host": "unraid.example.internal",
+        "user": "ops-admin",
+        "timeout_seconds": 90
+      },
+      "nas_system_log_remote": {
+        "host": "unraid.example.internal",
+        "user": "ops-admin",
+        "log_paths": [
+          "/var/log/syslog",
+          "/var/log/messages",
+          "/var/log/kern.log",
+          "/var/log/daemon.log",
+          "/var/log/auth.log"
+        ],
+        "tail_lines": 2000,
+        "limit": 200,
+        "timeout_seconds": 90
+      },
+      "auth_log_remote": {
+        "host": "unraid.example.internal",
+        "user": "ops-admin",
+        "log_paths": [
+          "/var/log/auth.log",
+          "/var/log/secure",
+          "/var/log/messages"
+        ],
+        "tail_lines": 2000,
+        "limit": 100,
+        "timeout_seconds": 90
+      },
+      "network_socket_remote": {
+        "host": "unraid.example.internal",
+        "user": "ops-admin",
+        "top_limit": 20,
+        "timeout_seconds": 90
+      },
+      "docker_service_remote": {
+        "host": "unraid.example.internal",
+        "user": "ops-admin",
+        "limit": 100,
+        "timeout_seconds": 90
+      }
     }
   ]
 }

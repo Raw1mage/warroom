@@ -20,11 +20,20 @@ mkdir -p "$(dirname "$STATE")"
 NOW=$(date +%s)
 SINCE=$((NOW - WINDOW_SEC))
 
-# 1) Expire old bans: anything past expires_at -> remove rule + drop state
-expired_ips=$(jq -r --argjson now "$NOW" 'to_entries[] | select(.value.expires_at <= $now) | .key' "$STATE")
+# 1) Expire old bans + stale grace entries
+# Active bans past expires_at -> remove rule via ban-unset (which writes a grace)
+expired_ips=$(jq -r --argjson now "$NOW" \
+  'to_entries[] | select(.value.expires_at and (.value.expires_at <= $now) and (.value.suppressed | not)) | .key' "$STATE")
 for ip in $expired_ips; do
   echo "[$(date '+%F %T')] expiring ban: $ip"
   "$DEVICE_DIR/bin/ban-unset.sh" "$ip" || true
+done
+# Grace entries past grace_until -> fully remove from state (events have aged out)
+stale_grace=$(jq -r --argjson now "$NOW" \
+  'to_entries[] | select(.value.suppressed == true and .value.grace_until <= $now) | .key' "$STATE")
+for ip in $stale_grace; do
+  echo "[$(date '+%F %T')] clearing grace: $ip"
+  tmp="$(mktemp)"; jq --arg ip "$ip" 'del(.[$ip])' "$STATE" > "$tmp" && mv "$tmp" "$STATE"
 done
 
 # 2) Tally WSLSSH- SYNs by SRC in window

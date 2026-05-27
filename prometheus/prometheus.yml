@@ -69,6 +69,17 @@ scrape_configs:
           model_family: qwen
           telemetry_scope: proxy
 
+  - job_name: aisecurity-llamacpp-runtime
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - 192.168.112.1:7730
+        labels:
+          service: aisecurity-llamacpp-runtime
+          model_family: qwen
+          telemetry_scope: runtime-cache
+
   - job_name: aisecurity-gpu
     metrics_path: /metrics
     scrape_interval: 5s
