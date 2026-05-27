@@ -1,0 +1,211 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Open system host health",
+      "type": "dashboard",
+      "uid": "thesmart-nas-host-health"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Overview / Docker service health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "最近 5 分鐘 Docker service snapshot 數。為 0 表示 collector 尚未收到 Unraid Docker metadata。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 1},
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$host\", source_channel=\"docker_service\", source_app=\"host_docker\"}[5m])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Docker snapshots / 5m",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "目前 Docker container 總數。",
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "mappings": [], "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 1},
+      "id": 3,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "max(last_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$host\", source_channel=\"docker_service\", source_app=\"host_docker\"} | json | unwrap docker_container_count [5m])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Containers total",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "目前 Docker running container 數。",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 1},
+      "id": 4,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "max(last_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$host\", source_channel=\"docker_service\", source_app=\"host_docker\"} | json | unwrap docker_running_count [5m])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Running containers",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "目前非 running 或 Docker health=unhealthy/dead/restarting 的 container 數。",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 3}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 1},
+      "id": 5,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "max(last_over_time({job=\"warroom-dlp-event-collector\", nas_host=~\"$host\", source_channel=\"docker_service\", source_app=\"host_docker\"} | json | unwrap docker_unhealthy_count [5m])) or vector(0)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Unhealthy containers",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "description": "Docker service snapshot 原始 JSON，用於 drill-down 查看 container 名稱、image、state、status 與 health。",
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 6},
+      "id": 6,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-dlp-event-collector\", nas_host=~\"$host\", source_channel=\"docker_service\", source_app=\"host_docker\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Docker service snapshots",
+      "type": "logs"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["warroom", "unraid", "docker", "host-health", "infrastructure"],
+  "templating": {
+    "list": [
+      {
+        "current": {"selected": false, "text": "unraid", "value": "unraid"},
+        "datasource": {"type": "loki", "uid": "loki"},
+        "definition": "label_values({job=\"warroom-dlp-event-collector\", source_channel=\"docker_service\", source_app=\"host_docker\"}, nas_host)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Host",
+        "multi": false,
+        "name": "host",
+        "options": [],
+        "query": "label_values({job=\"warroom-dlp-event-collector\", source_channel=\"docker_service\", source_app=\"host_docker\"}, nas_host)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "Asia/Taipei",
+  "title": "Unraid Docker Services",
+  "uid": "unraid-docker-services",
+  "version": 1,
+  "weekStart": ""
+}

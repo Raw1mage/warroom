@@ -19,7 +19,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "title": "[45 郵件閘道] 利善美智能 Postfix / Dovecot 攻擊面",
+  "title": "Postfix / Dovecot 攻擊面",
   "uid": "thesmart-rawdb-mail",
   "tags": [
     "warroom",

@@ -1321,7 +1321,7 @@
   },
   "timepicker": {},
   "timezone": "Asia/Taipei",
-  "title": "[30 基礎設施] Warroom System Host Health",
+  "title": "主機效能／健康／異常",
   "uid": "thesmart-nas-host-health",
   "version": 3,
   "weekStart": ""
