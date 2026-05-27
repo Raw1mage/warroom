@@ -69,14 +69,14 @@ scrape_configs:
           model_family: qwen
           telemetry_scope: proxy
 
-  - job_name: aisecurity-llamacpp-runtime
+  - job_name: aisecurity-vllm-runtime
     metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
       - targets:
-          - 192.168.112.1:7730
+          - host.docker.internal:7730
         labels:
-          service: aisecurity-llamacpp-runtime
+          service: aisecurity-vllm-runtime
           model_family: qwen
           telemetry_scope: runtime-cache
 
@@ -90,3 +90,13 @@ scrape_configs:
           service: aisecurity-gpu
           gpu: rtx-3090
           telemetry_scope: gpu
+
+  - job_name: aisecurity-semantic-cache-demo
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - host.docker.internal:7734
+        labels:
+          service: aisecurity-semantic-cache-demo
+          telemetry_scope: semantic-response-cache-demo
