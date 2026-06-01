@@ -330,7 +330,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\", source_channel=\"collector_capability_gap\"}[2m])) or vector(0)",
+          "expr": "sum(count_over_time({nas_host=\"thesmart\", source_channel=\"collector_capability_gap\", action=\"capability_gap\"}[2m])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -478,7 +478,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__range])) or vector(0)",
+          "expr": "sum(count_over_time({nas_host=\"thesmart\", source_channel=\"collector_capability_gap\", action=\"capability_gap\"}[$__range])) or vector(0)",
           "legendFormat": "收集缺口",
           "queryType": "instant",
           "refId": "C"
@@ -598,7 +598,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({job=\"warroom-dlp-event-collector\", nas_host=\"thesmart\", action=\"capability_gap\"}[$__interval])) or vector(0)",
+          "expr": "sum(count_over_time({nas_host=\"thesmart\", source_channel=\"collector_capability_gap\", action=\"capability_gap\"}[$__interval])) or vector(0)",
           "legendFormat": "收集缺口",
           "queryType": "range",
           "refId": "B"
@@ -1102,7 +1102,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "AI scorer 已產生的 anomaly_alert。空白代表目前查詢時間範圍內沒有需要處理的 AI 告警，不代表資料源未開發。",
+      "description": "AI scorer 已產生的 anomaly_alert 總覽（快速掃描）。每筆告警的完整 AI 判斷理由與建議動作見下方『AI 判斷詳情』。空白代表查詢時間範圍內沒有 AI 告警，非資料源未開發。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1110,9 +1110,11 @@
             "cellOptions": {
               "type": "auto"
             },
+            "filterable": true,
             "inspect": false
           },
           "mappings": [],
+          "noValue": "目前查詢時間範圍內沒有 AI 告警 — 系統運作正常或無異常事件。",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1123,7 +1125,132 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "嚴重度"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "high": {
+                        "color": "red",
+                        "index": 0,
+                        "text": "high"
+                      },
+                      "medium": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "medium"
+                      },
+                      "low": {
+                        "color": "yellow",
+                        "index": 2,
+                        "text": "low"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AI 信心"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "需人工複查"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "true": {
+                        "color": "orange",
+                        "index": 0,
+                        "text": "需複查"
+                      },
+                      "false": {
+                        "color": "green",
+                        "index": 1,
+                        "text": "—"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "規則"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -1158,7 +1285,7 @@
           "refId": "A"
         }
       ],
-      "title": "AI 告警清單（目前無告警時空白）",
+      "title": "AI 告警總覽",
       "transformations": [
         {
           "id": "extractFields",
@@ -1178,40 +1305,48 @@
               "collector": true,
               "confidence": true,
               "event_id": true,
+              "alert_id": true,
+              "entity_type": true,
+              "entity_value_hash": true,
+              "evidence": true,
               "ingested_at": true,
+              "llm_model": true,
+              "llm_model_spec": true,
+              "llm_provider": true,
+              "llm_provider_id": true,
+              "llm_is_anomaly": true,
+              "llm_reason": true,
+              "model_family": true,
               "nas_host": true,
               "observed_at": true,
               "policy_notes": true,
               "raw_ref": true,
+              "recommended_action": true,
+              "recommended_actions": true,
+              "recommended_next_steps": true,
               "source_channel": true,
               "source_key": true,
-              "source_surface": true
+              "source_surface": true,
+              "action": true,
+              "summary": true,
+              "status": true,
+              "score": true
             },
             "indexByName": {
               "Time": 0,
-              "llm_confidence": 8,
-              "llm_reason": 9,
-              "llm_status": 7,
-              "recommended_action": 6,
-              "recommended_actions": 10,
-              "rule_id": 2,
-              "score": 4,
               "severity": 1,
-              "status": 3,
-              "summary": 5
+              "rule_id": 2,
+              "llm_confidence": 3,
+              "needs_human_review": 4,
+              "llm_status": 5
             },
             "renameByName": {
               "Time": "時間",
               "llm_confidence": "AI 信心",
-              "llm_reason": "AI 理由",
               "llm_status": "AI 狀態",
-              "recommended_action": "建議處置",
-              "recommended_actions": "AI 建議",
+              "needs_human_review": "需人工複查",
               "rule_id": "規則",
-              "score": "分數",
-              "severity": "嚴重度",
-              "status": "狀態",
-              "summary": "摘要"
+              "severity": "嚴重度"
             }
           }
         }
@@ -1219,12 +1354,57 @@
       "type": "table"
     },
     {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "每筆 AI 告警的完整 LLM triage 判斷：嚴重度、規則、信心度與判斷理由。展開單行可看全部欄位（含 recommended_actions 建議動作）。",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 37
+      },
+      "id": 77,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{job=\"warroom-ai-anomaly-scorer\", nas_host=\"thesmart\", source_channel=\"ai_anomaly_alert\", action=\"anomaly_alert\"} | json | line_format \"[{{.severity}} | {{.rule_id}}] 信心={{.llm_confidence}} | {{ if eq .needs_human_review \\\"true\\\" }}⚑需複查 {{ end }}{{.llm_reason}}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "AI 判斷詳情（展開看完整理由與建議）",
+      "type": "logs"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 46
       },
       "id": 900,
       "panels": [],
@@ -1268,7 +1448,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 38
+        "y": 47
       },
       "id": 904,
       "options": {
@@ -1335,7 +1515,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 38
+        "y": 47
       },
       "id": 902,
       "options": {
@@ -1364,6 +1544,440 @@
       ],
       "title": "Last success (age)",
       "type": "stat"
+    },
+    {
+      "type": "row",
+      "title": "AI 判斷引擎健康（LLM triage via 7731）",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 109
+      }
+    },
+    {
+      "type": "stat",
+      "title": "LLM triage 成功率 (5m)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "成功 triage / (成功+失敗)。低於 90% 代表 LLM 端不穩或逾時。",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 110
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(rate(warroom_ai_anomaly_scorer_llm_success_total[5m])) / clamp_min(sum(rate(warroom_ai_anomaly_scorer_llm_success_total[5m])) + sum(rate(warroom_ai_anomaly_scorer_llm_failures_total[5m])), 1e-9)"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.9
+              },
+              {
+                "color": "green",
+                "value": 0.98
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "LLM 端可用性",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "warroom_ai_llm_unavailable：0=可用，1=不可用/逾時/傳輸錯誤。",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 110
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "max(warroom_ai_llm_unavailable)"
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "可用"
+                },
+                "1": {
+                  "color": "red",
+                  "text": "不可用"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "LLM 最近成功 triage (age)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "距離上次成功 LLM triage 的秒數；持續增長代表 triage 卡住。",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 110
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "time() - max(warroom_ai_llm_last_success_timestamp_seconds)"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "目前 triage model",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "從 LLM triage 延遲指標的 model label 取得目前實際使用的模型。",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 110
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "format": "table",
+          "instant": true,
+          "expr": "count by (model) (warroom_ai_llm_request_duration_seconds_count)"
+        }
+      ],
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "name",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^model$/"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {}
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "LLM triage 成功 / 失敗速率",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 115
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(rate(warroom_ai_anomaly_scorer_llm_success_total[5m]))",
+          "legendFormat": "success/s"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "B",
+          "expr": "sum(rate(warroom_ai_anomaly_scorer_llm_failures_total[5m]))",
+          "legendFormat": "failure/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 12
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "LLM triage 延遲 p50/p95 (per model)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "scorer 端量到的單次 triage 端到端延遲；用來定 read timeout。",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 115
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "histogram_quantile(0.50, sum by (le,model) (rate(warroom_ai_llm_request_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{model}} p50"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by (le,model) (rate(warroom_ai_llm_request_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{model}} p95"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 8
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "AI 判定異常告警速率（依嚴重度）",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "warroom_ai_anomaly_alerts_total 依 severity 分組：AI 實際判為異常並送出的告警。",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 122
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (severity) (rate(warroom_ai_anomaly_alerts_total[15m]))",
+          "legendFormat": "{{severity}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 12,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "異常候選 → AI 告警 轉化",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "候選訊號數 vs 經 LLM triage 後實際送出的告警數；差距=AI 過濾掉的雜訊。",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 122
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(rate(warroom_ai_anomaly_candidates_total[15m]))",
+          "legendFormat": "candidates/s"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "refId": "B",
+          "expr": "sum(rate(warroom_ai_anomaly_alerts_total[15m]))",
+          "legendFormat": "alerts/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 8
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
     }
   ],
   "preload": false,
@@ -1387,6 +2001,6 @@
   "timezone": "Asia/Taipei",
   "title": "AI 異常告警與判斷",
   "uid": "thesmart-anomaly-alert-center",
-  "version": 35,
+  "version": 36,
   "weekStart": ""
 }
