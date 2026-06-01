@@ -32,6 +32,18 @@ Warroom 是一個企業內部監控與稽核平台概念驗證。本專案目前
 
 ![A4 正規化 DLP 事件](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_A4.svg)
 
+### A6：AI 異常分析與分流
+
+正規化事件除了進視覺化（A5），也分流給 AI 異常分析（A6）。A6 是兩段式管線：先用確定性規則與 rolling baseline 從事件產生 candidate，再把去識別化證據送 LLM 做 triage 分級與建議，最後把 `ai_anomaly_alert` 推回 Loki 供告警與儀表板使用。
+
+![A6 AI 異常分析與分流](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_A6.svg)
+
+### GRAFCET：端到端狀態流
+
+下圖以 GRAFCET（IEC 60848）描述從初始化、能力偵測、證據蒐集、正規化、AI 異常分析到視覺化的完整狀態流；step 9–11 即 A6 的規則偵測、LLM triage 與告警推送。
+
+![GRAFCET Warroom 狀態流](plans/20260427_warroom_monitoring_platform/miat-compliant/diagram_Main.svg)
+
 ## 核心元件
 
 | 元件 | 位置 | 用途 |
@@ -45,6 +57,7 @@ Warroom 是一個企業內部監控與稽核平台概念驗證。本專案目前
 | Drive enricher | `tools/drive_event_enricher.py` | 透過 SSH stdin 執行 resolver，產生 Drive DLP event |
 | File Station adapter | `tools/file_station_transfer_adapter.py` | 唯讀讀取 File Station transfer DB，產生 download/export event |
 | DLP event collector | `tools/dlp_event_collector.py` | 驗證 normalized event，dry-run 或推送到 Loki |
+| AI anomaly scorer | `services/warroom-ai-anomaly-scorer/` | 每 60s 以 LogQL 查 Loki，跑確定性規則 + rolling baseline 產生 candidate，再送 LLM triage，把 `ai_anomaly_alert` 推回 Loki |
 
 ## 實作方式
 
@@ -102,6 +115,56 @@ Warroom 使用一致的 DLP event JSON。常見 action 包含：
 - `capability_gap`
 
 Loki labels 僅使用 bounded、低敏感度欄位（例如 `source_app`、`source_channel`、`action`、`nas_host`）。檔名、路徑、使用者與 IP 若需要出現在管理畫面，應留在 event payload，不要放入 label。
+
+### 5. AI 異常偵測
+
+Warroom 的 AI 分析**不是「把原始 log 丟給 LLM 找異常」**，而是兩段式管線：確定性規則先做第一線偵測，LLM 只在第二線做分流（triage）。由 `services/warroom-ai-anomaly-scorer/` 每 60 秒執行一輪。
+
+```text
+Loki（正規化 DLP 事件，LogQL 查詢）
+  -> [第一段] 確定性規則 + rolling baseline（Python，無 AI）
+       產生 candidate（已知什麼可疑、為什麼可疑）
+  -> 去重（同 rule + entity 15 分鐘內不重複）
+  -> [第二段] LLM triage（OpenAI-compatible，Qwen）
+       對成立的 candidate 做分級 / 信心度 / 判斷理由 / 建議動作
+  -> push 回 Loki（source_channel=ai_anomaly_alert）
+  -> Grafana Alerting + AI 異常告警儀表板
+```
+
+**設計重點：LLM 是「分流官」，不是第一線偵測者。** 第一段規則先判定事件是否可疑；第二段才把該 candidate 的去識別化證據送 LLM，請它回答：是否真異常、信心度、判斷理由、建議動作、是否需人工複查。prompt 明確禁止 LLM 發明 root cause、禁止建議破壞性或自動阻斷動作。
+
+#### 分析類型（9 種規則）
+
+**A. 閾值規則**（純 LogQL 聚合 + 門檻）
+
+| rule_id | 偵測什麼 | 嚴重度 |
+| --- | --- | --- |
+| `AUTH_FAILURE_SPIKE_V1` | 5 分鐘認證失敗 > 20 次（暴力破解） | high |
+| `AUTH_SUCCESS_AFTER_FAILURE_V1` | 失敗潮後出現成功登入（破解得手徵兆） | high |
+| `NETWORK_CONNECTION_SPIKE_V1` | TCP established > 100（連線異常） | medium |
+| `DOWNLOAD_LARGE_FILE_INGESTED_V1` | File Station 下載 ≥ 100MB（外洩） | medium |
+| `FILE_DELETE_BURST_V1` | 5 分鐘刪檔 > 20 次（破壞 / 掩蓋） | high |
+| `COLLECTOR_ACTIVE_GAP_V1` | 收集器能力缺口（觀測本身失效） | high |
+
+**B. Baseline + GeoIP 規則**（有 24h 學習期）
+
+| rule_id | 偵測什麼 | 嚴重度 |
+| --- | --- | --- |
+| `IP_ANOMALY_NEW_SOURCE_V1` | 成功登入來自 baseline 沒見過的 IP | medium |
+| `IP_ANOMALY_UNEXPECTED_COUNTRY_V1` | 登入解析到非預期 / 黑名單國家 | high |
+
+**C. 快照閾值規則**
+
+| rule_id | 偵測什麼 | 嚴重度 |
+| --- | --- | --- |
+| `IP_HIGH_FREQUENCY_V1` | 單一遠端 IP 併發連線 > 50 | medium |
+
+#### 隱私與安全特色
+
+- **去識別化優先**：送 LLM 前只給規則摘要 + salted hash + ISO 國碼，**原始 IP 永不外送**，也不進 Loki label。
+- **冷啟動抑制**：baseline 有 24h 學習期（`learning` 模式只記錄不告警），避免剛上線就把所有 IP 當異常。
+- **Fail-fast 不猜測**：GeoIP 庫缺失時記 `geoip_capability_gap` 指標並回 `unknown`，不亂猜國家。
+- **不自動阻斷**：AI 只做分級與建議，實際處置交由人工 / Grafana Alerting，不做破壞性回應。
 
 ## 快速開始
 
@@ -214,6 +277,7 @@ python3 tools/file_station_transfer_adapter.py \
 - `warroom-dlp-web-ingress.json`：web ingress 統計
 - `warroom-dlp-terminal-stream.json`：terminal-like DLP event stream
 - `warroom-dlp-file-evidence.json`：Drive/File Station 檔案證據總覽
+- AI 異常告警與判斷：AI 告警總覽（嚴重度、信心度、是否需人工複查）＋ AI 判斷詳情（完整 `llm_reason` 與建議動作），即登入後預設首頁
 
 ## 安全與隱私邊界
 

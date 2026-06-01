@@ -89,8 +89,37 @@
     {
       "id": "A5",
       "title": "視覺化與操作",
-      "description": "在 Grafana 儀表板呈現 web ingress、檔案證據、事件流與 capability gaps。",
+      "description": "在 Grafana 儀表板呈現 web ingress、檔案證據、事件流、AI 異常告警與 capability gaps。",
       "decomposition": null
+    },
+    {
+      "id": "A6",
+      "title": "AI 異常分析與分流",
+      "description": "兩段式管線：先用確定性規則與 rolling baseline 從正規化事件產生 candidate，再把去識別化證據送 LLM 做 triage 分級與建議，最後推回受限 label 的 ai_anomaly_alert 串流。",
+      "decomposition": {
+        "diagram_title": "AI 異常分析與分流 A6",
+        "node_reference": "A6",
+        "activities": [
+          { "id": "A61", "title": "查詢異常候選", "description": "每 60 秒以 LogQL 查詢 Loki 正規化事件，計算視窗聚合與 snapshot。", "decomposition": null },
+          { "id": "A62", "title": "規則與基線偵測", "description": "套用 9 條確定性規則與 rolling baseline（含 GeoIP），產生帶嚴重度的 candidate。", "decomposition": null },
+          { "id": "A63", "title": "LLM 分流判斷", "description": "把去識別化證據送 LLM triage，取得是否異常、信心度、判斷理由與建議動作。", "decomposition": null },
+          { "id": "A64", "title": "推回告警串流", "description": "去重後將 ai_anomaly_alert 以受限 label 推回 Loki，交由 Grafana Alerting 接手。", "decomposition": null }
+        ],
+        "arrows": [
+          { "id": "A6I1", "source": "EXTERNAL", "target": "A61:input", "label": "正規化 DLP 事件串流", "type": "input" },
+          { "id": "A6C1", "source": "EXTERNAL", "target": "A62:control", "label": "baseline 24h 學習期；fail-fast 不猜測", "type": "control" },
+          { "id": "A6C2", "source": "EXTERNAL", "target": "A63:control", "label": "去識別化；僅送 salted hash 與 ISO 國碼，raw IP 永不外送", "type": "control" },
+          { "id": "A6C3", "source": "EXTERNAL", "target": "A64:control", "label": "受限 label；不做自動阻斷或破壞性回應", "type": "control" },
+          { "id": "A6M1", "source": "EXTERNAL", "target": "A61:mechanism", "label": "warroom-ai-anomaly-scorer、LogQL", "type": "mechanism" },
+          { "id": "A6M2", "source": "EXTERNAL", "target": "A62:mechanism", "label": "規則引擎、rolling baseline、GeoIP mmdb", "type": "mechanism" },
+          { "id": "A6M3", "source": "EXTERNAL", "target": "A63:mechanism", "label": "OpenAI-compatible LLM（Qwen via rawbase）", "type": "mechanism" },
+          { "id": "A6M4", "source": "EXTERNAL", "target": "A64:mechanism", "label": "Loki Push API、Grafana Alerting", "type": "mechanism" },
+          { "id": "A6F6162", "source": "A61:output", "target": "A62:input", "label": "視窗聚合與 snapshot", "type": "output" },
+          { "id": "A6F6263", "source": "A62:output", "target": "A63:input", "label": "帶嚴重度的異常 candidate", "type": "output" },
+          { "id": "A6F6364", "source": "A63:output", "target": "A64:input", "label": "LLM triage 判斷與建議", "type": "output" },
+          { "id": "A6O1", "source": "A64:output", "target": "EXTERNAL", "label": "ai_anomaly_alert 告警串流", "type": "output" }
+        ]
+      }
     }
   ],
   "arrows": [
@@ -104,7 +133,10 @@
     { "id": "F12", "source": "A1:output", "target": "A2:input", "label": "可觀測性平面", "type": "output" },
     { "id": "F23", "source": "A2:output", "target": "A3:input", "label": "已核准能力面與缺口", "type": "output" },
     { "id": "F34", "source": "A3:output", "target": "A4:input", "label": "安全原始證據候選集", "type": "output" },
-    { "id": "F45", "source": "A4:output", "target": "A5:input", "label": "正規化 DLP 事件串流", "type": "output" },
-    { "id": "O1", "source": "A5:output", "target": "EXTERNAL", "label": "Warroom Grafana 證據儀表板", "type": "output" }
+    { "id": "C3", "source": "EXTERNAL", "target": "A6:control", "label": "去識別化、fail-fast、不自動阻斷", "type": "control" },
+    { "id": "M3", "source": "EXTERNAL", "target": "A6:mechanism", "label": "warroom-ai-anomaly-scorer、規則+baseline+GeoIP、LLM triage", "type": "mechanism" },
+    { "id": "F46", "source": "A4:output", "target": "A6:input", "label": "正規化 DLP 事件串流", "type": "output" },
+    { "id": "F65", "source": "A6:output", "target": "A5:input", "label": "ai_anomaly_alert 告警串流", "type": "output" },
+    { "id": "O1", "source": "A5:output", "target": "EXTERNAL", "label": "Warroom Grafana 證據與 AI 告警儀表板", "type": "output" }
   ]
 }

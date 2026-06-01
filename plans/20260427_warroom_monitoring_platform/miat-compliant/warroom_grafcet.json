@@ -5,10 +5,14 @@
     "StepType": "initial",
     "StepAction": "Initialize observability runtime from sanitized configuration",
     "LinkInputType": [],
-    "LinkInputNumber": [10],
-    "LinkOutputNumber": [1],
+    "LinkInputNumber": [],
+    "LinkOutputNumber": [
+      1
+    ],
     "LinkOutputType": "track",
-    "Condition": ["docker_compose_config_valid"],
+    "Condition": [
+      "docker_compose_config_valid"
+    ],
     "SubGrafcet": []
   },
   {
@@ -16,11 +20,22 @@
     "ModuleRef": "A2",
     "StepType": "normal",
     "StepAction": "Detect approved NAS monitoring and evidence capabilities",
-    "LinkInputType": [],
-    "LinkInputNumber": [0],
-    "LinkOutputNumber": [2, 7],
+    "LinkInputType": [
+      "or_converge"
+    ],
+    "LinkInputNumber": [
+      0,
+      6
+    ],
+    "LinkOutputNumber": [
+      2,
+      7
+    ],
     "LinkOutputType": "or_diverge",
-    "Condition": ["capability_surface_available", "capability_surface_missing_or_blocked"],
+    "Condition": [
+      "capability_surface_available",
+      "capability_surface_missing_or_blocked"
+    ],
     "SubGrafcet": []
   },
   {
@@ -29,10 +44,18 @@
     "StepType": "normal",
     "StepAction": "Collect metadata-first evidence from nginx, Drive DB, File Station DB, or fixtures",
     "LinkInputType": [],
-    "LinkInputNumber": [1],
-    "LinkOutputNumber": [3, 7],
+    "LinkInputNumber": [
+      1
+    ],
+    "LinkOutputNumber": [
+      3,
+      7
+    ],
     "LinkOutputType": "or_diverge",
-    "Condition": ["evidence_candidate_observed", "evidence_source_unreliable"],
+    "Condition": [
+      "evidence_candidate_observed",
+      "evidence_source_unreliable"
+    ],
     "SubGrafcet": []
   },
   {
@@ -41,10 +64,18 @@
     "StepType": "normal",
     "StepAction": "Normalize evidence into Warroom DLP event payload",
     "LinkInputType": [],
-    "LinkInputNumber": [2],
-    "LinkOutputNumber": [4, 8],
+    "LinkInputNumber": [
+      2
+    ],
+    "LinkOutputNumber": [
+      4,
+      8
+    ],
     "LinkOutputType": "or_diverge",
-    "Condition": ["required_fields_valid_and_labels_bounded", "validation_failed"],
+    "Condition": [
+      "required_fields_valid_and_labels_bounded",
+      "validation_failed"
+    ],
     "SubGrafcet": []
   },
   {
@@ -53,22 +84,39 @@
     "StepType": "normal",
     "StepAction": "Emit dry-run JSONL or push bounded-label stream to Loki",
     "LinkInputType": [],
-    "LinkInputNumber": [3],
-    "LinkOutputNumber": [5, 8],
+    "LinkInputNumber": [
+      3
+    ],
+    "LinkOutputNumber": [
+      9,
+      8
+    ],
     "LinkOutputType": "or_diverge",
-    "Condition": ["collector_emit_success", "collector_emit_failed"],
+    "Condition": [
+      "collector_emit_success",
+      "collector_emit_failed"
+    ],
     "SubGrafcet": []
   },
   {
     "StepNumber": 5,
     "ModuleRef": "A5",
     "StepType": "normal",
-    "StepAction": "Visualize evidence, route activity, file evidence, and capability gaps in Grafana",
-    "LinkInputType": [],
-    "LinkInputNumber": [4],
-    "LinkOutputNumber": [6],
+    "StepAction": "Visualize evidence, route activity, file evidence, AI anomaly alerts, and capability gaps in Grafana",
+    "LinkInputType": [
+      "or_converge"
+    ],
+    "LinkInputNumber": [
+      9,
+      11
+    ],
+    "LinkOutputNumber": [
+      6
+    ],
     "LinkOutputType": "track",
-    "Condition": ["dashboard_queries_return_evidence_or_empty_safe_state"],
+    "Condition": [
+      "dashboard_queries_return_evidence_or_empty_safe_state"
+    ],
     "SubGrafcet": []
   },
   {
@@ -76,11 +124,21 @@
     "ModuleRef": "A5",
     "StepType": "normal",
     "StepAction": "Complete POC evidence cycle and wait for next observation window",
-    "LinkInputType": ["or_converge"],
-    "LinkInputNumber": [5, 7, 8],
-    "LinkOutputNumber": [1],
+    "LinkInputType": [
+      "or_converge"
+    ],
+    "LinkInputNumber": [
+      5,
+      7,
+      8
+    ],
+    "LinkOutputNumber": [
+      1
+    ],
     "LinkOutputType": "track",
-    "Condition": ["next_poll_or_manual_test_requested"],
+    "Condition": [
+      "next_poll_or_manual_test_requested"
+    ],
     "SubGrafcet": []
   },
   {
@@ -88,11 +146,20 @@
     "ModuleRef": "A2",
     "StepType": "normal",
     "StepAction": "Record capability_gap instead of guessing unavailable evidence",
-    "LinkInputType": [],
-    "LinkInputNumber": [1, 2],
-    "LinkOutputNumber": [6],
-    "LinkOutputType": "or_converge",
-    "Condition": ["gap_recorded_with_source_and_reason"],
+    "LinkInputType": [
+      "or_converge"
+    ],
+    "LinkInputNumber": [
+      1,
+      2
+    ],
+    "LinkOutputNumber": [
+      6
+    ],
+    "LinkOutputType": "track",
+    "Condition": [
+      "gap_recorded_with_source_and_reason"
+    ],
     "SubGrafcet": []
   },
   {
@@ -100,11 +167,76 @@
     "ModuleRef": "A4",
     "StepType": "normal",
     "StepAction": "Fail fast with explicit validation error and preserve safe diagnostics",
+    "LinkInputType": [
+      "or_converge"
+    ],
+    "LinkInputNumber": [
+      3,
+      4
+    ],
+    "LinkOutputNumber": [
+      6
+    ],
+    "LinkOutputType": "track",
+    "Condition": [
+      "safe_error_payload_written"
+    ],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 9,
+    "ModuleRef": "A6",
+    "StepType": "normal",
+    "StepAction": "Query normalized events via LogQL and apply deterministic rules plus rolling baseline to produce anomaly candidates",
     "LinkInputType": [],
-    "LinkInputNumber": [3, 4],
-    "LinkOutputNumber": [6],
-    "LinkOutputType": "or_converge",
-    "Condition": ["safe_error_payload_written"],
+    "LinkInputNumber": [
+      4
+    ],
+    "LinkOutputNumber": [
+      10,
+      5
+    ],
+    "LinkOutputType": "or_diverge",
+    "Condition": [
+      "anomaly_candidate_emitted",
+      "no_candidate_safe_state"
+    ],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 10,
+    "ModuleRef": "A6",
+    "StepType": "normal",
+    "StepAction": "Send de-identified evidence to LLM triage for severity, confidence, reason, and recommended actions",
+    "LinkInputType": [],
+    "LinkInputNumber": [
+      9
+    ],
+    "LinkOutputNumber": [
+      11
+    ],
+    "LinkOutputType": "track",
+    "Condition": [
+      "llm_triage_completed_or_timeout_safe"
+    ],
+    "SubGrafcet": []
+  },
+  {
+    "StepNumber": 11,
+    "ModuleRef": "A6",
+    "StepType": "normal",
+    "StepAction": "Deduplicate and push ai_anomaly_alert with bounded labels back to Loki for Grafana Alerting",
+    "LinkInputType": [],
+    "LinkInputNumber": [
+      10
+    ],
+    "LinkOutputNumber": [
+      5
+    ],
+    "LinkOutputType": "track",
+    "Condition": [
+      "alert_pushed_with_bounded_labels"
+    ],
     "SubGrafcet": []
   }
 ]
