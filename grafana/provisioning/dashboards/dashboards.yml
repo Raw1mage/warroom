@@ -13,6 +13,7 @@ providers:
 
   - name: warroom-local
     orgId: 1
+    folder: 利善美智能
     type: file
     disableDeletion: false
     editable: true
@@ -20,7 +21,6 @@ providers:
     updateIntervalSeconds: 30
     options:
       path: /var/lib/grafana/dashboards
-      foldersFromFilesStructure: true
 
   - name: warroom-sunshine
     orgId: 1
